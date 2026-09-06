@@ -2,6 +2,8 @@
 
 This is a proposed investigation, not a claim that any profiler has been installed or validated for this project. The study has two outputs: diagnostic explanations of costs and an experiment on measurement overhead. Headline coverage-performance results come from the unprofiled conditions in the [performance protocol](performance-protocol.md).
 
+For practical instructions on profiling a running game independently of the test harness, use the [application profiling guide](../profiling/application-profiling.md). It covers external resource measurements, Godot script/rendering views, native stacks, memory/I/O, and tracing. The [methods addendum](methods-addendum.md) connects that workflow and the framework-methods survey to this experiment. A local tool/help probe exists, but no application or profiler capture has been validated.
+
 ## Profile at the appropriate layer
 
 | Layer | Candidate mechanism | What to investigate | Interpretation boundary |
@@ -16,6 +18,8 @@ This is a proposed investigation, not a claim that any profiler has been install
 Godot documents that its built-in profiler is disabled by default because profiling is costly; it exposes inclusive and self measurements and does not currently profile C# scripts. This supports measuring observer effects rather than assuming the editor profiler is neutral. [Godot 4.7 profiler documentation](https://docs.godotengine.org/en/4.7/tutorials/scripting/debug/the_profiler.html)
 
 Godot's Tracy integration requires a build configured for Tracy; its documentation also calls for compatible client/server versions and explains capture connection behavior. Pin engine source, compiler, build options, Tracy revision, symbols, and capture mode. Compare the same Tracy-enabled binary with collection inactive and active before attributing costs to recording. A stock-versus-Tracy build comparison measures a separate build effect. [Godot 4.7 Tracy documentation](https://docs.godotengine.org/en/4.7/engine_details/development/profiling/tracy.html)
+
+Godot 4.7 also documents an Android Perfetto workflow with engine and script event categories. The script category has a substantially higher stated cost. It is a useful later event-selection experiment, with device/template/capture settings held constant, and remains separate from the first Linux study. [Godot Perfetto documentation](https://docs.godotengine.org/en/4.7/engine_details/development/profiling/perfetto.html)
 
 Python's documentation cautions that profilers are for locating costs rather than benchmarking, because their overhead can distort comparisons. Use cProfile diagnostically; use unprofiled elapsed measurements to evaluate a proposed harness optimization. py-spy is a separate sampling candidate whose settings and native-stack support must be validated on the actual host. [Python profiling](https://docs.python.org/3/library/profile.html), [py-spy](https://github.com/benfred/py-spy)
 

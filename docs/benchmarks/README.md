@@ -2,6 +2,8 @@
 
 Protocol draft 0.1, 6 September 2026. **Planning only: no benchmark implementation, measured results, or verified collector compatibility is included in this revision.** Numerical settings below are proposed experimental choices, to be calibrated in a labeled pilot and frozen before the main study.
 
+The same-date [methods addendum](methods-addendum.md) refines this draft using a [survey of 14 benchmarking systems](../research/2026-09-06-benchmarking-methods-survey.md). Read the [application profiling guide](../profiling/application-profiling.md) for practical external and Godot-specific capture procedures. These additions precede implementation and main-study data collection.
+
 The first public deliverable should be a reusable benchmark suite and an evidence-backed report about GDScript coverage. It can help users choose existing tools and help maintainers reproduce defects, even if the research concludes that a new collector is unnecessary. Profiling is a first-class investigation: measure application performance, explain collector costs, and test how the benchmark and its profilers affect their own measurements.
 
 ## Questions and deliverables
@@ -25,6 +27,7 @@ The public package comprises a versioned protocol, small readable correctness fi
 | [Performance protocol](performance-protocol.md) | Baselines, workloads, repeated measurements, statistical analysis, and validity. |
 | [Workload catalog](workload-catalog.tsv) | Work amounts, calibration rules, behavioral checks, and intended metrics. |
 | [Profiling protocol](profiling-protocol.md) | Profiling tools, harness diagnostics, observer experiments, and later evidence synthesis. |
+| [Methods addendum](methods-addendum.md) | Changes motivated by framework research and standalone application profiling. |
 | [Experiment matrix](experiment-matrix.tsv) | Bounded experiment families, dependencies, and eligibility conditions. |
 | [Reproducibility contract](reproducibility.md) | Run identities, adapters, artifacts, result states, and machine records. |
 | [Publication plan](publication-plan.md) | Public protocol, evidence release, charts, review, corrections, and decision criteria. |

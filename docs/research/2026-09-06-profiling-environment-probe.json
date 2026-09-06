@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "kind": "environment_probe",
+  "observation_date": "2026-09-06",
+  "repository": "blocktag-games/godot-tooling",
+  "scope": "Executable discovery, Godot help header/flags, selected tool help, and engine file hash. No application, benchmark, profiler capture, or compatibility test was run.",
+  "benchmark_run": false,
+  "application_profiled": false,
+  "tools_installed_by_this_task": false,
+  "path_mapping": "Home directory paths normalized to $USER_HOME; binary hash unchanged.",
+  "godot": {
+    "invoked_name": "godot4.7.1",
+    "version_from_help": "4.7.1.stable.official.a13da4feb",
+    "build_type_from_help": "editor",
+    "resolved_path": "$USER_HOME/.local/opt/godot-4.7.1/Godot_v4.7.1-stable_linux.x86_64",
+    "sha256": "32f8d7596c4b41185512b1c49d69f2da3be018fd784a53e349fa92a98a97bcde",
+    "help_flags_present": [
+      "--path",
+      "--headless",
+      "--quit-after",
+      "--import",
+      "--profiling",
+      "--gpu-profile",
+      "--gpu-validation",
+      "--remote-debug",
+      "--dap-port",
+      "--benchmark",
+      "--benchmark-file"
+    ],
+    "editor_only_flags_in_this_help": [
+      "--import",
+      "--benchmark",
+      "--benchmark-file"
+    ],
+    "capture_support": "not_verified"
+  },
+  "command_availability": {
+    "godot4_7_1": true,
+    "gnu_time": true,
+    "pidstat": true,
+    "strace": true,
+    "python3": true,
+    "perf": false,
+    "hotspot": false,
+    "heaptrack": false,
+    "valgrind": false,
+    "hyperfine": false
+  },
+  "help_checks": [
+    {
+      "argv": [
+        "godot4.7.1",
+        "--help"
+      ],
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "/usr/bin/time",
+        "--help"
+      ],
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "pidstat",
+        "--help"
+      ],
+      "exit_code": 1,
+      "note": "Printed usage/options; this is not a capture failure."
+    },
+    {
+      "argv": [
+        "strace",
+        "-h"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "not_checked": [
+    "GUI capture",
+    "GPU/driver profiling support",
+    "native symbols",
+    "perf permissions/counters",
+    "trace event loss",
+    "Windows/macOS/Android",
+    "application user-data isolation",
+    "reproducible gameplay scenario"
+  ]
+}

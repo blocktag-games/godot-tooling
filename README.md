@@ -19,6 +19,8 @@ The initial research covers GDScript and Godot 4.7, with adjacent C# and native 
 | [Session summary](docs/sessions/2026-09-06-project-kickoff.md) | Kickoff motivation, priorities, findings, and handoff context. |
 | [Tooling survey](docs/research/2026-09-06-godot-tooling-survey.md) | Cited comparison of 31 projects/components and Godot's built-in facilities. |
 | [Comparison inventory](docs/research/2026-09-06-godot-tooling-inventory.tsv) | Licenses, documented compatibility, releases, maintenance evidence, and adoption snapshots. |
+| [Benchmarking methods survey](docs/research/2026-09-06-benchmarking-methods-survey.md) | How 14 testing, mutation, coverage, analysis, and benchmark systems measure performance. |
+| [Application profiling guide](docs/profiling/application-profiling.md) | External resource/CPU measurements and Godot script, rendering, memory, and tracing workflows. |
 | [Benchmark study plan](docs/benchmarks/README.md) | Research questions, correctness/performance/profiling protocols, catalogs, reproduction, and public reporting. |
 | [Implementation plan](docs/benchmarks/implementation-plan.md) | Ordered benchmark work packages, first executable slice, completion evidence, and resource estimates. |
 | [Roadmap](docs/ROADMAP.md) | Project milestones and current status. |
@@ -27,5 +29,7 @@ The initial research covers GDScript and Godot 4.7, with adjacent C# and native 
 The survey and benchmark protocol draft are dated 6 September 2026. They distinguish documentation, selected source inspection, and proposed experiments from runtime verification. Coverage accuracy, performance, profiler overhead, and PyCharm compatibility still need practical evaluation.
 
 The benchmark plan specifies 87 correctness/integration cases, 20 workloads, and 28 experiment families. These are planned catalogs, not implemented tests. Execution starts with a 12-case vertical slice and one adapter before expanding to the full study. Compare gd-tools, Nano Coverage, and godot-code-coverage, with GdUnit4 Coverage as a separately scoped feature comparator.
+
+The [methods addendum](docs/benchmarks/methods-addendum.md) incorporates lessons from the broader ecosystem and separates profiling an application from profiling the benchmark harness. A [local environment probe](docs/research/2026-09-06-profiling-environment-probe.json) records tool availability and engine help/hash checks; application captures and benchmark execution remain pending.
 
 This project uses the [Apache License 2.0](LICENSE). Surveyed tools retain their own licenses.
