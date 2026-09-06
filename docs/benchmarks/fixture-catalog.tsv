@@ -1,0 +1,88 @@
+id	tier	domain	case	requirement	eligibility	oracle_basis	status
+F001	0	population	Never-loaded selected file	Selected source remains accounted for; unknown differs from measured zero	all_supported	Hand-listed file inventory and zero-execution obligations	planned
+F002	0	population	Never-called function	Uncalled function/body remains eligible under the declared contract	all_supported	Reviewed call graph and zero body hits	planned
+F003	1	population	Empty source population	Empty denominator is not automatically 100 percent	all_supported	Explicit empty source manifest	planned
+F004	1	population	Include and exclude rules	Selected application and excluded vendor/test sources are distinguished	all_supported	Independent path selection manifest	planned
+F005	1	population	Loaded dependency outside selection	Dependency execution does not silently broaden or shrink declared scope	all_supported	Known preload graph and selected inventory	planned
+F006	2	population	Same basename in different directories	Distinct original sources do not share counters	all_supported	Two hashes and different expected paths	planned
+F007	2	population	Tracking-limit boundary	Limit and incomplete scope are explicit at below/equal/above boundary	limited_provider	Exact total tracked scripts including runner/add-on scripts	planned
+F008	1	population	Selected file cannot be instrumented	Unmeasured selected file is visible in completeness accounting	all_supported	Known selected file and injected instrumentation rejection	planned
+F009	2	population	Generated source	Generated/original identity and measurement scope remain explicit	dynamic_source_supported	Pinned generator output and mapping contract	planned
+F010	0	lines	Straight-line body	Reached body lines match hand-traced execution	all_supported	Exact values and line obligations	planned
+F011	1	lines	Blank comments and annotations	Nonexecuting text is classified explicitly	all_supported	Reviewed executable-location set	planned
+F012	1	lines	Multiline expression	Continuation lines follow a documented line convention	all_supported	Statement spans and reached-expression obligations	planned
+F013	1	lines	Multiple statements on one line	Line-hit result does not imply every statement executed	syntax_validated	Separate statement obligations and derived line view	planned
+F014	1	lines	Early return	Code after the selected return is not falsely hit	all_supported	Input-to-return trace	planned
+F015	1	lines	Runtime error within an expression	Reaching and completing an expression are distinguished	all_supported	Observed baseline error point and preceding events	planned
+F016	1	lines	Repeated invocation	Hit set remains stable; counts match only a defined event contract	all_supported	Fixed invocation count and expected outputs	planned
+F017	2	lines	Multiline string and source-like text	Text contents are not instrumented as executable GDScript	all_supported	Literal contents and unchanged output	planned
+F018	2	lines	Unicode and CRLF source	Source mapping and behavior survive supported encodings/line endings	platform_supported	Byte hashes and logical location mapping	planned
+F019	2	lines	Assertions and build modes	Eligibility and execution are explicit for each engine build mode	build_supported	Separate debug/release baseline behavior	planned
+F020	0	control_flow	If with both outcomes	Separate runs and union distinguish true/false outcomes	branch_optional	Hand-traced complementary inputs	planned
+F021	0	control_flow	If without explicit else	Implicit untaken/taken continuation is a defined outcome	branch_optional	Decision truth table and original spans	planned
+F022	1	control_flow	Elif chain	Intermediate conditions/outcomes are mapped without invented equivalence	branch_optional	Inputs reaching each arm and no arm	planned
+F023	1	control_flow	Nested decisions	Inner decision does not execute when outer path excludes it	branch_optional	Nested truth table	planned
+F024	1	control_flow	While loop zero/one/many iterations	Loop entry/body/exit semantics and counts are explicit	branch_optional	Fixed iteration counts and termination output	planned
+F025	1	control_flow	For loop zero/one/many elements	Iteration and exhaustion obligations match inputs	branch_optional	Known arrays and iteration event list	planned
+F026	1	control_flow	Break and continue	Skipped statements and exit paths have correct hit states	branch_optional	Per-iteration trace	planned
+F027	1	control_flow	Match and fallback	Reached arms and default behavior are distinguished	branch_optional	Inputs for each arm and fallback	planned
+F028	2	control_flow	Match guards and patterns	Guard evaluation and selected arm follow pinned engine syntax	syntax_validated	Hand-traced guard inputs	planned
+F029	1	control_flow	Conditional expression	Selected expression arm is distinct from whole-line hit	branch_optional	Both values and expression obligations	planned
+F030	1	control_flow	Short-circuit and/or	Unevaluated operand remains distinguishable from false operand	condition_optional	Operand side effects and truth table	planned
+F031	2	control_flow	Compound condition independence	Condition and MC/DC requirements are separate from decision coverage	condition_optional	Explicit independence pairs; no inferred support	planned
+F032	1	language	Static functions	Static entry/calls map to original source	all_supported	Known calls and return values	planned
+F033	1	language	Lambda and Callable	Invocation identity and captured-value behavior are preserved	all_supported	Fixed capture inputs and call counts	planned
+F034	1	language	Inheritance and super	Base/derived method hits and return behavior remain distinct	all_supported	Known dispatch and super-call trace	planned
+F035	1	language	Property getter and setter	Implicit accessor calls and recursion guards retain behavior	all_supported	Read/write sequence and expected values	planned
+F036	1	language	Typed arrays dictionaries and signatures	Supported typed syntax is preserved during instrumentation	syntax_validated	Baseline type/parse validation and results	planned
+F037	1	language	Default arguments	Default-expression and supplied-argument paths follow contract	all_supported	Two invocation forms and observed defaults	planned
+F038	2	language	Class names and nested classes	Class discovery and source/function identity are preserved	syntax_validated	Cross-file instantiation and dispatch trace	planned
+F039	2	language	Recursion and re-entry	Counts and state survive nested invocations	all_supported	Bounded call tree and return result	planned
+F040	0	lifecycle	Autoload initialization	Pre-hook initialization is measured or explicitly out of scope	all_supported	Ordered startup events and collection start boundary	planned
+F041	1	lifecycle	Member and static initialization	Initialization location and timing follow declared collection scope	syntax_validated	Fresh-process initial state and init events	planned
+F042	1	lifecycle	Enter-tree ready and exit-tree callbacks	Lifecycle ordering and reached locations remain correct	scene_supported	Expected callback order for a small tree	planned
+F043	1	lifecycle	Process and physics callbacks	Fixed callback work is accounted for without assuming equal real-time counts	scene_supported	Explicit step counts and final state	planned
+F044	1	lifecycle	Direct and deferred signals	Immediate/deferred delivery and callback hits remain correct	scene_supported	Explicit connections and expected delivered event sequence	planned
+F045	0	lifecycle	Await suspension and resumption	Pre-await execution and post-resumption hits are distinguished	async_supported	Known signal trigger and continuation state	planned
+F046	1	lifecycle	Await never resumes	Unreached continuation is not marked executed	async_supported	Controlled shutdown before trigger	planned
+F047	2	lifecycle	Await with inheritance	Baseline engine regressions are separated from instrumentation regressions	syntax_validated	Pinned minimal derived-class coroutine and baseline output	planned
+F048	1	lifecycle	Deferred calls and queued deletion	Lifecycle work pending at shutdown is explicitly included or excluded	scene_supported	Known queue/drain/exit schedule	planned
+F049	1	lifecycle	Load versus preload	Eager/lazy script initialization and source discovery are explicit	all_supported	Separate fresh-process load scenarios	planned
+F050	2	lifecycle	Script reload and source change	Old/new source identity and collection state do not silently mix	reload_supported	Two source hashes and separate expected records	planned
+F051	2	lifecycle	Tool script in editor	Editor-only execution is separated from game collection	editor_supported	Recorded editor action sequence and source scope	planned
+F052	2	lifecycle	Exit-time callbacks and flush	Final tracked event and completed report boundary are known	scene_supported	Controlled final event and flush evidence	planned
+F053	2	concurrency	Single worker thread	Supported threaded hits match work and completion barrier	thread_supported	Fixed worker calls and joined result	planned
+F054	2	concurrency	Contended counters	Concurrent updates do not silently lose promised event counts	thread_supported	Fixed total work with synchronized start/join	planned
+F055	2	concurrency	Multiple processes and sessions	Isolation holds; merging requires explicit source/run identity	multiprocess_supported	Disjoint outputs and known input unions	planned
+F056	2	concurrency	Timing-sensitive gameplay	Timing perturbation is reported separately from deterministic semantic error	scene_supported	Predeclared invariant and real-time sensitivity scenario	planned
+F060	0	behavior	Deterministic state preservation	Covered and baseline output/state agree	all_supported	Independent final state and event trace	planned
+F061	1	failures	Baseline parse failure	Invalid fixture is not scored as a collector defect	all_supported	Engine diagnostic and failed baseline classification	planned
+F062	0	failures	Injected instrumentation failure	Collection failure cannot become a complete successful measurement	fault_injection_supported	Controlled rejected transformation and diagnostic provenance	planned
+F063	1	failures	Application test failure	Application failure and coverage completeness remain independent	test_runner_supported	Deliberate failing assertion and known executed prefix	planned
+F064	0	failures	Zero requested tests execute	Empty successful process cannot satisfy requested test execution	test_runner_supported	Requested selection and observed zero count	planned
+F065	0	failures	Graceful interrupted run	Partial reports and source restoration follow termination contract	all_supported	Known interruption point and retained artifacts	planned
+F066	1	failures	Forced termination or crash	Partial evidence and next-start recovery are explicit	all_supported	Owned process termination and recovery inspection	planned
+F067	1	failures	Timeout with child processes	Harness terminates/reaps owned work and retains failure outcome	child_process_supported	Synthetic child ownership and final process record	planned
+F068	1	failures	Truncated or malformed report	Parsing failure is not interpreted as zero or complete coverage	report_supported	Known malformed bytes and validator result	planned
+F069	1	failures	Stale report from earlier run	Wrong-run artifacts cannot satisfy a fresh attempt	report_supported	Old artifact plus new isolated run identity	planned
+F070	1	merge	Complementary run merge	Merged hit set equals defined union on identical source	merge_supported	Two known paths and exact source hashes	planned
+F071	0	merge	Source revision mismatch	Incompatible source counters are rejected or separated explicitly	merge_supported	Changed source hash and merge disposition	planned
+F072	1	merge	Duplicate input merge	Duplicate handling follows explicit hit/count semantics	merge_supported	Same run ID twice and expected policy	planned
+F073	2	merge	Different source filters	Merged denominator accounts for distinct selected populations	merge_supported	Two source manifests and defined merged scope	planned
+F074	2	merge	Relocated workspace merge	Logical source identity survives path relocation without collision	merge_supported	Same sources at two roots and verified path map	planned
+F075	1	robustness	Source restoration	Successful and failed runs preserve original fixture sources	all_supported	Before/after hashes and backup inventory	planned
+F076	1	robustness	User-data isolation	Run does not consume another profile or leak its outputs	all_supported	Unique sentinels in separate test profiles	planned
+F077	2	robustness	Read-only or full output target	Write/flush failure produces explicit incomplete result	fault_injection_supported	Disposable constrained destination and recorded error	planned
+F078	2	robustness	Large stdout/stderr volume	No deadlock or unmarked evidence loss under backpressure	all_supported	Known emitted bytes and bounded capture	planned
+F079	2	robustness	Concurrent disk instrumentation	Independent workspaces stay separate; shared target conflict is explicit	disk_mode_supported	Distinct copies plus controlled shared-target conflict	planned
+F080	1	integration	GUT and GdUnit4 parity	Thin drivers invoke identical application behavior	runner_modes_available	Matching input/event traces; timing strata separate	planned
+F081	1	integration	Standalone/manual driver	Coverage is validated independently of an available test framework	manual_supported	Recorded input script or exact manual action log	planned
+F082	2	integration	Original-source breakpoint	Breakpoint binds and stops at the intended user location	debugger_supported	Verified breakpoint response and observed state	planned
+F083	2	integration	Step stack and variables	Instrumented source does not mislead navigation and state inspection	debugger_supported	Step transcript and expected variable/frame values	planned
+F084	2	integration	Await breakpoint resumption	Post-await stop and source location remain useful	debugger_async_supported	Controlled continuation and expected stop	planned
+F085	2	integration	Debug selected failing test	IDE can reach the chosen failure with correct process ownership	ide_runner_supported	Exact IDE/plugin configuration and failure transcript	planned
+F086	2	integration	Coverage gutters and navigation	Displayed original lines agree with normalized/native evidence	ide_coverage_supported	Source/report/IDE location comparison	planned
+F087	2	portability	Path spaces unicode and separators	Launch report paths and mapping survive supported OS path forms	platform_supported	Same hashed source and equivalent path cases	planned
+F088	2	portability	Debug and release export	Export capability and measurement semantics are established separately	export_supported	Pinned templates and standalone exported behavior	planned
+F089	2	portability	Fresh machine installation	Documented pinned setup yields the same small correctness case	platform_available	Installation log and reproduced case artifacts	planned
+F090	2	robustness	Test-order and seed reproducibility	Independent case union survives reversed order and repeated seed	test_runner_supported	Forward/reverse schedules and expected union	planned

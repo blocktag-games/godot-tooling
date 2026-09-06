@@ -1,0 +1,29 @@
+id	family	questions	dependencies	workloads	eligibility	design	completion_evidence	status
+E01	setup	RQ6	BP01;BP05	none	all_candidates	Probe versions dependencies build/license boundaries; no timed downloads	Installation record or scoped unavailable outcome	planned
+E02	correctness	RQ1;RQ2	BP02;BP04	none	tier_0_available	Fresh baseline and covered inputs; three deterministic repeats	Independent oracle and complete run provenance	planned
+E03	correctness	RQ1	BP06	none	tier_1_available	Lines source population language and branch/condition contracts	Native and normalized records with explicit unsupported scope	planned
+E04	lifecycle	RQ1;RQ2	BP06	none	lifecycle_available	Startup async shutdown and reload boundaries	Known event schedule and collection interval	planned
+E05	robustness	RQ2	BP03;BP06	W17	failure_cases_available	Faults timeouts source restoration stale reports and log loss	Owned disposable workspaces; partial outcomes retained	planned
+E06	merging	RQ1;RQ2	BP06	none	merge_available	Complementary duplicate relocated and changed-source inputs	Source-aware union/count contract	planned
+E07	runner_parity	RQ6	BP05;BP06	W11	runner_modes_available	GUT GdUnit4 standalone drivers use identical application inputs	Behavioral trace parity; runner timings remain separate	planned
+E08	calibration	RQ5	BP03;BP08	W00;W02;W17;W18;W19	harness	Known work wait output memory and process controls	Validated clocks scopes capture and independent timing comparison	planned
+E09	performance_pilot	RQ3;RQ5	BP07	W01;W03;W05;W11	open_candidates_available	Two sessions five blocks; B0/B1/C where real	Pilot sizing variance and budget; excluded from main estimates	planned
+E10	primary_performance	RQ3	BP09	W01;W03;W05;W11	open_candidates_eligible	Ten sessions six blocks proposed; randomized matched conditions	Behavior/completeness eligible and unprofiled	planned
+E11	startup	RQ3	BP07;BP09	W14	startup_available	Fresh import versus prepared launch; distinct cache strata	Equivalent prepared state and observed phase boundaries	planned
+E12	scaling	RQ3;RQ4	BP07;BP09	W02;W04;W08;W09	scale_available	Work amount source population and loaded fraction varied separately	Inputs frozen; tracking limits respected and labeled	planned
+E13	concurrency	RQ2;RQ3;RQ4	BP06;BP07	W10	thread_modes_available	Fixed total work versus worker count; separate throughput extension	Joined behavior and validated count semantics	planned
+E14	reporting	RQ3;RQ4	BP07;BP08	W13	report_available	Offline parse normalize render on immutable known reports	Same input/output scope; separate application timing	planned
+E15	script_profile	RQ4	BP08	W03;W05;W11	godot_profiler_available	One profiler configuration plus matched unprofiled control	Capture scope symbols/settings and observer cost recorded	planned
+E16	native_profile	RQ4	BP08	W03;W09;W11	perf_available	Native samples/counters with same binary and workload	Access event availability stack quality and losses checked	planned
+E17	tracy_profile	RQ4;RQ5	BP08	W09;W11	tracy_build_available	Matched build; inactive/active capture; stock build separate	Build flags and connection/buffering behavior established	planned
+E18	harness_profile	RQ4;RQ5	BP08	W00;W01;W13;W17	python_profile_available	cProfile or py-spy separately; child and parent scopes distinguished	Diagnostics followed by unprofiled optimization validation	planned
+E19	observer_pilot	RQ5	BP08	W01;W03;W11	selected_factorial_available	Eight H/C/P conditions; two sessions five blocks proposed	Equivalent child command; all condition outcomes retained	planned
+E20	observer_main	RQ5	BP09	W01;W03;W11	selected_factorial_eligible	Selected combinations only; ten sessions six blocks proposed	Frozen contrasts and session-level uncertainty	planned
+E21	profiler_sensitivity	RQ5	BP08;BP09	W03;W11	sampling_available	Separate sampling-rate/marker-density sweep	Requested/achieved settings and loss known	planned
+E22	developer_integration	RQ6	BP11	W11	ide_debugger_available	Godot/PyCharm launch attach steps failed test and gutters	Exact IDE/plugin build and original-source transcript	planned
+E23	rendered_export	RQ3;RQ6	BP06;BP07	W15;W16	render_export_available	Rendered/debug-export/release-export as separate strata	Template renderer display settings and behavior verified	planned
+E24	feature_comparator	RQ1;RQ2;RQ6	BP05;BP06	W11	gdunit4_coverage_available	Within-limit feature checks plus explicit limit boundary	Matched permitted binaries; no unrestricted scaling claim	planned
+E25	portability	RQ1;RQ2;RQ6	BP12	W01;W11	platform_available	Clean additional OS correctness; optional controlled performance	Named environment; no pooling unlike machines	planned
+E26	real_project	RQ3;RQ6	BP07;BP12	W12	case_study_available	Public reproducible case after core corpus	Pinned assets/license and scenario; limited generalization	planned
+E27	publication_rebuild	RQ6;RQ7	BP13	none	all_artifacts	Fresh environment regenerates tables and figures from archived data	Hashes scheduled-cell accounting and identical derived values	planned
+E28	future_synthesis	RQ5;RQ7	BP13	none	independent_studies_available	Structured evidence table then optional compatible-study synthesis	Study-level independence and estimand compatibility reviewed	planned
