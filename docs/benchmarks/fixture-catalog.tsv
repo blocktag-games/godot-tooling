@@ -1,6 +1,6 @@
 id	tier	domain	case	requirement	eligibility	oracle_basis	status
-F001	0	population	Never-loaded selected file	Selected source remains accounted for; unknown differs from measured zero	all_supported	Hand-listed file inventory and zero-execution obligations	planned
-F002	0	population	Never-called function	Uncalled function/body remains eligible under the declared contract	all_supported	Reviewed call graph and zero body hits	planned
+F001	0	population	Never-loaded selected file	Selected source remains accounted for; unknown differs from measured zero	all_supported	Hand-listed file inventory and zero-execution obligations	fixture-built
+F002	0	population	Never-called function	Uncalled function/body remains eligible under the declared contract	all_supported	Reviewed call graph and zero body hits	fixture-built
 F003	1	population	Empty source population	Empty denominator is not automatically 100 percent	all_supported	Explicit empty source manifest	planned
 F004	1	population	Include and exclude rules	Selected application and excluded vendor/test sources are distinguished	all_supported	Independent path selection manifest	planned
 F005	1	population	Loaded dependency outside selection	Dependency execution does not silently broaden or shrink declared scope	all_supported	Known preload graph and selected inventory	planned
@@ -8,9 +8,9 @@ F006	2	population	Same basename in different directories	Distinct original sourc
 F007	2	population	Tracking-limit boundary	Limit and incomplete scope are explicit at below/equal/above boundary	limited_provider	Exact total tracked scripts including runner/add-on scripts	planned
 F008	0	population	Selected file cannot be instrumented	Unmeasured selected file is visible in completeness accounting	all_supported	Known selected file and injected instrumentation rejection	planned
 F009	2	population	Generated source	Generated/original identity and measurement scope remain explicit	dynamic_source_supported	Pinned generator output and mapping contract	planned
-F010	0	lines	Straight-line body	Reached body lines match hand-traced execution	all_supported	Exact values and line obligations	planned
+F010	0	lines	Straight-line body	Reached body lines match hand-traced execution	all_supported	Exact values and line obligations	fixture-built
 F011	1	lines	Blank comments and annotations	Nonexecuting text is classified explicitly	all_supported	Reviewed executable-location set	planned
-F012	0	lines	Multiline expression	Continuation lines follow a documented line convention	all_supported	Statement spans and reached-expression obligations	planned
+F012	0	lines	Multiline expression	Continuation lines follow a documented line convention	all_supported	Statement spans and reached-expression obligations	fixture-built
 F013	1	lines	Multiple statements on one line	Line-hit result does not imply every statement executed	syntax_validated	Separate statement obligations and derived line view	planned
 F014	1	lines	Early return	Code after the selected return is not falsely hit	all_supported	Input-to-return trace	planned
 F015	1	lines	Runtime error within an expression	Reaching and completing an expression are distinguished	all_supported	Observed baseline error point and preceding events	planned
@@ -18,12 +18,12 @@ F016	1	lines	Repeated invocation	Hit set remains stable; counts match only a def
 F017	2	lines	Multiline string and source-like text	Text contents are not instrumented as executable GDScript	all_supported	Literal contents and unchanged output	planned
 F018	2	lines	Unicode and CRLF source	Source mapping and behavior survive supported encodings/line endings	platform_supported	Byte hashes and logical location mapping	planned
 F019	2	lines	Assertions and build modes	Eligibility and execution are explicit for each engine build mode	build_supported	Separate debug/release baseline behavior	planned
-F020	0	control_flow	If with both outcomes	Separate runs and union distinguish true/false outcomes	branch_optional	Hand-traced complementary inputs	planned
-F021	0	control_flow	If without explicit else	Implicit untaken/taken continuation is a defined outcome	branch_optional	Decision truth table and original spans	planned
+F020	0	control_flow	If with both outcomes	Separate runs and union distinguish true/false outcomes	branch_optional	Hand-traced complementary inputs	fixture-built
+F021	0	control_flow	If without explicit else	Implicit untaken/taken continuation is a defined outcome	branch_optional	Decision truth table and original spans	fixture-built
 F022	1	control_flow	Elif chain	Intermediate conditions/outcomes are mapped without invented equivalence	branch_optional	Inputs reaching each arm and no arm	planned
 F023	1	control_flow	Nested decisions	Inner decision does not execute when outer path excludes it	branch_optional	Nested truth table	planned
 F024	1	control_flow	While loop zero/one/many iterations	Loop entry/body/exit semantics and counts are explicit	branch_optional	Fixed iteration counts and termination output	planned
-F025	0	control_flow	For loop zero/one/many elements	Iteration and exhaustion obligations match inputs	branch_optional	Known arrays and iteration event list	planned
+F025	0	control_flow	For loop zero/one/many elements	Iteration and exhaustion obligations match inputs	branch_optional	Known arrays and iteration event list	fixture-built
 F026	1	control_flow	Break and continue	Skipped statements and exit paths have correct hit states	branch_optional	Per-iteration trace	planned
 F027	1	control_flow	Match and fallback	Reached arms and default behavior are distinguished	branch_optional	Inputs for each arm and fallback	planned
 F028	2	control_flow	Match guards and patterns	Guard evaluation and selected arm follow pinned engine syntax	syntax_validated	Hand-traced guard inputs	planned
@@ -38,13 +38,13 @@ F036	1	language	Typed arrays dictionaries and signatures	Supported typed syntax 
 F037	1	language	Default arguments	Default-expression and supplied-argument paths follow contract	all_supported	Two invocation forms and observed defaults	planned
 F038	2	language	Class names and nested classes	Class discovery and source/function identity are preserved	syntax_validated	Cross-file instantiation and dispatch trace	planned
 F039	2	language	Recursion and re-entry	Counts and state survive nested invocations	all_supported	Bounded call tree and return result	planned
-F040	0	lifecycle	Autoload initialization, ordered before the collector autoload	Pre-hook initialization is measured or explicitly out of scope	all_supported	Ordered startup events and collection start boundary	planned
-F091	0	lifecycle	Autoload initialization, ordered after the collector autoload	Same obligations as F040 with reversed autoload order; a difference between the two exposes an order-dependent blind spot	all_supported	Ordered startup events and collection start boundary, autoload list reversed relative to F040	planned
+F040	0	lifecycle	Autoload initialization, ordered before the collector autoload	Pre-hook initialization is measured or explicitly out of scope	all_supported	Ordered startup events and collection start boundary	fixture-built
+F091	0	lifecycle	Autoload initialization, ordered after the collector autoload	Same obligations as F040 with reversed autoload order; a difference between the two exposes an order-dependent blind spot	all_supported	Ordered startup events and collection start boundary, autoload list reversed relative to F040	fixture-built
 F041	1	lifecycle	Member and static initialization	Initialization location and timing follow declared collection scope	syntax_validated	Fresh-process initial state and init events	planned
 F042	1	lifecycle	Enter-tree ready and exit-tree callbacks	Lifecycle ordering and reached locations remain correct	scene_supported	Expected callback order for a small tree	planned
 F043	1	lifecycle	Process and physics callbacks	Fixed callback work is accounted for without assuming equal real-time counts	scene_supported	Explicit step counts and final state	planned
 F044	1	lifecycle	Direct and deferred signals	Immediate/deferred delivery and callback hits remain correct	scene_supported	Explicit connections and expected delivered event sequence	planned
-F045	0	lifecycle	Await suspension and resumption	Pre-await execution and post-resumption hits are distinguished	async_supported	Known signal trigger and continuation state	planned
+F045	0	lifecycle	Await suspension and resumption	Pre-await execution and post-resumption hits are distinguished	async_supported	Known signal trigger and continuation state	fixture-built
 F046	1	lifecycle	Await never resumes	Unreached continuation is not marked executed	async_supported	Controlled shutdown before trigger	planned
 F047	2	lifecycle	Await with inheritance	Baseline engine regressions are separated from instrumentation regressions	syntax_validated	Pinned minimal derived-class coroutine and baseline output	planned
 F048	1	lifecycle	Deferred calls and queued deletion	Lifecycle work pending at shutdown is explicitly included or excluded	scene_supported	Known queue/drain/exit schedule	planned
@@ -56,7 +56,7 @@ F053	2	concurrency	Single worker thread	Supported threaded hits match work and c
 F054	2	concurrency	Contended counters	Concurrent updates do not silently lose promised event counts	thread_supported	Fixed total work with synchronized start/join	planned
 F055	2	concurrency	Multiple processes and sessions	Isolation holds; merging requires explicit source/run identity	multiprocess_supported	Disjoint outputs and known input unions	planned
 F056	2	concurrency	Timing-sensitive gameplay	Timing perturbation is reported separately from deterministic semantic error	scene_supported	Predeclared invariant and real-time sensitivity scenario	planned
-F060	0	behavior	Deterministic state preservation across script reload	Covered and baseline output/state agree, including state on an instance created before instrumentation reloads its script	all_supported	Independent final state and event trace, with a pre-existing autoload instance carrying mutated state into the reload	planned
+F060	0	behavior	Deterministic state preservation across script reload	Covered and baseline output/state agree, including state on an instance created before instrumentation reloads its script	all_supported	Independent final state and event trace, with a pre-existing autoload instance carrying mutated state into the reload	fixture-built
 F061	1	failures	Baseline parse failure	Invalid fixture is not scored as a collector defect	all_supported	Engine diagnostic and failed baseline classification	planned
 F062	0	failures	Injected instrumentation failure	Collection failure cannot become a complete successful measurement	fault_injection_supported	Controlled rejected transformation and diagnostic provenance	planned
 F063	1	failures	Application test failure	Application failure and coverage completeness remain independent	test_runner_supported	Deliberate failing assertion and known executed prefix	planned

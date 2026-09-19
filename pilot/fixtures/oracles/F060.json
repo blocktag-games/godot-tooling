@@ -1,0 +1,35 @@
+{
+  "id": "F060",
+  "tier": 0,
+  "domain": "behavior",
+  "case": "Deterministic state preservation across script reload",
+  "requirement": "Covered and baseline output/state agree, including state on an instance created before instrumentation reloads its script",
+  "files": [
+    {
+      "path": "cases/f060_reload_state/stateful_autoload.gd",
+      "sha256": "73294a459dfc0c5a76f4f1d99df4304e98b76d0a498fa03bc0bccaf6f472768b",
+      "obligations": [
+        { "line": 10, "kind": "statement", "text": "counter += 1", "expected_hit": true, "expected_count": 1, "phase": "autoload_ready" }
+      ]
+    }
+  ],
+  "inputs": [
+    { "name": "baseline", "driver": "driver_baseline.gd", "steps": ["_ready: counter=1", "counter += 10  -> 11", "counter += 100 -> 111"], "expected_final_counter": 111 },
+    { "name": "covered", "driver": "driver_covered.gd", "steps": ["_ready: counter=1", "counter += 10 -> 11", "script.reload(true)", "counter += 100 -> 111"], "expected_final_counter": 111, "expected_reload_err": 0, "expected_same_instance": true }
+  ],
+  "measured_on_engine": {
+    "godot_build": "4.7.1.stable.official.a13da4feb",
+    "baseline_final_counter": 111,
+    "covered_final_counter": 111,
+    "reload_err": 0,
+    "same_instance": true,
+    "matches_expected": true
+  },
+  "notes": "Isolates gd-tools 0.4.0's own stated mechanism -- Script.reload(true) on an already-running autoload's script, called from coverage.gd's addon _ready() -- from its source-rewriting step, which this fixture does not perform (the script's source is unchanged across the reload call). Result on the pinned Godot 4.7.1 build: reload(true) preserves both object identity (same_instance=true) and mutated instance-variable state (counter carries 11 into the reload and reaches 111 afterward, matching the no-reload baseline exactly) with reload_err=0. This is a real, engine-version-specific finding, not an assumption: it means the reload mechanism itself is sound on this engine build, so if BP04 finds gd-tools mishandling state, the defect is in the source-rewriting/injection step or in something reload(true) does NOT preserve (e.g. running scripts with active coroutines, or non-Node RefCounted instances, which this fixture does not exercise), not in reload(true) itself.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Only tested on a Node-based autoload with plain instance variables. A RefCounted instance holding a live coroutine (interacts with F045/F046) or a Resource with exported properties are separate, unbuilt variants.",
+    "Does not test reload(true) when the on-disk source has actually changed (gd-tools' real use case, since it rewrites the file before reloading). This fixture only shows the reload mechanism preserves state when the source is unchanged; a changed-source variant belongs with the real adapter in BP04."
+  ]
+}

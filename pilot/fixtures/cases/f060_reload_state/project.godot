@@ -1,0 +1,10 @@
+config_version=5
+
+[application]
+
+config/name="f060-reload-state"
+config/features=PackedStringArray("4.7")
+
+[autoload]
+
+StatefulAutoload="*res://stateful_autoload.gd"

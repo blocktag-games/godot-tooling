@@ -1,0 +1,11 @@
+config_version=5
+
+[application]
+
+config/name="f091-autoload-after-collector"
+config/features=PackedStringArray("4.7")
+
+[autoload]
+
+CollectorMarker="*res://collector_marker.gd"
+UserAutoload="*res://user_autoload.gd"

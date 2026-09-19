@@ -1,0 +1,52 @@
+{
+  "id": "F091",
+  "tier": 0,
+  "domain": "lifecycle",
+  "case": "Autoload initialization, ordered after the collector autoload",
+  "requirement": "Same obligations as F040 with reversed autoload order; a difference between the two exposes an order-dependent blind spot",
+  "files": [
+    {
+      "path": "cases/f091_autoload_after_collector/event_log.gd",
+      "sha256": "7d5c79fd7f90c545d0d82002dc0919d0c2bb09241806b5413dee92bb111ae82d",
+      "role": "infrastructure, not a scored obligation"
+    },
+    {
+      "path": "cases/f091_autoload_after_collector/user_autoload.gd",
+      "sha256": "b42f8bfb7692a45986c6a9dc7e16f7ad03fd039814a85c509f05d783ebfdf732",
+      "obligations": [
+        { "line": 9, "kind": "statement", "text": "EventLog.record(...)", "expected_hit": true, "expected_count": 1 }
+      ]
+    },
+    {
+      "path": "cases/f091_autoload_after_collector/collector_marker.gd",
+      "sha256": "969c01b97a9e4fa76bca93e96d7d5167515ab2eeb8e039cb068a3e3f7a1b64fe",
+      "obligations": [
+        { "line": 18, "kind": "statement", "text": "EventLog.record(\"collector_marker_ready\")", "expected_hit": true, "expected_count": 1 },
+        { "line": 19, "kind": "statement", "text": "EventLog.collector_active = true", "expected_hit": true, "expected_count": 1 }
+      ]
+    }
+  ],
+  "inputs": [
+    { "name": "default", "call": "driver.gd (project.godot autoload order: CollectorMarker, UserAutoload -- reversed from F040)" }
+  ],
+  "expected_output": {
+    "printed_lines_in_order": [
+      "collector_marker_ready",
+      "user_ready:collector_active=true"
+    ]
+  },
+  "measured_on_engine": {
+    "godot_build": "4.7.1.stable.official.a13da4feb",
+    "actual_output": [
+      "collector_marker_ready",
+      "user_ready:collector_active=true"
+    ],
+    "matches_expected": true
+  },
+  "notes": "Identical fixture scripts to F040, only the [autoload] section order in project.godot is reversed. Confirmed empirically: with CollectorMarker registered first, UserAutoload's _ready() observes collector_active=true, the opposite of F040's result with the same code. This is the direct proof that gd-tools-style _ready()-activated instrumentation's startup coverage depends entirely on autoload registration order, which is a per-project configuration choice, not a property of the collector alone. Whether a given user's project has their state-initializing autoloads before or after wherever gd-tools inserts its own collector autoload determines whether this fixture's F040 or F091 outcome applies to them.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Same caveat as F040: this models a _ready()-activated collector. If BP04 finds gd-tools actually activates via a pre-run hook script invoked by the GUT test runner rather than pure autoload order, this ordering experiment needs a companion fixture for that activation path instead of assuming it transfers unchanged."
+  ]
+}
