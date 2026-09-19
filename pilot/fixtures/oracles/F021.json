@@ -7,20 +7,32 @@
   "files": [
     {
       "path": "cases/f021_if_without_else/subject.gd",
-      "sha256": "d2525e43b7db6d7310c70fbcdf3da969b97ba69a1939506170621e6c5c68c30a",
-      "obligations": [
-        { "line": 4, "kind": "statement", "text": "var outcome: int = 0", "expected_hit": {"value_gt_0": true, "value_lte_0": true} },
-        { "line": 5, "kind": "decision", "text": "if value > 0:", "branch_outcomes": {"true": {"reached": ["value_gt_0"]}, "false_implicit": {"reached": ["value_lte_0"]}} },
-        { "line": 6, "kind": "statement", "text": "outcome = value", "expected_hit": {"value_gt_0": true, "value_lte_0": false} },
-        { "line": 7, "kind": "statement", "text": "return outcome", "expected_hit": {"value_gt_0": true, "value_lte_0": true} }
-      ]
+      "sha256": "d2525e43b7db6d7310c70fbcdf3da969b97ba69a1939506170621e6c5c68c30a"
     }
   ],
   "inputs": [
-    { "name": "value_gt_0", "call": "subject.gd:run(5)", "expected_result": 5 },
-    { "name": "value_lte_0", "call": "subject.gd:run(-5)", "expected_result": 0 }
+    {
+      "name": "value_gt_0",
+      "call": "subject.gd:run(5)",
+      "expected_result": 5,
+      "obligations": [
+        { "file": "cases/f021_if_without_else/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f021_if_without_else/subject.gd", "line": 6, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f021_if_without_else/subject.gd", "line": 7, "kind": "statement", "expected_hit": true }
+      ]
+    },
+    {
+      "name": "value_lte_0",
+      "call": "subject.gd:run(-5)",
+      "expected_result": 0,
+      "obligations": [
+        { "file": "cases/f021_if_without_else/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f021_if_without_else/subject.gd", "line": 6, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f021_if_without_else/subject.gd", "line": 7, "kind": "statement", "expected_hit": true }
+      ]
+    }
   ],
-  "notes": "There is no else clause, so the false outcome has no line of its own to hit -- it is defined as 'line 6 not reached, execution falls through to line 7.' A provider must treat this as a legitimate, fully-covered false outcome when both inputs are run, not as an uncoverable or ambiguous branch.",
+  "notes": "There is no else clause, so the false outcome has no line of its own to hit -- it is defined as 'line 6 not reached, execution falls through to line 7.' A provider must treat this as a legitimate, fully-covered false outcome when both inputs are run, not as an uncoverable or ambiguous branch. Line 5 (`if value > 0:`) is a decision line, deliberately not listed as a body-line obligation here -- see F020's ambiguities note for why this project's current Obligation schema doesn't yet represent decision/branch points distinctly from statement lines.",
   "author": "godot-tooling-session-2026-09-19",
   "reviewer": null,
   "ambiguities": []

@@ -10,6 +10,8 @@
   },
   "harness_synthetic_control": {
     "note": "Independent of any specific tool, pilot/harness/faults.py provides a generic fault-injection primitive (make_unwritable) so this requirement can be tested against future adapters that use a write-based instrumentation strategy, not just gd-tools' parse-based one.",
+    "check": "cases/f062_injected_instrumentation_failure/check.py",
+    "check_sha256": "2feeca4a4100f4ea50b0f3e453841dddc007d56418095c619bd4a585339af027",
     "mechanism": "chmod a fixture source file to read-only, then attempt to write instrumented content to it",
     "measured": {
       "write_raises": "PermissionError",
@@ -17,7 +19,7 @@
     },
     "harness_requirement": "An adapter wrapper that catches this write failure must report the affected file as failed/excluded in its own structured outcome record (see pilot/harness/comparator.py's missing_files handling), never as a silent success or a false zero."
   },
-  "notes": "This case is intentionally satisfied two ways: by an already-real finding against gd-tools (F008), and by a generic, tool-independent fault-injection primitive in the harness for use against later adapters (Nano Coverage, godot-code-coverage) that may fail via a different mechanism than a second parser. No fixture-specific GDScript files are needed here beyond F008's.",
+  "notes": "This case is intentionally satisfied two ways: by an already-real finding against gd-tools (F008), and by a generic, tool-independent fault-injection primitive in the harness (cases/f062_injected_instrumentation_failure/check.py) for use against later adapters (Nano Coverage, godot-code-coverage) that may fail via a different mechanism than a second parser. No GDScript fixture files are needed here beyond F008's -- check.py exercises pilot/harness/faults.py directly against a throwaway temp file.",
   "author": "godot-tooling-session-2026-09-19",
   "reviewer": null,
   "ambiguities": [

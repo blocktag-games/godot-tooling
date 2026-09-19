@@ -7,22 +7,44 @@
   "files": [
     {
       "path": "cases/f020_if_both_outcomes/subject.gd",
-      "sha256": "568e031677b8eb0d864bfbb3c41a540bbaddb26cf17e37b00519f793b2f77e42",
-      "obligations": [
-        { "line": 4, "kind": "statement", "text": "var outcome: int", "expected_hit": {"value_gt_0": true, "value_lte_0": true} },
-        { "line": 5, "kind": "decision", "text": "if value > 0:", "branch_outcomes": {"true": {"reached": ["value_gt_0"]}, "false": {"reached": ["value_lte_0"]}} },
-        { "line": 6, "kind": "statement", "text": "outcome = 1", "expected_hit": {"value_gt_0": true, "value_lte_0": false} },
-        { "line": 8, "kind": "statement", "text": "outcome = -1", "expected_hit": {"value_gt_0": false, "value_lte_0": true} },
-        { "line": 9, "kind": "statement", "text": "return outcome", "expected_hit": {"value_gt_0": true, "value_lte_0": true} }
-      ]
+      "sha256": "568e031677b8eb0d864bfbb3c41a540bbaddb26cf17e37b00519f793b2f77e42"
     }
   ],
   "inputs": [
-    { "name": "value_gt_0", "call": "subject.gd:run(2)", "expected_result": 1 },
-    { "name": "value_lte_0", "call": "subject.gd:run(-2)", "expected_result": -1 }
+    {
+      "name": "value_gt_0",
+      "call": "subject.gd:run(2)",
+      "expected_result": 1,
+      "obligations": [
+        { "file": "cases/f020_if_both_outcomes/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f020_if_both_outcomes/subject.gd", "line": 6, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f020_if_both_outcomes/subject.gd", "line": 8, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f020_if_both_outcomes/subject.gd", "line": 9, "kind": "statement", "expected_hit": true }
+      ]
+    },
+    {
+      "name": "value_lte_0",
+      "call": "subject.gd:run(-2)",
+      "expected_result": -1,
+      "obligations": [
+        { "file": "cases/f020_if_both_outcomes/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f020_if_both_outcomes/subject.gd", "line": 6, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f020_if_both_outcomes/subject.gd", "line": 8, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f020_if_both_outcomes/subject.gd", "line": 9, "kind": "statement", "expected_hit": true }
+      ]
+    }
   ],
-  "notes": "Neither single run exercises both branch outcomes; the union of the two runs must show both outcomes taken. Line 7 (`else:`) is a non-executable decision keyword, not a body-line obligation.",
+  "notes": "Neither single run exercises both branch outcomes; the union of the two runs (pilot/harness/oracle.py's union_obligations()) must show both outcomes taken. Line 5 (`if value > 0:`) and line 7 (`else:`) are decision/keyword lines, deliberately not listed as body-line obligations here -- see measured_with_gd_tools_0_4_0 below for how a real tool's branch-tracking obligations at those lines were evaluated separately, since branch semantics are a distinct concept from statement-line obligations and use a different comparison in BP04, not this oracle's per-input statement list.",
+  "measured_with_gd_tools_0_4_0": {
+    "godot_build": "4.7.1.stable.official.a13da4feb",
+    "gd_tools_version": "0.4.0",
+    "runs": "pilot/adapter-run/f020_if_both_outcomes/ -- both tests together, true-only, and false-only",
+    "line_obligations_result": "Statement-line obligations above (4, 6, 8, 9) matched correctly across the true-only and false-only runs. Line 4 (`var outcome: int`, no initializer) has NO trackable point in gd-tools' plan at all -- a real completeness gap, not reflected in the obligations above since gd-tools never gets the chance to hit-or-miss a line it doesn't track. See pilot/adapter-run/f020_if_both_outcomes/compare.py for the branch-tracking finding: gd-tools' if_true branch counter fires on every evaluation of the decision (line 5), not on the true outcome specifically, so it reports 100% branch coverage even in the false-only run where the true body (line 6) never executed.",
+    "requirement_met": "statement-line obligations: yes, except gd-tools has no trackable point for line 4 at all. gd-tools' branch-level tracking (a separate concept from these statement obligations): no -- see compare.py."
+  },
   "author": "godot-tooling-session-2026-09-19",
   "reviewer": null,
-  "ambiguities": []
+  "ambiguities": [
+    "This oracle's obligations list only statement-line hits (4, 6, 8, 9), not the decision/branch points at lines 5 and 7 themselves, since this project's Obligation schema (file, line, expected_hit) doesn't yet have a distinct representation for 'this decision's true/false outcome was taken' as opposed to 'this line executed.' BP04's real gd-tools run found and required exactly that distinction (see measured_with_gd_tools_0_4_0) -- a branch-obligation schema extension is unbuilt BP06 work, not retrofitted here to avoid re-introducing a bespoke shape this project just removed."
+  ]
 }

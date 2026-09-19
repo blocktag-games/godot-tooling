@@ -7,21 +7,42 @@
   "files": [
     {
       "path": "cases/f025_for_loop_iteration/subject.gd",
-      "sha256": "67528ab7df191e26b483923075e10867e9825aef4d2daea4cebef9764ab16d38",
-      "obligations": [
-        { "line": 4, "kind": "statement", "text": "var total: int = 0", "expected_hit": {"zero": true, "one": true, "many": true} },
-        { "line": 5, "kind": "decision", "text": "for item in items:", "note": "Loop header; entered once per call regardless of iteration count, including zero iterations." },
-        { "line": 6, "kind": "statement", "text": "total += item", "expected_hit": {"zero": false, "one": true, "many": true}, "expected_count": {"zero": 0, "one": 1, "many": 3} },
-        { "line": 7, "kind": "statement", "text": "return total", "expected_hit": {"zero": true, "one": true, "many": true} }
-      ]
+      "sha256": "67528ab7df191e26b483923075e10867e9825aef4d2daea4cebef9764ab16d38"
     }
   ],
   "inputs": [
-    { "name": "zero", "call": "subject.gd:run([])", "expected_result": 0 },
-    { "name": "one", "call": "subject.gd:run([10])", "expected_result": 10 },
-    { "name": "many", "call": "subject.gd:run([1, 2, 3])", "expected_result": 6 }
+    {
+      "name": "zero",
+      "call": "subject.gd:run([])",
+      "expected_result": 0,
+      "obligations": [
+        { "file": "cases/f025_for_loop_iteration/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f025_for_loop_iteration/subject.gd", "line": 6, "kind": "statement", "expected_hit": false, "expected_count": 0 },
+        { "file": "cases/f025_for_loop_iteration/subject.gd", "line": 7, "kind": "statement", "expected_hit": true }
+      ]
+    },
+    {
+      "name": "one",
+      "call": "subject.gd:run([10])",
+      "expected_result": 10,
+      "obligations": [
+        { "file": "cases/f025_for_loop_iteration/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f025_for_loop_iteration/subject.gd", "line": 6, "kind": "statement", "expected_hit": true, "expected_count": 1 },
+        { "file": "cases/f025_for_loop_iteration/subject.gd", "line": 7, "kind": "statement", "expected_hit": true }
+      ]
+    },
+    {
+      "name": "many",
+      "call": "subject.gd:run([1, 2, 3])",
+      "expected_result": 6,
+      "obligations": [
+        { "file": "cases/f025_for_loop_iteration/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f025_for_loop_iteration/subject.gd", "line": 6, "kind": "statement", "expected_hit": true, "expected_count": 3 },
+        { "file": "cases/f025_for_loop_iteration/subject.gd", "line": 7, "kind": "statement", "expected_hit": true }
+      ]
+    }
   ],
-  "notes": "The zero-iteration case is the implicit-branch check: line 6 is never reached but line 7 still is, proving the loop's zero-body-executions path is distinguished from a crash or early exit. The 'many' case additionally checks that a count contract, if one is claimed, multiplies correctly (3 body executions, not 1).",
+  "notes": "The zero-iteration case is the implicit-branch check: line 6 is never reached but line 7 still is, proving the loop's zero-body-executions path is distinguished from a crash or early exit. The 'many' case additionally checks that a count contract, if one is claimed, multiplies correctly (3 body executions, not 1). Line 5 (`for item in items:`, the loop header) is deliberately not listed as a body-line obligation -- it is entered once per call regardless of iteration count, including zero iterations, which this project's current Obligation schema doesn't yet represent distinctly from a body-line hit.",
   "author": "godot-tooling-session-2026-09-19",
   "reviewer": null,
   "ambiguities": []

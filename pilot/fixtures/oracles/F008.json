@@ -8,21 +8,23 @@
     {
       "path": "cases/f008_cannot_be_instrumented/unparseable.gd",
       "sha256": "45bc0225d68b7ba8f88c3d9669efa96f737b6e128bba8be804897e52f0aeae2c",
-      "note": "UTF-8 file starts with a BOM (bytes EF BB BF) followed by otherwise ordinary GDScript. This is not invalid GDScript -- see engine confirmation below -- it specifically breaks gdtoolkit 4.5.0's Lark-based tokenizer, which gd-tools 0.4.0 uses for its own, separate parse pass.",
-      "obligations": [
-        { "line": 4, "kind": "statement", "text": "return 99", "expected_hit_uninstrumented": true }
-      ]
+      "note": "UTF-8 file starts with a BOM (bytes EF BB BF) followed by otherwise ordinary GDScript. This is not invalid GDScript -- see measured_on_engine below -- it specifically breaks gdtoolkit 4.5.0's Lark-based tokenizer, which gd-tools 0.4.0 uses for its own, separate parse pass."
     },
     {
       "path": "cases/f008_cannot_be_instrumented/normal.gd",
-      "sha256": "2c5b73b27966732f2c3d63df08b10c2e9fcaea3b4075c5bb212e07d924a26fa9",
-      "obligations": [
-        { "line": 4, "kind": "statement", "text": "return 1", "expected_hit_uninstrumented": true }
-      ]
+      "sha256": "2c5b73b27966732f2c3d63df08b10c2e9fcaea3b4075c5bb212e07d924a26fa9"
     }
   ],
   "inputs": [
-    { "name": "default", "call": "driver.gd", "expected_output": ["unparseable_result=99", "normal_result=1"] }
+    {
+      "name": "default",
+      "call": "driver.gd",
+      "expected_output": ["unparseable_result=99", "normal_result=1"],
+      "obligations": [
+        { "file": "cases/f008_cannot_be_instrumented/unparseable.gd", "line": 4, "kind": "statement", "expected_hit": true, "note": "Uninstrumented ground truth only -- gd-tools never reaches the point of scoring this line at all; see measured_with_gd_tools_0_4_0." },
+        { "file": "cases/f008_cannot_be_instrumented/normal.gd", "line": 4, "kind": "statement", "expected_hit": true }
+      ]
+    }
   ],
   "measured_on_engine": {
     "godot_build": "4.7.1.stable.official.a13da4feb",
@@ -42,7 +44,7 @@
   "author": "godot-tooling-session-2026-09-19",
   "reviewer": null,
   "ambiguities": [
-    "Only the plan-generation stage was tested directly (Python API), not the full CLI (`gd-tools coverage report`) end to end through a live GUT test run. It's possible -- though nothing in the reporter source suggests it -- that a later stage surfaces the omission. BP04's full end-to-end run should confirm this doesn't change.",
+    "Only the plan-generation stage was tested directly (Python API), not the full CLI (`gd-tools coverage report`) end to end through a live GUT test run. It's possible -- though nothing in the reporter source suggests it -- that a later stage surfaces the omission. A future full end-to-end run should confirm this doesn't change.",
     "Whether gd-tools' console warning is captured by CI systems that discard stdout/stderr on success is untested; this fixture only establishes that no *artifact* (plan JSON, coverage JSON, HTML/LCOV/Cobertura reports) records the omission, which is the more serious form of the gap regardless of console capture."
   ]
 }

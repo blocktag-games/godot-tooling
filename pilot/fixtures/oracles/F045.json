@@ -7,24 +7,28 @@
   "files": [
     {
       "path": "cases/f045_await_resume/subject.gd",
-      "sha256": "aad86bccbf3bbd59c5befd026a8ca70b3dec29460eb47e8ed6282026ea15bc8b",
-      "obligations": [
-        { "line": 9, "kind": "statement", "text": "log.append(\"before_await\")", "expected_hit": true, "expected_count": 1, "phase": "pre_suspend" },
-        { "line": 10, "kind": "statement", "text": "call_deferred(\"emit_signal\", \"resume_now\")", "expected_hit": true, "expected_count": 1, "phase": "pre_suspend" },
-        { "line": 11, "kind": "await", "text": "await resume_now", "expected_hit": true, "expected_count": 1, "note": "Suspension point. A provider must attribute this line as reached once, at the point of suspension, not skipped or double-counted at resumption." },
-        { "line": 12, "kind": "statement", "text": "log.append(\"after_resume\")", "expected_hit": true, "expected_count": 1, "phase": "post_resume" }
-      ]
+      "sha256": "aad86bccbf3bbd59c5befd026a8ca70b3dec29460eb47e8ed6282026ea15bc8b"
     }
   ],
   "inputs": [
-    { "name": "default", "call": "subject.gd:run()", "expected_result": ["before_await", "after_resume"] }
+    {
+      "name": "default",
+      "call": "subject.gd:run()",
+      "expected_result": ["before_await", "after_resume"],
+      "obligations": [
+        { "file": "cases/f045_await_resume/subject.gd", "line": 9, "kind": "statement", "expected_hit": true, "expected_count": 1, "note": "phase: pre_suspend" },
+        { "file": "cases/f045_await_resume/subject.gd", "line": 10, "kind": "statement", "expected_hit": true, "expected_count": 1, "note": "phase: pre_suspend" },
+        { "file": "cases/f045_await_resume/subject.gd", "line": 11, "kind": "await", "expected_hit": true, "expected_count": 1, "note": "Suspension point. A provider must attribute this line as reached once, at the point of suspension, not skipped or double-counted at resumption." },
+        { "file": "cases/f045_await_resume/subject.gd", "line": 12, "kind": "statement", "expected_hit": true, "expected_count": 1, "note": "phase: post_resume" }
+      ]
+    }
   ],
   "measured_on_engine": {
     "godot_build": "4.7.1.stable.official.a13da4feb",
     "actual_output": "log=[\"before_await\", \"after_resume\"]",
     "matches_expected": true
   },
-  "notes": "Uses a custom signal (resume_now) rather than a scene-tree frame signal (e.g. process_frame), deferred-emitted so the suspend/resume genuinely crosses an idle-frame boundary without needing multi-frame driving logic in the driver. This isolates the core risk -- can a line-injecting collector correctly attribute code before an await, the await statement itself, and code after resumption, without merging or losing any of the three -- without conflating it with scene-tree frame timing. If BP04 finds gd-tools' counter injection behaves differently for a get_tree().process_frame-based await, that is a distinct follow-up fixture, not assumed to be covered by this one.",
+  "notes": "Uses a custom signal (resume_now) rather than a scene-tree frame signal (e.g. process_frame), deferred-emitted so the suspend/resume genuinely crosses an idle-frame boundary without needing multi-frame driving logic in the driver. This isolates the core risk -- can a line-injecting collector correctly attribute code before an await, the await statement itself, and code after resumption, without merging or losing any of the three -- without conflating it with scene-tree frame timing. If BP04/BP05 finds gd-tools' counter injection behaves differently for a get_tree().process_frame-based await, that is a distinct follow-up fixture, not assumed to be covered by this one. Not yet re-run against a real coverage adapter.",
   "author": "godot-tooling-session-2026-09-19",
   "reviewer": null,
   "ambiguities": [

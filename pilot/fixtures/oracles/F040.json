@@ -12,38 +12,31 @@
     },
     {
       "path": "cases/f040_autoload_before_collector/user_autoload.gd",
-      "sha256": "b42f8bfb7692a45986c6a9dc7e16f7ad03fd039814a85c509f05d783ebfdf732",
-      "obligations": [
-        { "line": 9, "kind": "statement", "text": "EventLog.record(...)", "expected_hit": true, "expected_count": 1 }
-      ]
+      "sha256": "b42f8bfb7692a45986c6a9dc7e16f7ad03fd039814a85c509f05d783ebfdf732"
     },
     {
       "path": "cases/f040_autoload_before_collector/collector_marker.gd",
-      "sha256": "969c01b97a9e4fa76bca93e96d7d5167515ab2eeb8e039cb068a3e3f7a1b64fe",
-      "obligations": [
-        { "line": 18, "kind": "statement", "text": "EventLog.record(\"collector_marker_ready\")", "expected_hit": true, "expected_count": 1 },
-        { "line": 19, "kind": "statement", "text": "EventLog.collector_active = true", "expected_hit": true, "expected_count": 1 }
-      ]
+      "sha256": "969c01b97a9e4fa76bca93e96d7d5167515ab2eeb8e039cb068a3e3f7a1b64fe"
     }
   ],
   "inputs": [
-    { "name": "default", "call": "driver.gd (project.godot autoload order: UserAutoload, CollectorMarker)" }
+    {
+      "name": "default",
+      "call": "driver.gd (project.godot autoload order: UserAutoload, CollectorMarker)",
+      "expected_output": ["user_ready:collector_active=false", "collector_marker_ready"],
+      "obligations": [
+        { "file": "cases/f040_autoload_before_collector/user_autoload.gd", "line": 9, "kind": "statement", "expected_hit": true, "expected_count": 1 },
+        { "file": "cases/f040_autoload_before_collector/collector_marker.gd", "line": 18, "kind": "statement", "expected_hit": true, "expected_count": 1 },
+        { "file": "cases/f040_autoload_before_collector/collector_marker.gd", "line": 19, "kind": "statement", "expected_hit": true, "expected_count": 1 }
+      ]
+    }
   ],
-  "expected_output": {
-    "printed_lines_in_order": [
-      "user_ready:collector_active=false",
-      "collector_marker_ready"
-    ]
-  },
   "measured_on_engine": {
     "godot_build": "4.7.1.stable.official.a13da4feb",
-    "actual_output": [
-      "user_ready:collector_active=false",
-      "collector_marker_ready"
-    ],
+    "actual_output": ["user_ready:collector_active=false", "collector_marker_ready"],
     "matches_expected": true
   },
-  "notes": "Ground truth only -- no real coverage tool runs here. CollectorMarker stands in for the one concrete architectural fact read from gd-tools 0.4.0's addons/gd-tools-coverage/coverage.gd: the collector is itself a project autoload and its instrumentation activates from within its own _ready(). This fixture establishes, independent of any specific tool, that when a user autoload is registered BEFORE the collector's autoload in project.godot's [autoload] section, the user autoload's _ready() runs to completion with collector_active still false -- i.e. anything it does at startup is unmeasurable by a _ready()-activated collector, regardless of what that collector's documentation claims about startup coverage. Confirmed empirically on the pinned engine: autoload _ready() notifications are not delivered synchronously during SceneTree._initialize() -- they are queued and only observable once the driver's _process() runs on the first frame. Pairs with F091, which reverses the autoload order.",
+  "notes": "Ground truth only -- no real coverage tool runs here. CollectorMarker stands in for the one concrete architectural fact read from gd-tools 0.4.0's addons/gd-tools-coverage/coverage.gd: the collector is itself a project autoload and its instrumentation activates from within its own _ready(). This fixture establishes, independent of any specific tool, that when a user autoload is registered BEFORE the collector's autoload in project.godot's [autoload] section, the user autoload's _ready() runs to completion with collector_active still false. Confirmed empirically on the pinned engine: autoload _ready() notifications are not delivered synchronously during SceneTree._initialize() -- they are queued and only observable once the driver's _process() runs on the first frame. Pairs with F091, which reverses the autoload order.",
   "author": "godot-tooling-session-2026-09-19",
   "reviewer": null,
   "ambiguities": [],
