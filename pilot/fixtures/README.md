@@ -140,15 +140,14 @@ cd cases/f071_merge_identity && python3 check.py
   `union_obligations()` now mechanically reproduces a finding that previously
   needed hand-written prose. F008/F064/F065/F071 correctly keep their own
   shape -- they test process/artifact behavior, not line hits.
-- Oracles are single-author; no genuine second-reviewer pass (a distinct
-  person re-deriving each oracle from its fixture) has been performed
-  (`"reviewer": null` in each oracle file). Per correctness-protocol.md, that
-  is desirable before public correctness claims. The project owner has
-  directed that the 2026-09-19 external review of this work (which did
-  examine F040/F091/F008/F071/F020 in detail) satisfies the project's review
-  gate for now; that review did not re-derive every oracle line-by-line, so
-  the `reviewer` field is left honestly `null` rather than stamped with a
-  broader claim.
+- An independent review agent performed a genuine second-reviewer pass on all
+  16 oracles on 2026-09-19: re-hashed every referenced file, hand-traced every
+  named input, re-ran every driver/check.py/compare.py, and read gd-tools/GUT
+  source directly. 12 of 16 confirmed clean; 4 real issues found and fixed
+  (F045 was missing an obligation; F060 and F065 had stale/inaccurate
+  mechanism descriptions; F020 mischaracterized one comparison result). Each
+  oracle's `reviewer` field now records specifically what was independently
+  re-derived, per correctness-protocol.md's second-review requirement.
 - All 16 tier-0 oracles (15 cases + F091) are now built (groups 1, 2, and 3).
 - F008/F064/F071 constitute real, reproducible defect findings against the
   pinned tools, ahead of BP04's planned full adapter run — worth surfacing
