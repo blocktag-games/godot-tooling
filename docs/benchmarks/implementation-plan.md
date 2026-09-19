@@ -1,14 +1,14 @@
 # Benchmark implementation roadmap
 
-Status on 19 September 2026: protocol and catalogs drafted; BP01 is closed (see [pilot-environment.md](pilot-environment.md)). BP02 onward have not started. Work packages below are ordered by dependency. Estimates are planning ranges for one active contributor and will be revised after the first runnable slice.
+Status on 19 September 2026: protocol and catalogs drafted; BP01 and BP03 are closed (see [pilot-environment.md](pilot-environment.md) and [../../pilot/harness/](../../pilot/harness/)). BP02 is in progress (groups 1–2 of 3 built, group 3 depends on BP03's now-closed harness). Work packages below are ordered by dependency. Estimates are planning ranges for one active contributor and will be revised after the first runnable slice.
 
 ## Work packages and completion evidence
 
 | ID | Package | Depends on | Completion evidence | Initial effort |
 | --- | --- | --- | --- | --- |
 | BP01 | Freeze pilot scope and environment identity. | This draft | **Closed 2026-09-19.** [pilot-environment.md](pilot-environment.md): Godot 4.7.1 (`a13da4feb`, sha256 pinned), gd-tools-cli 0.4.0 via Pipenv, GUT v9.7.1 pinned (not yet vendored), machine record, pilot schedule, explicit unavailable modes. | 1–2 days |
-| BP02 | Implement the first independent fixtures and oracles. | BP01 | Tier-0 cases compile/run uninstrumented; documented inputs, expected behavior, hashes, reviewed obligations. | 2–4 days |
-| BP03 | Implement minimal orchestration and evidence records. | BP01 | Isolated workspaces, structured outcomes, logs, timeouts, source checks, artifact validation; synthetic failure controls pass; positive controls (a hand-written clean report scores a full match, a no-op null adapter shows zero behavioral difference) also pass, so the harness can't pass by rejecting everything. | 2–4 days |
+| BP02 | Implement the first independent fixtures and oracles. | BP01 | **In progress.** Groups 1–2 (11 of 15 tier-0 cases) built and passing on the pinned engine; see [pilot/fixtures/](../../pilot/fixtures/). Group 3 (F008, F062, F064, F065, F071) depends on BP03. | 2–4 days |
+| BP03 | Implement minimal orchestration and evidence records. | BP01 | **Closed 2026-09-19.** [pilot/harness/](../../pilot/harness/): report comparator, process runner with timeout/marker-termination, fault-injection helpers; 8/8 self-tests pass (synthetic failure controls: false hit, missing hit, missing file, stale source, malformed shape, truncated JSON; positive controls: clean report matches, null adapter shows no behavioral difference). | 2–4 days |
 | BP04 | Add the first coverage adapter. | BP02, BP03 | Baseline and covered runs of the same case; native/normalized reports; exact mismatches; one-command reproduction. | 2–4 days |
 | BP05 | Add remaining candidate modes and parity drivers. | BP04 | Thin GUT/GdUnit4/manual drivers, available configurations installed, unresolved setup limits recorded. | 3–7 days |
 | BP06 | Complete primary correctness corpus. | BP05 | Tier-1 outcomes, source-population checks, failure evidence, minimal reproductions, oracle review record. | 4–8 days |
