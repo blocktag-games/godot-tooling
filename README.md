@@ -24,6 +24,7 @@ The initial research covers GDScript and Godot 4.7, with adjacent C# and native 
 | [Benchmark study plan](docs/benchmarks/README.md) | Research questions, correctness/performance/profiling protocols, catalogs, reproduction, and public reporting. |
 | [Implementation plan](docs/benchmarks/implementation-plan.md) | Ordered benchmark work packages, first executable slice, completion evidence, and resource estimates. |
 | [Roadmap](docs/ROADMAP.md) | Project milestones and current status. |
+| [GUT bugs to report upstream](docs/upstream/gut-bugs.md) | Twelve unfiled defects found reading `bitwes/Gut`'s source as an adapter candidate, tracked for a future small-PR contribution. |
 | [Contributing](CONTRIBUTING.md) | How to contribute research, fixtures, reproducible results, and corrections. |
 
 The survey and benchmark protocol draft are dated 6 September 2026. They distinguish documentation, selected source inspection, and proposed experiments from runtime verification. Coverage accuracy, performance, profiler overhead, and PyCharm compatibility still need practical evaluation.
