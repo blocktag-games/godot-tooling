@@ -23,6 +23,5 @@ print("MARKER_PARTIAL_WRITTEN", flush=True)
 time.sleep(5)  # window for the harness to terminate here
 
 tmp_path.write_text(json.dumps({"status": "complete", "files": ["a.gd", "b.gd"]}))
-final_path.write_text(tmp_path.read_text())
-tmp_path.unlink()
+tmp_path.rename(final_path)  # atomic on POSIX: no window where a partial rename is observable
 print("MARKER_DONE", flush=True)

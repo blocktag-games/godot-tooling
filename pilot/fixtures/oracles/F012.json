@@ -16,13 +16,26 @@
       "call": "subject.gd:run(1, 2, 3)",
       "expected_result": 6,
       "obligations": [
-        { "file": "cases/f012_multiline_expression/subject.gd", "line": 4, "kind": "statement", "expected_hit": true, "expected_count": 1, "note": "Anchor line: obligation covers the whole assignment statement spanning lines 4-8. Lines 5-8 are continuation lines of this same statement and are deliberately NOT listed as separate obligations -- their absence here is the point, not an omission." },
-        { "file": "cases/f012_multiline_expression/subject.gd", "line": 9, "kind": "statement", "expected_hit": true, "expected_count": 1 }
+        {
+          "file": "cases/f012_multiline_expression/subject.gd",
+          "line": 4,
+          "kind": "statement",
+          "expected_hit": true,
+          "expected_count": 1,
+          "note": "Anchor line: obligation covers the whole assignment statement spanning lines 4-8. Lines 5-8 are continuation lines of this same statement and are deliberately NOT listed as separate obligations -- their absence here is the point, not an omission."
+        },
+        {
+          "file": "cases/f012_multiline_expression/subject.gd",
+          "line": 9,
+          "kind": "statement",
+          "expected_hit": true,
+          "expected_count": 1
+        }
       ]
     }
   ],
   "notes": "This fixture's whole point is the line convention, not the arithmetic. Our chosen convention: a multi-line statement is one obligation, anchored to its first physical line (line 4). Lines 5-8 (a, + b, + c, )) are continuation lines of that same statement, not independent obligations -- under this project's oracle schema, a line not listed in any input's obligations is not a trackable obligation at all, which is exactly the right way to express 'these lines are not separate obligations' without a bespoke sentinel value. A provider that instead reports every physical line as hit (5, 6, 7, 8 each individually) is not wrong -- it uses a different, equally defensible convention -- but its result must be explicitly remapped to ours before comparison, never silently treated as a mismatch. This directly probes gd-tools 0.4.0's line-injection approach, since its plan generator walks a separately-parsed (gdtoolkit/Lark) syntax tree rather than the engine's own tree, and continuation lines are a plausible place for that second parser's line attribution to diverge from Godot's own executed-statement notion.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: lines 4-9 and run(1,2,3)=6 confirmed; gd-tools' plan generator was found to track exactly lines 4 and 9 for this file -- the same anchor convention this oracle chose, so the speculated continuation-line divergence does not occur for gd-tools 0.4.0.",
   "ambiguities": []
 }

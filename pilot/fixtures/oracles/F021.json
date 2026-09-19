@@ -16,9 +16,24 @@
       "call": "subject.gd:run(5)",
       "expected_result": 5,
       "obligations": [
-        { "file": "cases/f021_if_without_else/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
-        { "file": "cases/f021_if_without_else/subject.gd", "line": 6, "kind": "statement", "expected_hit": true },
-        { "file": "cases/f021_if_without_else/subject.gd", "line": 7, "kind": "statement", "expected_hit": true }
+        {
+          "file": "cases/f021_if_without_else/subject.gd",
+          "line": 4,
+          "kind": "statement",
+          "expected_hit": true
+        },
+        {
+          "file": "cases/f021_if_without_else/subject.gd",
+          "line": 6,
+          "kind": "statement",
+          "expected_hit": true
+        },
+        {
+          "file": "cases/f021_if_without_else/subject.gd",
+          "line": 7,
+          "kind": "statement",
+          "expected_hit": true
+        }
       ]
     },
     {
@@ -26,14 +41,29 @@
       "call": "subject.gd:run(-5)",
       "expected_result": 0,
       "obligations": [
-        { "file": "cases/f021_if_without_else/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
-        { "file": "cases/f021_if_without_else/subject.gd", "line": 6, "kind": "statement", "expected_hit": false },
-        { "file": "cases/f021_if_without_else/subject.gd", "line": 7, "kind": "statement", "expected_hit": true }
+        {
+          "file": "cases/f021_if_without_else/subject.gd",
+          "line": 4,
+          "kind": "statement",
+          "expected_hit": true
+        },
+        {
+          "file": "cases/f021_if_without_else/subject.gd",
+          "line": 6,
+          "kind": "statement",
+          "expected_hit": false
+        },
+        {
+          "file": "cases/f021_if_without_else/subject.gd",
+          "line": 7,
+          "kind": "statement",
+          "expected_hit": true
+        }
       ]
     }
   ],
   "notes": "There is no else clause, so the false outcome has no line of its own to hit -- it is defined as 'line 6 not reached, execution falls through to line 7.' A provider must treat this as a legitimate, fully-covered false outcome when both inputs are run, not as an uncoverable or ambiguous branch. Line 5 (`if value > 0:`) is a decision line, deliberately not listed as a body-line obligation here -- see F020's ambiguities note for why this project's current Obligation schema doesn't yet represent decision/branch points distinctly from statement lines.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: run(5)=5 and run(-5)=0 hand-traced; lines 4/6/7 confirmed; gd-tools tracks 4, 5(if_true), 6, 7 -- no line-4 gap here since it has an initializer, consistent with F020's finding.",
   "ambiguities": []
 }

@@ -33,7 +33,7 @@
   },
   "notes": "This is a real, verified finding against the actual pinned GUT v9.7.1, not gd-tools -- GUT is the test-runner layer gd-tools' coverage workflow sits on top of, so this gap is inherited by any coverage adapter built on GUT's exit-code contract. The harness requirement this establishes: never gate a 'did tests run' check on process exit code alone; parse either the console for the 'Nothing was run' error or the JUnit/other structured artifact's test count.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-ran both the default and JUnit-artifact inputs after --import: console output, exit code 0, and JUnit tests=\"0\" all reproduce exactly; GutRunner.gd's _handle_quit confirmed to only set a non-zero exit code when get_fail_count() > 0.",
   "ambiguities": [
     "Not tested: whether GUT's -gexit_on_success option or a nonstandard -gselect pattern (matching zero tests within an otherwise-populated, correctly-named set) produces different exit-code behavior than an empty -gdir selection. This fixture covers the directory-selection case only.",
     "gd-tools' own pre_run_hook.gd/post_run_hook.gd wrap GUT's execution for coverage purposes; whether gd-tools' own wrapper adds an independent zero-test check on top of GUT's exit code is untested and belongs in BP04's real adapter run."

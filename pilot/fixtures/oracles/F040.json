@@ -23,22 +23,46 @@
     {
       "name": "default",
       "call": "driver.gd (project.godot autoload order: UserAutoload, CollectorMarker)",
-      "expected_output": ["user_ready:collector_active=false", "collector_marker_ready"],
+      "expected_output": [
+        "user_ready:collector_active=false",
+        "collector_marker_ready"
+      ],
       "obligations": [
-        { "file": "cases/f040_autoload_before_collector/user_autoload.gd", "line": 9, "kind": "statement", "expected_hit": true, "expected_count": 1 },
-        { "file": "cases/f040_autoload_before_collector/collector_marker.gd", "line": 18, "kind": "statement", "expected_hit": true, "expected_count": 1 },
-        { "file": "cases/f040_autoload_before_collector/collector_marker.gd", "line": 19, "kind": "statement", "expected_hit": true, "expected_count": 1 }
+        {
+          "file": "cases/f040_autoload_before_collector/user_autoload.gd",
+          "line": 9,
+          "kind": "statement",
+          "expected_hit": true,
+          "expected_count": 1
+        },
+        {
+          "file": "cases/f040_autoload_before_collector/collector_marker.gd",
+          "line": 18,
+          "kind": "statement",
+          "expected_hit": true,
+          "expected_count": 1
+        },
+        {
+          "file": "cases/f040_autoload_before_collector/collector_marker.gd",
+          "line": 19,
+          "kind": "statement",
+          "expected_hit": true,
+          "expected_count": 1
+        }
       ]
     }
   ],
   "measured_on_engine": {
     "godot_build": "4.7.1.stable.official.a13da4feb",
-    "actual_output": ["user_ready:collector_active=false", "collector_marker_ready"],
+    "actual_output": [
+      "user_ready:collector_active=false",
+      "collector_marker_ready"
+    ],
     "matches_expected": true
   },
   "notes": "Ground truth only -- no real coverage tool runs here. CollectorMarker stands in for the one concrete architectural fact read from gd-tools 0.4.0's addons/gd-tools-coverage/coverage.gd: the collector is itself a project autoload and its instrumentation activates from within its own _ready(). This fixture establishes, independent of any specific tool, that when a user autoload is registered BEFORE the collector's autoload in project.godot's [autoload] section, the user autoload's _ready() runs to completion with collector_active still false. Confirmed empirically on the pinned engine: autoload _ready() notifications are not delivered synchronously during SceneTree._initialize() -- they are queued and only observable once the driver's _process() runs on the first frame. Pairs with F091, which reverses the autoload order.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: engine re-run reproduces user_ready:collector_active=false / collector_marker_ready exactly; autoload order in project.godot confirmed; the 2026-09-19 correction's claims verified directly against coverage.gd (_ready assigns source_code in memory + reload(true); _active stays false until pre_run_hook.gd's set_active(true)).",
   "ambiguities": [],
   "correction_2026-09-19": "The original text here incorrectly claimed gd-tools 'rewrites source files on disk before Godot ever imports the project.' Reading addons/gd-tools-coverage/coverage.gd directly (its own doc comment, plus _ready()/set_active()) shows this is wrong: gd-tools instruments IN MEMORY via Script.reload(true) inside _GDTCoverage's own _ready(), triggered when the GD_TOOLS_COVERAGE_PLAN env var is set -- no disk rewrite. More importantly, instrumentation and counting are two separate steps: _ready() only injects trackers; the tracker stays inactive (_active = false) until GUT's pre_run_hook.gd calls set_active(true). Since GUT's cmdln script only begins running after Godot's engine has already completed its entire native autoload phase, this means counting is gated on GUT's test-run lifecycle, not on any autoload's position -- so EVERY autoload's startup code is unmeasured by gd-tools, regardless of whether it's ordered before or after _GDTCoverage in project.godot's [autoload] list. This is a stronger, more definitive version of what CollectorMarker's ordering model in this fixture was built to test: F040 and F091 correctly demonstrate that Godot's own autoload _ready() ordering is a real, order-dependent fact (confirmed on-engine), but that ordering fact does not, by itself, predict gd-tools' real startup-coverage boundary, which is later than either ordering models. Not yet re-verified with a real gd-tools+GUT run against an autoload-based fixture; that is future BP05 work, not done here."
 }

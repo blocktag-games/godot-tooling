@@ -23,22 +23,47 @@
     {
       "name": "default",
       "call": "driver.gd (project.godot autoload order: CollectorMarker, UserAutoload -- reversed from F040)",
-      "expected_output": ["collector_marker_ready", "user_ready:collector_active=true"],
+      "expected_output": [
+        "collector_marker_ready",
+        "user_ready:collector_active=true"
+      ],
       "obligations": [
-        { "file": "cases/f091_autoload_after_collector/user_autoload.gd", "line": 9, "kind": "statement", "expected_hit": true, "expected_count": 1, "note": "Always executes regardless of ordering; only the printed collector_active VALUE differs from F040, not whether this line runs." },
-        { "file": "cases/f091_autoload_after_collector/collector_marker.gd", "line": 18, "kind": "statement", "expected_hit": true, "expected_count": 1 },
-        { "file": "cases/f091_autoload_after_collector/collector_marker.gd", "line": 19, "kind": "statement", "expected_hit": true, "expected_count": 1 }
+        {
+          "file": "cases/f091_autoload_after_collector/user_autoload.gd",
+          "line": 9,
+          "kind": "statement",
+          "expected_hit": true,
+          "expected_count": 1,
+          "note": "Always executes regardless of ordering; only the printed collector_active VALUE differs from F040, not whether this line runs."
+        },
+        {
+          "file": "cases/f091_autoload_after_collector/collector_marker.gd",
+          "line": 18,
+          "kind": "statement",
+          "expected_hit": true,
+          "expected_count": 1
+        },
+        {
+          "file": "cases/f091_autoload_after_collector/collector_marker.gd",
+          "line": 19,
+          "kind": "statement",
+          "expected_hit": true,
+          "expected_count": 1
+        }
       ]
     }
   ],
   "measured_on_engine": {
     "godot_build": "4.7.1.stable.official.a13da4feb",
-    "actual_output": ["collector_marker_ready", "user_ready:collector_active=true"],
+    "actual_output": [
+      "collector_marker_ready",
+      "user_ready:collector_active=true"
+    ],
     "matches_expected": true
   },
   "notes": "Identical fixture scripts to F040, only the [autoload] section order in project.godot is reversed. Confirmed empirically: with CollectorMarker registered first, UserAutoload's _ready() observes collector_active=true, the opposite of F040's result with the same code. This is a real, confirmed fact about Godot's own autoload ordering, on its own. It is NOT, by itself, a demonstrated fact about gd-tools: see F040.json's 2026-09-19 correction. Reading addons/gd-tools-coverage/coverage.gd directly shows counting only activates via GUT's pre_run_hook.gd calling set_active(true), which fires after Godot's entire native autoload phase (all autoloads, both orderings) has already completed. So both F040's and F091's orderings likely produce the SAME real outcome for gd-tools specifically -- startup code unmeasured either way -- rather than the order-dependent difference this pair of fixtures demonstrates for Godot's own autoload mechanism. This has not been re-verified with a real gd-tools+GUT run against an autoload fixture; that is BP05 work.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: engine re-run reproduces collector_marker_ready / user_ready:collector_active=true exactly; project.godot's reversed autoload order confirmed; fixture .gd files confirmed byte-identical to F040's except project.godot.",
   "ambiguities": [
     "Confirmed by reading source (not yet by a real run): gd-tools activates via GUT's pre-run hook, not via _ready()-ordering as CollectorMarker models. See the 2026-09-19 correction above and in F040.json. A real gd-tools+GUT run against an autoload-based fixture, to check whether F040 and F091 actually converge to the same result, is unbuilt BP05 work."
   ]

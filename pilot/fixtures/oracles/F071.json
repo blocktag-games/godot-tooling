@@ -36,22 +36,34 @@
     }
   ],
   "inputs": [
-    { "name": "default", "call": "check.py -> real gd-tools-cli 0.4.0 `coverage merge` CLI, invoked via .venv/bin/gd-tools" }
+    {
+      "name": "default",
+      "call": "check.py -> real gd-tools-cli 0.4.0 `coverage merge` CLI, invoked via .venv/bin/gd-tools"
+    }
   ],
   "measured_with_gd_tools_0_4_0": {
-    "plan_v1_file_ids": { "0": "res://alpha.gd", "1": "res://beta.gd" },
-    "plan_v2_file_ids": { "0": "res://beta.gd", "1": "res://aardvark.gd" },
+    "plan_v1_file_ids": {
+      "0": "res://alpha.gd",
+      "1": "res://beta.gd"
+    },
+    "plan_v2_file_ids": {
+      "0": "res://beta.gd",
+      "1": "res://aardvark.gd"
+    },
     "merge_command": "gd-tools coverage merge session_v1_coverage.json session_v2_coverage.json --output merged.json",
     "merge_exit_code": 0,
-    "merge_stdout": "Merged 2 file(s) → 2 file(s) in output. Written to: ../merged.json",
+    "merge_stdout": "Merged 2 file(s) \u2192 2 file(s) in output. Written to: ../merged.json",
     "merge_stderr_warning": "WARNING: Coverage addon version file not found. Run `gd-tools init` to deploy the addon. (unrelated to source identity; no mismatch warning of any kind was emitted)",
-    "merged_result": { "file_id_0_hits_line_4": 12, "file_id_1_hits_line_4": 5 },
+    "merged_result": {
+      "file_id_0_hits_line_4": 12,
+      "file_id_1_hits_line_4": 5
+    },
     "finding": "gd-tools' merge_coverage_data (gd_tools/coverage/reporter.py) sums hit counts purely by integer file_id, with no source_hash field anywhere in its raw coverage-data JSON schema at all -- confirmed directly from read_coverage_json's own docstring: 'A path field is NOT required in the coverage data -- path resolution happens at report-generation time via the plan.' Merging session_v1_coverage.json (file_id 0 = alpha.gd, 5 hits) with session_v2_coverage.json (file_id 0 = beta.gd, 7 hits) produces file_id 0: 12 hits -- alpha.gd's and beta.gd's counts blended into one number attributed to whichever file a later report-generation step's plan happens to assign file_id 0. Exit code 0, no warning of any kind referencing source identity, hash, or mismatch.",
     "requirement_met": false
   },
   "notes": "This is a real, reproducible, verified defect against gd-tools-cli 0.4.0, not a synthetic or hypothetical scenario -- run `python3 check.py` to reproduce against the pinned tool. The practical scenario this models: a developer runs tests, gets coverage data, then edits their project (delete one file, add another) before running tests again and merging both sessions' coverage for a combined report -- an ordinary CI/local workflow, not an edge case. Because file discovery order (not path or content) determines file_id, this can happen with an unmodified file too (beta.gd here, whose id shifts purely because alpha.gd was removed ahead of it in discovery order).",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: hashes verified; session JSON contents cross-checked against notes; check.py re-run reproduces plan_v1/plan_v2 file_id assignments and the merged 12/5 blended counts exactly; reporter.py's merge_coverage_data and read_coverage_json's docstring confirmed by direct read; file_discovery.py confirmed to use unsorted os.walk.",
   "ambiguities": [
     "Not tested: whether gd-tools' `coverage report` command (which pairs a coverage-data file with a specific plan) would itself catch a mismatch when file counts differ, only the merge step in isolation. A full BP04 run should check whether report-generation adds any downstream safety net that merge itself lacks.",
     "File discovery order was empirically observed to not be strictly alphabetical (beta.gd sorted before aardvark.gd in project_v2) -- likely OS directory-entry order via Path.glob or os.walk, which is itself non-deterministic across filesystems/platforms in the general case. This makes the practical likelihood of an id collision even less predictable than a naive alphabetical-order assumption would suggest, and is worth its own follow-up fixture."

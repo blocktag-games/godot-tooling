@@ -16,13 +16,26 @@
       "call": "subject.gd:called()",
       "expected_result": 1,
       "obligations": [
-        { "file": "cases/f002_never_called/subject.gd", "line": 4, "kind": "statement", "expected_hit": true, "expected_count": 1, "note": "body of called()" },
-        { "file": "cases/f002_never_called/subject.gd", "line": 7, "kind": "statement", "expected_hit": false, "note": "body of never_called(); declared but never invoked by this or any input" }
+        {
+          "file": "cases/f002_never_called/subject.gd",
+          "line": 4,
+          "kind": "statement",
+          "expected_hit": true,
+          "expected_count": 1,
+          "note": "body of called()"
+        },
+        {
+          "file": "cases/f002_never_called/subject.gd",
+          "line": 7,
+          "kind": "statement",
+          "expected_hit": false,
+          "note": "body of never_called(); declared but never invoked by this or any input"
+        }
       ]
     }
   ],
   "notes": "Function-entry obligation: called() entered exactly once, never_called() entered zero times. Line numbering is one-based; lines 1-3 and 5-6 (extends, blanks, second func signature) are not body-line obligations.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: hashes verified; line 4 (called) and line 7 (never_called) confirmed; gd-tools tracks both lines.",
   "ambiguities": []
 }

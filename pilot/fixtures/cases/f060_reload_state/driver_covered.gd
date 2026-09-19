@@ -4,7 +4,10 @@ extends SceneTree
 ## addons/gd-tools-coverage/coverage.gd does to apply instrumentation to
 ## already-running autoloads without discarding their instances. No
 ## instrumentation is actually injected here -- this isolates the
-## reload(true) mechanism itself from gd-tools' source-rewriting step.
+## reload(true) mechanism itself from gd-tools' actual instrumentation
+## step, which assigns instrumented GDScript text to the script's
+## in-memory source_code property before calling reload(true) -- not a
+## disk rewrite.
 
 var ran := false
 

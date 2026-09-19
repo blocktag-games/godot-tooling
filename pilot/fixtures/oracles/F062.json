@@ -21,7 +21,7 @@
   },
   "notes": "This case is intentionally satisfied two ways: by an already-real finding against gd-tools (F008), and by a generic, tool-independent fault-injection primitive in the harness (cases/f062_injected_instrumentation_failure/check.py) for use against later adapters (Nano Coverage, godot-code-coverage) that may fail via a different mechanism than a second parser. No GDScript fixture files are needed here beyond F008's -- check.py exercises pilot/harness/faults.py directly against a throwaway temp file.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: check.py hash verified and re-run (both checks pass); cross-reference to F008 verified.",
   "ambiguities": [
     "If a future adapter's instrumentation writes to a NEW file rather than overwriting the original (e.g. writing to a build/cache directory), make_unwritable on the source file won't trigger a failure the same way; a make_dir_unwritable variant targeting the adapter's actual output path would be needed then."
   ]

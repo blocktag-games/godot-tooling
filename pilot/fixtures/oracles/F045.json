@@ -19,7 +19,8 @@
         { "file": "cases/f045_await_resume/subject.gd", "line": 9, "kind": "statement", "expected_hit": true, "expected_count": 1, "note": "phase: pre_suspend" },
         { "file": "cases/f045_await_resume/subject.gd", "line": 10, "kind": "statement", "expected_hit": true, "expected_count": 1, "note": "phase: pre_suspend" },
         { "file": "cases/f045_await_resume/subject.gd", "line": 11, "kind": "await", "expected_hit": true, "expected_count": 1, "note": "Suspension point. A provider must attribute this line as reached once, at the point of suspension, not skipped or double-counted at resumption." },
-        { "file": "cases/f045_await_resume/subject.gd", "line": 12, "kind": "statement", "expected_hit": true, "expected_count": 1, "note": "phase: post_resume" }
+        { "file": "cases/f045_await_resume/subject.gd", "line": 12, "kind": "statement", "expected_hit": true, "expected_count": 1, "note": "phase: post_resume" },
+        { "file": "cases/f045_await_resume/subject.gd", "line": 13, "kind": "statement", "expected_hit": true, "expected_count": 1, "note": "phase: post_resume; final statement, found missing by the 2026-09-19 second-reviewer pass" }
       ]
     }
   ],

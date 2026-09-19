@@ -23,14 +23,25 @@
       "call": "loaded.gd:run()",
       "expected_result": 42,
       "obligations": [
-        { "file": "cases/f001_never_loaded/loaded.gd", "line": 4, "kind": "statement", "expected_hit": true },
-        { "file": "cases/f001_never_loaded/unloaded.gd", "line": 4, "kind": "statement", "expected_hit": false, "note": "Declared and plannable (a well-behaved provider discovers it by scanning the project, not just by tracing loads) but never executed by this or any input." }
+        {
+          "file": "cases/f001_never_loaded/loaded.gd",
+          "line": 4,
+          "kind": "statement",
+          "expected_hit": true
+        },
+        {
+          "file": "cases/f001_never_loaded/unloaded.gd",
+          "line": 4,
+          "kind": "statement",
+          "expected_hit": false,
+          "note": "Declared and plannable (a well-behaved provider discovers it by scanning the project, not just by tracing loads) but never executed by this or any input."
+        }
       ]
     }
   ],
   "notes": "unloaded.gd is a real, plannable obligation with expected_hit: false, not an absent one -- a provider that cannot see this file at all (rather than seeing it and reporting zero hits) fails this case differently than one that reports a false zero. Both outcomes must be distinguished in the completeness accounting, per correctness-protocol.md's population/completeness dimensions. Line numbering is one-based; lines 1-3 (extends, blank, func signature) are not body-line obligations under our convention.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: hashes verified; loaded.gd:4=return 42, unloaded.gd:4=return 0 confirmed; gd-tools' own plan generator discovers unloaded.gd (1 trackable point).",
   "ambiguities": [
     "If a candidate declares class_name on a loaded/preloaded script elsewhere in a later fixture, Godot's global class cache may register the class during project import even without any code path loading it. This plain-file variant sidesteps that; a class_name variant is deferred to a later tier."
   ]

@@ -19,30 +19,50 @@
     {
       "name": "default",
       "call": "driver.gd",
-      "expected_output": ["unparseable_result=99", "normal_result=1"],
+      "expected_output": [
+        "unparseable_result=99",
+        "normal_result=1"
+      ],
       "obligations": [
-        { "file": "cases/f008_cannot_be_instrumented/unparseable.gd", "line": 4, "kind": "statement", "expected_hit": true, "note": "Uninstrumented ground truth only -- gd-tools never reaches the point of scoring this line at all; see measured_with_gd_tools_0_4_0." },
-        { "file": "cases/f008_cannot_be_instrumented/normal.gd", "line": 4, "kind": "statement", "expected_hit": true }
+        {
+          "file": "cases/f008_cannot_be_instrumented/unparseable.gd",
+          "line": 4,
+          "kind": "statement",
+          "expected_hit": true,
+          "note": "Uninstrumented ground truth only -- gd-tools never reaches the point of scoring this line at all; see measured_with_gd_tools_0_4_0."
+        },
+        {
+          "file": "cases/f008_cannot_be_instrumented/normal.gd",
+          "line": 4,
+          "kind": "statement",
+          "expected_hit": true
+        }
       ]
     }
   ],
   "measured_on_engine": {
     "godot_build": "4.7.1.stable.official.a13da4feb",
-    "actual_output": ["unparseable_result=99", "normal_result=1"],
+    "actual_output": [
+      "unparseable_result=99",
+      "normal_result=1"
+    ],
     "matches_expected": true,
     "note": "Confirms the BOM-prefixed file is genuinely valid, runnable GDScript on the pinned engine -- the incompatibility is specific to a second-parser tool, not the file itself."
   },
   "measured_with_gd_tools_0_4_0": {
     "call": "gd_tools.coverage.plan_generator.generate_plan(project_root)",
     "stderr": "Warning: Skipping '.../unparseable.gd' -- syntax error prevents coverage parsing.",
-    "resulting_plan_files": ["res://normal.gd", "res://driver.gd"],
+    "resulting_plan_files": [
+      "res://normal.gd",
+      "res://driver.gd"
+    ],
     "unparseable_gd_in_plan": false,
     "finding": "unparseable.gd is completely absent from the resulting CoveragePlan (checked gd_tools.coverage.plan_generator.FilePlan / CoveragePlan dataclass fields directly: no 'skipped', 'excluded', or 'parse_error' field exists anywhere in the plan, report, or any of the HTML/LCOV/Cobertura reporter modules). The only trace of the exclusion is a transient console warning printed during plan generation -- nothing persists to any artifact a report consumer would see. A coverage report generated from this plan could show 100% coverage over the files it knows about while never mentioning that a selected file was silently dropped.",
     "requirement_met": false
   },
   "notes": "This is the highest-confidence real finding from reading gd-tools 0.4.0's source in the original tooling survey: its coverage plan generator parses GDScript with gdtoolkit's Lark parser (a second, independent parser from Godot's own), and on any LarkError, prints a yellow console warning and `continue`s -- dropping the file from the plan with zero durable record. This fixture demonstrates the mechanism is real and reproducible with a legitimate engine-valid file, not a hypothetical. It doubles as the concrete realization of F062 (injected instrumentation failure): the 'injection' here is simply gdtoolkit's own tokenizer limitation, no synthetic fault needed.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: BOM bytes confirmed present; engine driver re-run matches; generate_plan() re-run reproduces the exact Lark warning and the plan's file list; confirmed no skipped/excluded/parse_error field exists anywhere in gd_tools.coverage's dataclasses or reporters.",
   "ambiguities": [
     "Only the plan-generation stage was tested directly (Python API), not the full CLI (`gd-tools coverage report`) end to end through a live GUT test run. It's possible -- though nothing in the reporter source suggests it -- that a later stage surfaces the omission. A future full end-to-end run should confirm this doesn't change.",
     "Whether gd-tools' console warning is captured by CI systems that discard stdout/stderr on success is untested; this fixture only establishes that no *artifact* (plan JSON, coverage JSON, HTML/LCOV/Cobertura reports) records the omission, which is the more serious form of the gap regardless of console capture."

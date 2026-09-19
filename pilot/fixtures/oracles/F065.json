@@ -7,8 +7,8 @@
   "files": [
     {
       "path": "cases/f065_graceful_interruption/subject.py",
-      "sha256": "a1ddcbdc3edb0ffac2048f2a051b0fa0ea01780b603c4739e586aae98be0b9c0",
-      "note": "Synthetic, adapter-agnostic report writer: writes report.json.tmp, prints a marker, sleeps 5s, then only completes and renames to report.json."
+      "sha256": "889fbed8d37efc3c99448f468cae3c18aeecde5468f32665abed4a02831ef4b2",
+      "note": "Synthetic, adapter-agnostic report writer: writes report.json.tmp, prints a marker, sleeps 5s, then completes the temp file and calls Path.rename() to atomically finalize it as report.json. Corrected 2026-09-19: an earlier version wrote the final path's content directly and unlinked the temp file separately (a non-atomic copy, not a rename) despite the oracle already describing 'write-temp-then-rename' -- found by the independent second-reviewer pass. The measured safety property was unaffected either way (termination always happens during the sleep, before either finalization step runs), but the code now actually implements the pattern the oracle claims to model."
     },
     {
       "path": "cases/f065_graceful_interruption/check.py",
@@ -27,7 +27,7 @@
   },
   "notes": "Known interruption point (the MARKER_PARTIAL_WRITTEN print) plus the harness's marker-triggered SIGTERM (pilot/harness/runner.py). This is a synthetic, tool-independent ground truth establishing the correct termination contract -- write-temp-then-rename -- that any adapter (gd-tools, Nano Coverage, godot-code-coverage) should be checked against in BP04/BP05: does the real tool's report-writing step follow this same safe pattern, or can it be caught mid-write leaving a corrupt or falsely-complete report.json in place? This fixture does not itself test any real adapter's writer, only establishes what 'graceful' looks like and that the harness can detect a violation of it.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-ran check.py (all 5 checks pass), and found subject.py didn't actually implement the atomic rename its own description claimed -- corrected in this pass; see the files[] entry's note.",
   "ambiguities": [
     "Only tests SIGTERM (graceful termination request). F066 (forced termination / SIGKILL, which cannot be caught or cleaned up after) is a separate, unbuilt tier-1 case -- a real adapter that only handles SIGTERM safely could still leave a corrupt report under SIGKILL.",
     "This models a Python-based writer (matching gd-tools' CLI reporters). A GDScript-side writer (e.g. gd-tools' addons/gd-tools-coverage/coverage.gd running inside the Godot process) has a different interruption surface -- Godot's own process termination handling -- untested here."

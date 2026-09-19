@@ -3,13 +3,15 @@
 F020 (if with both outcomes) against its oracle
 (pilot/fixtures/oracles/F020.json).
 
-Unlike F010, F020's oracle expresses per-input conditional obligations
-(a decision line's branch_outcomes, not a flat expected_hit bool), so
-this does not reuse pilot/harness/comparator.py's Obligation format
-directly -- it reports the raw plan/coverage evidence and states the
-findings explicitly instead. Three runs are compared, each a real,
-independent `gd-tools test --coverage` invocation (not derived from one
-another):
+F020's oracle now uses pilot/harness/oracle.py's unified schema
+(obligations per named input, no decision/branch_outcomes lines
+listed). This script does not yet load obligations through that schema
+programmatically for the mechanical match/mismatch verdict -- it
+reports the raw plan/coverage evidence and states the branch-tracking
+finding explicitly, since that finding is about branch-counter
+semantics gd-tools' plan doesn't represent as a statement obligation at
+all. Three runs are compared, each a real, independent
+`gd-tools test --coverage` invocation (not derived from one another):
 
   .gd-tools/coverage/  -- both tests in one GUT invocation
                           (test_true_branch + test_false_branch)
@@ -47,7 +49,8 @@ def summarize(label: str, plan: dict, coverage: dict) -> None:
 
 
 def main() -> int:
-    print("Oracle (F020.json) expects obligations on lines 4,5,6,8,9.")
+    print("Oracle (F020.json) expects statement obligations on lines 4, 6, 8, 9")
+    print("(per input; line 5 is the decision itself, not listed as a statement).")
     print("gd-tools' plan tracks only lines 5,6,7,8,9 -- line 4 (`var outcome: int`,")
     print("a bare declaration with no initializer) has NO trackable point at all in")
     print("gd-tools' plan. This is a real, confirmed finding: gd-tools' plan generator")
