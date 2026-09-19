@@ -53,11 +53,19 @@ than subdirectories of the shared `project.godot` above.
 F040/F091 use identical fixture scripts (`event_log.gd`, `user_autoload.gd`,
 `collector_marker.gd`) with only the `[autoload]` order in `project.godot`
 reversed between the two. `CollectorMarker` is a stand-in for a real
-collector's own `_ready()`-activated autoload (modeled on gd-tools 0.4.0's
-`addons/gd-tools-coverage/coverage.gd`), not a real coverage tool. Confirmed
-empirically on the pinned engine: reversing the order flips whether the user
-autoload observes `collector_active=true` or `false` at its own `_ready()` —
-a real, order-dependent startup blind spot, not a hypothetical one.
+collector's own `_ready()`-activated autoload, not a real coverage tool.
+Confirmed empirically on the pinned engine: reversing the order flips whether
+the user autoload observes `collector_active=true` or `false` at its own
+`_ready()` — a real fact about **Godot's own autoload ordering**. This is
+*not* confirmed to be gd-tools' actual behavior: reading
+`addons/gd-tools-coverage/coverage.gd` directly (see the 2026-09-19
+corrections in `oracles/F040.json` and `oracles/F091.json`) shows gd-tools'
+real counting only activates via GUT's pre-run hook, which fires after
+Godot's entire autoload phase completes regardless of ordering — meaning
+F040 and F091 likely converge to the *same* result for the real tool, not
+the order-dependent difference this pair demonstrates for the engine alone.
+A real gd-tools+GUT run against an autoload fixture, to check this, is
+unbuilt BP05 work.
 
 F060 isolates `Script.reload(true)` — the exact mechanism gd-tools 0.4.0 uses
 to instrument an already-running autoload without discarding its instance —

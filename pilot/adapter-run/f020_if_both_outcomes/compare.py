@@ -7,19 +7,19 @@ Unlike F010, F020's oracle expresses per-input conditional obligations
 (a decision line's branch_outcomes, not a flat expected_hit bool), so
 this does not reuse pilot/harness/comparator.py's Obligation format
 directly -- it reports the raw plan/coverage evidence and states the
-findings explicitly instead. Two runs are compared:
+findings explicitly instead. Three runs are compared, each a real,
+independent `gd-tools test --coverage` invocation (not derived from one
+another):
 
-  .gd-tools/coverage/            -- both tests in one GUT invocation
-                                     (test_true_branch + test_false_branch)
-  true_only/.gd-tools/coverage/  -- only test_true_branch_only, a
-                                     controlled follow-up run kept to
-                                     resolve a branch-count ambiguity
-                                     (see findings below; the run itself
-                                     was not preserved as a full project
-                                     to avoid duplicating the ~7MB
-                                     vendored GUT/gd-tools addons twice
-                                     more -- its plan/coverage JSON are
-                                     copied into true_only/ instead)
+  .gd-tools/coverage/  -- both tests in one GUT invocation
+                          (test_true_branch + test_false_branch)
+  true_only/           -- only test_true_branch_only (run(2), true path)
+  false_only/          -- only test_false_branch_only (run(-2), false path)
+
+true_only/ and false_only/ keep only the plan/coverage/lcov JSON, not a
+full duplicate project, to avoid tripling the ~7MB vendored GUT/gd-tools
+addons -- each is independently reproducible from subject.gd with a
+single-test tests/test_subject.gd.
 
 Run: python3 compare.py
 """
@@ -38,12 +38,12 @@ def load(rel: str) -> dict:
 def summarize(label: str, plan: dict, coverage: dict) -> None:
     id_to_line = {e["id"]: (e["line"], e["type"], e.get("branch_type")) for e in plan["files"][0]["lines"]}
     hits = coverage["files"][0]["hits"]
+    hit_ids = {int(k) for k in hits}
     print(f"--- {label} ---")
-    for id_str, count in sorted(hits.items(), key=lambda kv: int(kv[0])):
-        line, kind, branch_type = id_to_line[int(id_str)]
-        print(f"  line {line}: {kind}{f'({branch_type})' if branch_type else ''} hit {count}x")
-    tracked_lines = {line for line, _, _ in id_to_line.values()}
-    print(f"  lines tracked by plan: {sorted(tracked_lines)}")
+    for eid, (line, kind, branch_type) in sorted(id_to_line.items(), key=lambda kv: kv[1][0]):
+        count = hits.get(str(eid), 0)
+        marker = f"hit {count}x" if eid in hit_ids else "NOT HIT (absent from coverage.json)"
+        print(f"  line {line}: {kind}{f'({branch_type})' if branch_type else ''} {marker}")
 
 
 def main() -> int:
@@ -72,20 +72,30 @@ def main() -> int:
 
     plan_true = load("true_only/plan.json")
     cov_true = load("true_only/coverage.json")
-    summarize("true-branch test only (test_true_branch_only)", plan_true, cov_true)
+    summarize("true-branch test only (run(2))", plan_true, cov_true)
     print()
 
-    print("UNRESOLVED FINDING: in the true-branch-only run, the if_true branch (line 5)")
-    print("hits exactly once, and if_false (line 7) is entirely absent from hits (0),")
-    print("both exactly as expected for one call. But in the COMBINED two-test run,")
-    print("if_true reports 2 hits, not the expected 1, while if_false correctly reports 1.")
-    print("Each test function calls Subject.run() exactly once. Per")
-    print("correctness-protocol.md's guidance to 'retain raw counts without asserting")
-    print("count accuracy' when a count contract is unestablished: this is reported as")
-    print("an open discrepancy, not a confirmed bug -- root cause (GUT test-ordering,")
-    print("a double-dispatch during coverage instrumentation, or something specific to")
-    print("running multiple test functions in one file) is uninvestigated and belongs")
-    print("in BP05/BP06's fuller branch-semantics work, not this first adapter slice.")
+    plan_false = load("false_only/plan.json")
+    cov_false = load("false_only/coverage.json")
+    summarize("false-branch test only (run(-2))", plan_false, cov_false)
+    print()
+
+    print("CONFIRMED FINDING: gd-tools' if_true and if_false branch trackers have")
+    print("asymmetric placement semantics, verified directly from")
+    print("addons/gd-tools-coverage/coverage.gd's _inject_trackers(): entries with")
+    print("branch_type in {if_false, elif_true, match_case} are injected AFTER their")
+    print("line, inside the branch body, so they only fire when that body actually")
+    print("executes. if_true falls through to the function's `else` clause and is")
+    print("injected BEFORE the `if` line itself -- so it fires on every evaluation of")
+    print("the decision, regardless of which outcome is taken.")
+    print()
+    print("The false-branch-only run (run(-2) alone, never taking the true path) is the")
+    print("proof: line 6 (the true-branch body, `outcome = 1`) is NOT HIT, correctly,")
+    print("but gd-tools' own coverage.info still reports BRDA:5,0,0,1 and BRF:2 BRH:2 --")
+    print("100% branch coverage, with the true branch's body never having executed.")
+    print("gd-tools' branch-coverage percentage is therefore not a reliable signal that")
+    print("both outcomes of an if/else were actually exercised: it can be satisfied by")
+    print("merely reaching the decision, for the true-branch side specifically.")
     return 0
 
 

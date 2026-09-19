@@ -39,13 +39,13 @@ This is deliberately unglamorous: the first real end-to-end run should be
 boring when the tool is behaving. It establishes that the baseline-to-report
 pipeline itself works before layering in the more contested cases.
 
-## F020 (if with both outcomes) -- two real findings, one open question
+## F020 (if with both outcomes) -- three real findings
 
 ```sh
 cd f020_if_both_outcomes && python3 compare.py
 ```
 
-Result: **not a clean match against the oracle**, for a specific, identified reason:
+Result: **not a clean match against the oracle**, for three specific, confirmed reasons:
 
 1. **`var outcome: int` (line 4, no initializer) has no trackable point in
    gd-tools' plan at all.** It's not marked unhit -- it's simply absent from the
@@ -58,29 +58,43 @@ Result: **not a clean match against the oracle**, for a specific, identified rea
    are not the same line, and comparing them naively would produce a false
    mismatch -- exactly the cross-tool branch-identity risk
    `correctness-protocol.md` warns about.
-3. **Open, unresolved branch-count anomaly.** Running only `test_true_branch_only`
-   (one call, true outcome) gives the correct count: if_true hit 1x, if_false
-   absent (0x). Running both `test_true_branch` and `test_false_branch` in one
-   GUT invocation gives if_true hit **2x**, not the expected 1x, while if_false
-   still correctly shows 1x. Each test calls `Subject.run()` exactly once. Root
-   cause is not identified -- this is reported as an open discrepancy per
-   `correctness-protocol.md`'s instruction to retain raw counts rather than
-   assert count accuracy when a count contract isn't established, not asserted
-   as a confirmed defect.
+3. **gd-tools' `if_true` and `if_false` branch counters have asymmetric,
+   incompatible semantics -- confirmed by three independent runs (both tests
+   together, true-only, false-only; see `false_only/` and `true_only/`) and by
+   reading `addons/gd-tools-coverage/coverage.gd`'s `_inject_trackers()` directly.**
+   `if_false`/`elif_true`/`match_case` trackers are injected *inside* the branch
+   body, so they only fire when that body actually executes -- correct. `if_true`
+   falls through to the function's `else` clause in that same code and is
+   injected *before* the `if` line itself, so it fires on every evaluation of the
+   decision regardless of outcome. The false-branch-only run proves the practical
+   consequence: with `run(-2)` as the only call, line 6 (the true-branch body) is
+   never hit, but gd-tools' own `coverage.info` still reports `BRDA:5,0,0,1` and
+   `BRF:2 BRH:2` -- **100% branch coverage while the true branch's body never
+   executed.** gd-tools' branch percentage is not a reliable signal that both
+   outcomes of an `if`/`else` were exercised; it can be satisfied on the
+   `if_true` side by merely reaching the decision.
 
 ## What this does and doesn't establish
 
-- Confirms F008's and F071's source-reading-based predictions transfer to a real
-  end-to-end `gd-tools test --coverage` invocation (not just direct calls into
-  gd-tools' Python API, which is what F008/F071's fixtures used).
-- Line coverage on a no-branch case (F010) is accurate.
+- Line coverage on a no-branch case (F010) is accurate, including the source
+  hash recorded in `plan.json`.
 - Branch coverage exists (contradicting nothing from the earlier survey, which
-  only flagged branch coverage as *unverified*, not absent) but has at least one
-  completeness gap (uninitialized declarations) and one open count anomaly that
-  need dedicated investigation before trusting branch percentages at face value.
+  only flagged branch coverage as *unverified*, not absent), but its `if_true`
+  counter does not mean what a user would reasonably assume it means, and there
+  is a separate, confirmed completeness gap for uninitialized declarations.
+- Does **not** confirm F008's or F071's findings transfer to a full
+  `gd-tools test --coverage` invocation -- F008 and F071 were tested through
+  gd-tools' Python API (`generate_plan()`) and its `merge` CLI directly, not
+  through an end-to-end test run. That remains a real but separate finding,
+  not re-verified here.
 - Does **not** re-run F040/F091/F045/F060's real-adapter equivalents (autoload
   timing, await, reload-with-real-instrumentation) -- those remain source-read
-  predictions pending their own BP04/BP05-style real runs.
+  predictions pending their own BP04/BP05-style real runs. Note also that
+  `pilot/fixtures/oracles/F040.json`'s claim that gd-tools "rewrites source files
+  on disk before Godot ever imports the project" is itself unverified against the
+  real tool and contradicts `coverage.gd`'s own doc comment, which describes
+  in-memory `reload(true)` instrumentation, not a disk rewrite -- flagged as an
+  open correction, not yet fixed in that oracle.
 - Does **not** constitute the full tier-0 or tier-1 corpus run -- per
   `implementation-plan.md`, "the first usable contribution is BP04, not
   completion of every catalog case."
