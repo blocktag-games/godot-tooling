@@ -30,7 +30,7 @@ The initial research covers GDScript and Godot 4.7, with adjacent C# and native 
 
 The survey and benchmark protocol draft are dated 6 September 2026. They distinguish documentation, selected source inspection, and proposed experiments from runtime verification. Coverage accuracy, performance, profiler overhead, and PyCharm compatibility still need practical evaluation.
 
-The benchmark plan specifies 87 correctness/integration cases, 20 workloads, and 28 experiment families. These are planned catalogs, not implemented tests. Execution starts with a 12-case vertical slice and one adapter before expanding to the full study. Compare gd-tools, Nano Coverage, and godot-code-coverage, with GdUnit4 Coverage as a separately scoped feature comparator.
+The benchmark plan specifies 88 correctness/integration cases, 20 workloads, and 28 experiment families. These are planned catalogs, not implemented tests. Execution starts with a 15-case vertical slice and one adapter before expanding to the full study. Compare gd-tools, Nano Coverage, and godot-code-coverage, with GdUnit4 Coverage as a separately scoped feature comparator.
 
 The [methods addendum](docs/benchmarks/methods-addendum.md) incorporates lessons from the broader ecosystem and separates profiling an application from profiling the benchmark harness. A [local environment probe](docs/research/2026-09-06-profiling-environment-probe.json) records tool availability and engine help/hash checks; application captures and benchmark execution remain pending.
 

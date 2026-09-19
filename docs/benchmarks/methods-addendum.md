@@ -2,7 +2,7 @@
 
 Draft addendum dated 6 September 2026. This records refinements prompted by the [14-project methods survey](../research/2026-09-06-benchmarking-methods-survey.md) and [application profiling guide](../profiling/application-profiling.md). The initial protocol has not been frozen or executed, so these are design changes made before observing study results.
 
-The existing 87-case, 20-workload, 28-family catalogs remain planning inventories. This addendum refines how to implement them; it does not claim that extra executable fixtures or a benchmark harness now exist. Any additional workload rows need explicit IDs and a catalog update before scheduling.
+The existing 88-case, 20-workload, 28-family catalogs remain planning inventories. This addendum refines how to implement them; it does not claim that extra executable fixtures or a benchmark harness now exist. Any additional workload rows need explicit IDs and a catalog update before scheduling.
 
 ## Requirements to incorporate before the pilot
 
