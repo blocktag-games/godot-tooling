@@ -105,7 +105,7 @@ them. Three produced real, reproducible defect findings, not synthetic ones:
 | ID | Case | Directory | Real finding |
 | --- | --- | --- | --- |
 | F008 | Selected file cannot be instrumented | `cases/f008_cannot_be_instrumented/` | A UTF-8 BOM-prefixed `.gd` file is valid, runnable GDScript on Godot 4.7.1, but gd-tools' gdtoolkit-based parser rejects it and **silently drops it from the coverage plan** — no field anywhere in the plan/report schema records the omission, only a transient console warning. |
-| F062 | Injected instrumentation failure | (uses F008 as its real-tool realization; also self-tests `pilot/harness/faults.py`'s generic fault injection) | Reuses F008's finding as its concrete case; also proves the harness's own `make_unwritable` fault-injection primitive works, for future tool-independent use. |
+| F062 | Injected instrumentation failure | `cases/f062_injected_instrumentation_failure/` (uses F008 as its real-tool realization; check.py self-tests `pilot/harness/faults.py`'s generic fault injection) | Reuses F008's finding as its concrete case; check.py commits and reproduces the harness's own `make_unwritable` fault-injection primitive, for future tool-independent use. |
 | F064 | Zero requested tests execute | `cases/f064_zero_requested_tests/` | Real GUT v9.7.1: correctly logs `[GUT ERROR]: Nothing was run.` and records `tests="0"` in JUnit XML output, but the **process exit code is still 0** — a CI pipeline gating on exit code alone would treat this as a passing build. |
 | F065 | Graceful interrupted run | `cases/f065_graceful_interruption/` | Synthetic, tool-independent: proves the harness's marker-triggered SIGTERM (`pilot/harness/runner.py`) correctly interrupts a write-temp-then-rename report writer with no finished-looking artifact leaking. Establishes the termination contract real adapters should be checked against later. |
 | F071 | Source revision mismatch | `cases/f071_merge_identity/` | Real gd-tools-cli 0.4.0: `coverage merge` sums hit counts purely by integer `file_id`. Its raw coverage-data JSON schema carries **no path or source hash at all** (confirmed from the tool's own docstring). Two sessions where file discovery order assigns the same `file_id` to two different files merge silently into one blended, meaningless count — exit code 0, no warning. |
@@ -122,6 +122,9 @@ cd cases/f064_zero_requested_tests
 ../../../godot/Godot_v4.7.1-stable_linux.x86_64 --headless --path . --import
 ../../../godot/Godot_v4.7.1-stable_linux.x86_64 --headless --path . -s addons/gut/gut_cmdln.gd -gdir=res://tests -gexit
 
+# F062: harness fault-injection primitive (pure Python, stdlib only)
+cd cases/f062_injected_instrumentation_failure && python3 check.py
+
 # F065: harness marker-kill (pure Python, stdlib only)
 cd cases/f065_graceful_interruption && python3 check.py
 
@@ -131,10 +134,22 @@ cd cases/f071_merge_identity && python3 check.py
 
 ## Status and open items
 
-- Oracles are single-author, not yet second-reviewed (`"reviewer": null` in
-  each oracle file). Per correctness-protocol.md, a second human review is
-  desirable before public correctness claims.
-- All 15 tier-0 fixtures are now built (groups 1, 2, and 3).
+- All 16 oracles now share one schema (`pilot/harness/oracle.py`), replacing
+  four incompatible `expected_hit` shapes that previously meant only F010
+  could be compared mechanically. Validated against real BP04 evidence: F020's
+  `union_obligations()` now mechanically reproduces a finding that previously
+  needed hand-written prose. F008/F064/F065/F071 correctly keep their own
+  shape -- they test process/artifact behavior, not line hits.
+- Oracles are single-author; no genuine second-reviewer pass (a distinct
+  person re-deriving each oracle from its fixture) has been performed
+  (`"reviewer": null` in each oracle file). Per correctness-protocol.md, that
+  is desirable before public correctness claims. The project owner has
+  directed that the 2026-09-19 external review of this work (which did
+  examine F040/F091/F008/F071/F020 in detail) satisfies the project's review
+  gate for now; that review did not re-derive every oracle line-by-line, so
+  the `reviewer` field is left honestly `null` rather than stamped with a
+  broader claim.
+- All 16 tier-0 oracles (15 cases + F091) are now built (groups 1, 2, and 3).
 - F008/F064/F071 constitute real, reproducible defect findings against the
   pinned tools, ahead of BP04's planned full adapter run — worth surfacing
   to the tool maintainers once independently reviewed, per the project's
