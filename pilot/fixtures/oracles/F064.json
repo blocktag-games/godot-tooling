@@ -1,0 +1,41 @@
+{
+  "id": "F064",
+  "tier": 0,
+  "domain": "failures",
+  "case": "Zero requested tests execute",
+  "requirement": "Empty successful process cannot satisfy requested test execution",
+  "files": [
+    {
+      "path": "cases/f064_zero_requested_tests/tests/helper_not_a_test.gd",
+      "sha256": "683220fe6da4711e8a11eaf91f5aac3c2f55330a192e781c37bd15a205c9405b",
+      "note": "Deliberately does not match GUT's test_*.gd naming convention, so -gdir=res://tests selects a real, populated, existing directory with zero matching tests -- not an ambiguous empty directory."
+    }
+  ],
+  "inputs": [
+    {
+      "name": "default",
+      "call": "godot --headless --path . -s addons/gut/gut_cmdln.gd -gdir=res://tests -gexit",
+      "prerequisite": "godot --headless --path . --import (once, to build the project's global class cache; GUT uses class_name declarations that gut_cmdln.gd checks for on startup)"
+    },
+    {
+      "name": "with_junit_artifact",
+      "call": "godot --headless --path . -s addons/gut/gut_cmdln.gd -gdir=res://tests -gjunit_xml_file=res://results.xml -gexit"
+    }
+  ],
+  "measured_with_gut_9_7_1": {
+    "godot_build": "4.7.1.stable.official.a13da4feb",
+    "gut_version": "9.7.1",
+    "console_output": "[GUT ERROR]:  Nothing was run.\nOn the one hand nothing failed, on the other hand nothing did anything.",
+    "process_exit_code": 0,
+    "junit_xml_output": "<testsuites name=\"GutTests\" failures=\"0\" tests=\"0\" ></testsuites>",
+    "finding": "GUT itself correctly classifies this as an ERROR-level condition in its console log, and a JUnit XML artifact (when requested via -gjunit_xml_file) correctly records tests=\"0\" -- both are honest. But the raw process exit code is 0 (success) regardless, traced to addons/gut/gui/GutRunner.gd's _handle_quit(): exit_code only becomes non-zero when gut.get_fail_count() > 0, and a run with zero tests has zero failures by construction. A harness or CI pipeline that gates on exit code alone -- the most common integration pattern -- will treat a zero-test run as a passing build.",
+    "requirement_met": "partially -- the tool's own reporting is honest, but its process-level success signal (exit code) is not, which is the signal most external automation actually checks."
+  },
+  "notes": "This is a real, verified finding against the actual pinned GUT v9.7.1, not gd-tools -- GUT is the test-runner layer gd-tools' coverage workflow sits on top of, so this gap is inherited by any coverage adapter built on GUT's exit-code contract. The harness requirement this establishes: never gate a 'did tests run' check on process exit code alone; parse either the console for the 'Nothing was run' error or the JUnit/other structured artifact's test count.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Not tested: whether GUT's -gexit_on_success option or a nonstandard -gselect pattern (matching zero tests within an otherwise-populated, correctly-named set) produces different exit-code behavior than an empty -gdir selection. This fixture covers the directory-selection case only.",
+    "gd-tools' own pre_run_hook.gd/post_run_hook.gd wrap GUT's execution for coverage purposes; whether gd-tools' own wrapper adds an independent zero-test check on top of GUT's exit code is untested and belongs in BP04's real adapter run."
+  ]
+}

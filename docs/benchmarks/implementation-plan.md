@@ -1,13 +1,13 @@
 # Benchmark implementation roadmap
 
-Status on 19 September 2026: protocol and catalogs drafted; BP01 and BP03 are closed (see [pilot-environment.md](pilot-environment.md) and [../../pilot/harness/](../../pilot/harness/)). BP02 is in progress (groups 1–2 of 3 built, group 3 depends on BP03's now-closed harness). Work packages below are ordered by dependency. Estimates are planning ranges for one active contributor and will be revised after the first runnable slice.
+Status on 19 September 2026: protocol and catalogs drafted; BP01, BP02, and BP03 are closed (see [pilot-environment.md](pilot-environment.md), [../../pilot/fixtures/](../../pilot/fixtures/), and [../../pilot/harness/](../../pilot/harness/)). BP04 is next. Work packages below are ordered by dependency. Estimates are planning ranges for one active contributor and will be revised after the first runnable slice.
 
 ## Work packages and completion evidence
 
 | ID | Package | Depends on | Completion evidence | Initial effort |
 | --- | --- | --- | --- | --- |
-| BP01 | Freeze pilot scope and environment identity. | This draft | **Closed 2026-09-19.** [pilot-environment.md](pilot-environment.md): Godot 4.7.1 (`a13da4feb`, sha256 pinned), gd-tools-cli 0.4.0 via Pipenv, GUT v9.7.1 pinned (not yet vendored), machine record, pilot schedule, explicit unavailable modes. | 1–2 days |
-| BP02 | Implement the first independent fixtures and oracles. | BP01 | **In progress.** Groups 1–2 (11 of 15 tier-0 cases) built and passing on the pinned engine; see [pilot/fixtures/](../../pilot/fixtures/). Group 3 (F008, F062, F064, F065, F071) depends on BP03. | 2–4 days |
+| BP01 | Freeze pilot scope and environment identity. | This draft | **Closed 2026-09-19.** [pilot-environment.md](pilot-environment.md): Godot 4.7.1 (`a13da4feb`, sha256 pinned), gd-tools-cli 0.4.0 via Pipenv, GUT v9.7.1 pinned and vendored, machine record, pilot schedule, explicit unavailable modes. | 1–2 days |
+| BP02 | Implement the first independent fixtures and oracles. | BP01 | **Closed 2026-09-19.** All 15 tier-0 cases built and passing on the pinned engine; see [pilot/fixtures/](../../pilot/fixtures/). Group 3 (F008, F064, F071) produced real, reproducible findings against the actual pinned gd-tools-cli 0.4.0 and GUT v9.7.1, ahead of BP04's planned adapter run. | 2–4 days |
 | BP03 | Implement minimal orchestration and evidence records. | BP01 | **Closed 2026-09-19.** [pilot/harness/](../../pilot/harness/): report comparator, process runner with timeout/marker-termination, fault-injection helpers; 8/8 self-tests pass (synthetic failure controls: false hit, missing hit, missing file, stale source, malformed shape, truncated JSON; positive controls: clean report matches, null adapter shows no behavioral difference). | 2–4 days |
 | BP04 | Add the first coverage adapter. | BP02, BP03 | Baseline and covered runs of the same case; native/normalized reports; exact mismatches; one-command reproduction. | 2–4 days |
 | BP05 | Add remaining candidate modes and parity drivers. | BP04 | Thin GUT/GdUnit4/manual drivers, available configurations installed, unresolved setup limits recorded. | 3–7 days |

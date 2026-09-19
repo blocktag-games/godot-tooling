@@ -1,0 +1,35 @@
+{
+  "id": "F065",
+  "tier": 0,
+  "domain": "failures",
+  "case": "Graceful interrupted run",
+  "requirement": "Partial reports and source restoration follow termination contract",
+  "files": [
+    {
+      "path": "cases/f065_graceful_interruption/subject.py",
+      "sha256": "a1ddcbdc3edb0ffac2048f2a051b0fa0ea01780b603c4739e586aae98be0b9c0",
+      "note": "Synthetic, adapter-agnostic report writer: writes report.json.tmp, prints a marker, sleeps 5s, then only completes and renames to report.json."
+    },
+    {
+      "path": "cases/f065_graceful_interruption/check.py",
+      "sha256": "c48910eeaaeb7791c22424142d2af3372e0fa69b511be6849ce640603a332ab7"
+    }
+  ],
+  "inputs": [
+    { "name": "default", "call": "check.py -> harness.runner.run_and_terminate_on_marker(subject.py, marker=\"MARKER_PARTIAL_WRITTEN\")" }
+  ],
+  "measured": {
+    "process_was_terminated": true,
+    "terminated_by_signal": true,
+    "no_finished_report_exists": true,
+    "partial_artifact_retained": true,
+    "partial_artifact_labeled_partial": true
+  },
+  "notes": "Known interruption point (the MARKER_PARTIAL_WRITTEN print) plus the harness's marker-triggered SIGTERM (pilot/harness/runner.py). This is a synthetic, tool-independent ground truth establishing the correct termination contract -- write-temp-then-rename -- that any adapter (gd-tools, Nano Coverage, godot-code-coverage) should be checked against in BP04/BP05: does the real tool's report-writing step follow this same safe pattern, or can it be caught mid-write leaving a corrupt or falsely-complete report.json in place? This fixture does not itself test any real adapter's writer, only establishes what 'graceful' looks like and that the harness can detect a violation of it.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Only tests SIGTERM (graceful termination request). F066 (forced termination / SIGKILL, which cannot be caught or cleaned up after) is a separate, unbuilt tier-1 case -- a real adapter that only handles SIGTERM safely could still leave a corrupt report under SIGKILL.",
+    "This models a Python-based writer (matching gd-tools' CLI reporters). A GDScript-side writer (e.g. gd-tools' addons/gd-tools-coverage/coverage.gd running inside the Godot process) has a different interruption surface -- Godot's own process termination handling -- untested here."
+  ]
+}

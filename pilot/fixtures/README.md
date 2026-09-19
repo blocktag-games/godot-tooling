@@ -88,14 +88,49 @@ sha256sum cases/f010_straight_line/subject.gd
 # must match the "sha256" field in oracles/F010.json
 ```
 
+## Group 3 — harness-dependent, real-tool findings
+
+All five use `pilot/harness/`'s modules directly and, except F062, run the
+*actual* pinned tools (gd-tools-cli 0.4.0, GUT v9.7.1) rather than modeling
+them. Three produced real, reproducible defect findings, not synthetic ones:
+
+| ID | Case | Directory | Real finding |
+| --- | --- | --- | --- |
+| F008 | Selected file cannot be instrumented | `cases/f008_cannot_be_instrumented/` | A UTF-8 BOM-prefixed `.gd` file is valid, runnable GDScript on Godot 4.7.1, but gd-tools' gdtoolkit-based parser rejects it and **silently drops it from the coverage plan** — no field anywhere in the plan/report schema records the omission, only a transient console warning. |
+| F062 | Injected instrumentation failure | (uses F008 as its real-tool realization; also self-tests `pilot/harness/faults.py`'s generic fault injection) | Reuses F008's finding as its concrete case; also proves the harness's own `make_unwritable` fault-injection primitive works, for future tool-independent use. |
+| F064 | Zero requested tests execute | `cases/f064_zero_requested_tests/` | Real GUT v9.7.1: correctly logs `[GUT ERROR]: Nothing was run.` and records `tests="0"` in JUnit XML output, but the **process exit code is still 0** — a CI pipeline gating on exit code alone would treat this as a passing build. |
+| F065 | Graceful interrupted run | `cases/f065_graceful_interruption/` | Synthetic, tool-independent: proves the harness's marker-triggered SIGTERM (`pilot/harness/runner.py`) correctly interrupts a write-temp-then-rename report writer with no finished-looking artifact leaking. Establishes the termination contract real adapters should be checked against later. |
+| F071 | Source revision mismatch | `cases/f071_merge_identity/` | Real gd-tools-cli 0.4.0: `coverage merge` sums hit counts purely by integer `file_id`. Its raw coverage-data JSON schema carries **no path or source hash at all** (confirmed from the tool's own docstring). Two sessions where file discovery order assigns the same `file_id` to two different files merge silently into one blended, meaningless count — exit code 0, no warning. |
+
+Reproduce (each has its own driver/check script and, where noted, its own
+mini Godot project):
+
+```sh
+# F008: engine ground truth
+cd cases/f008_cannot_be_instrumented && ../../../godot/Godot_v4.7.1-stable_linux.x86_64 --headless --path . --script driver.gd
+
+# F064: real GUT v9.7.1 (needs one-time --import per checkout to build the class cache)
+cd cases/f064_zero_requested_tests
+../../../godot/Godot_v4.7.1-stable_linux.x86_64 --headless --path . --import
+../../../godot/Godot_v4.7.1-stable_linux.x86_64 --headless --path . -s addons/gut/gut_cmdln.gd -gdir=res://tests -gexit
+
+# F065: harness marker-kill (pure Python, stdlib only)
+cd cases/f065_graceful_interruption && python3 check.py
+
+# F071: real gd-tools-cli 0.4.0 merge (pure Python; imports the gd-tools venv directly)
+cd cases/f071_merge_identity && python3 check.py
+```
+
 ## Status and open items
 
 - Oracles are single-author, not yet second-reviewed (`"reviewer": null` in
   each oracle file). Per correctness-protocol.md, a second human review is
   desirable before public correctness claims.
-- Group 3 (harness-dependent: F008, F062, F064, F065, F071) is not yet
-  built — it needs BP03's orchestration harness first.
-- No coverage adapter has run against these fixtures. That begins in BP04.
+- All 15 tier-0 fixtures are now built (groups 1, 2, and 3).
+- F008/F064/F071 constitute real, reproducible defect findings against the
+  pinned tools, ahead of BP04's planned full adapter run — worth surfacing
+  to the tool maintainers once independently reviewed, per the project's
+  general policy of preferring upstream contribution over a new collector.
 - F040/F091/F060 model gd-tools' architecture as read from source, not as
   measured by actually running gd-tools. Each oracle's `ambiguities` field
   says explicitly what BP04 needs to reconcile once the real adapter runs.

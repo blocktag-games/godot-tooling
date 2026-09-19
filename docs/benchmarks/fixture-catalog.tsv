@@ -6,7 +6,7 @@ F004	1	population	Include and exclude rules	Selected application and excluded ve
 F005	1	population	Loaded dependency outside selection	Dependency execution does not silently broaden or shrink declared scope	all_supported	Known preload graph and selected inventory	planned
 F006	2	population	Same basename in different directories	Distinct original sources do not share counters	all_supported	Two hashes and different expected paths	planned
 F007	2	population	Tracking-limit boundary	Limit and incomplete scope are explicit at below/equal/above boundary	limited_provider	Exact total tracked scripts including runner/add-on scripts	planned
-F008	0	population	Selected file cannot be instrumented	Unmeasured selected file is visible in completeness accounting	all_supported	Known selected file and injected instrumentation rejection	planned
+F008	0	population	Selected file cannot be instrumented	Unmeasured selected file is visible in completeness accounting	all_supported	Known selected file and injected instrumentation rejection	fixture-built
 F009	2	population	Generated source	Generated/original identity and measurement scope remain explicit	dynamic_source_supported	Pinned generator output and mapping contract	planned
 F010	0	lines	Straight-line body	Reached body lines match hand-traced execution	all_supported	Exact values and line obligations	fixture-built
 F011	1	lines	Blank comments and annotations	Nonexecuting text is classified explicitly	all_supported	Reviewed executable-location set	planned
@@ -58,16 +58,16 @@ F055	2	concurrency	Multiple processes and sessions	Isolation holds; merging requ
 F056	2	concurrency	Timing-sensitive gameplay	Timing perturbation is reported separately from deterministic semantic error	scene_supported	Predeclared invariant and real-time sensitivity scenario	planned
 F060	0	behavior	Deterministic state preservation across script reload	Covered and baseline output/state agree, including state on an instance created before instrumentation reloads its script	all_supported	Independent final state and event trace, with a pre-existing autoload instance carrying mutated state into the reload	fixture-built
 F061	1	failures	Baseline parse failure	Invalid fixture is not scored as a collector defect	all_supported	Engine diagnostic and failed baseline classification	planned
-F062	0	failures	Injected instrumentation failure	Collection failure cannot become a complete successful measurement	fault_injection_supported	Controlled rejected transformation and diagnostic provenance	planned
+F062	0	failures	Injected instrumentation failure	Collection failure cannot become a complete successful measurement	fault_injection_supported	Controlled rejected transformation and diagnostic provenance	fixture-built
 F063	1	failures	Application test failure	Application failure and coverage completeness remain independent	test_runner_supported	Deliberate failing assertion and known executed prefix	planned
-F064	0	failures	Zero requested tests execute	Empty successful process cannot satisfy requested test execution	test_runner_supported	Requested selection and observed zero count	planned
-F065	0	failures	Graceful interrupted run	Partial reports and source restoration follow termination contract	all_supported	Known interruption point and retained artifacts	planned
+F064	0	failures	Zero requested tests execute	Empty successful process cannot satisfy requested test execution	test_runner_supported	Requested selection and observed zero count	fixture-built
+F065	0	failures	Graceful interrupted run	Partial reports and source restoration follow termination contract	all_supported	Known interruption point and retained artifacts	fixture-built
 F066	1	failures	Forced termination or crash	Partial evidence and next-start recovery are explicit	all_supported	Owned process termination and recovery inspection	planned
 F067	1	failures	Timeout with child processes	Harness terminates/reaps owned work and retains failure outcome	child_process_supported	Synthetic child ownership and final process record	planned
 F068	1	failures	Truncated or malformed report	Parsing failure is not interpreted as zero or complete coverage	report_supported	Known malformed bytes and validator result	planned
 F069	1	failures	Stale report from earlier run	Wrong-run artifacts cannot satisfy a fresh attempt	report_supported	Old artifact plus new isolated run identity	planned
 F070	1	merge	Complementary run merge	Merged hit set equals defined union on identical source	merge_supported	Two known paths and exact source hashes	planned
-F071	0	merge	Source revision mismatch	Incompatible source counters are rejected or separated explicitly, including when a provider keys merges by plan-order identity rather than source hash	merge_supported	Changed source hash and merge disposition; a second variant merges two plans with different file sets to check for identity-key mis-attribution	planned
+F071	0	merge	Source revision mismatch	Incompatible source counters are rejected or separated explicitly, including when a provider keys merges by plan-order identity rather than source hash	merge_supported	Changed source hash and merge disposition; a second variant merges two plans with different file sets to check for identity-key mis-attribution	fixture-built
 F072	1	merge	Duplicate input merge	Duplicate handling follows explicit hit/count semantics	merge_supported	Same run ID twice and expected policy	planned
 F073	2	merge	Different source filters	Merged denominator accounts for distinct selected populations	merge_supported	Two source manifests and defined merged scope	planned
 F074	2	merge	Relocated workspace merge	Logical source identity survives path relocation without collision	merge_supported	Same sources at two roots and verified path map	planned

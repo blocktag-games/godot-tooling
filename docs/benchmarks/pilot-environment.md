@@ -58,10 +58,8 @@ Per the [study plan](README.md#scope-and-comparison-units), the comparison unit 
 | --- | --- |
 | Upstream repo | [bitwes/Gut](https://github.com/bitwes/Gut) |
 | Target tag | `v9.7.1`, commit `aeb5d4f3f7f0a6c9b5e178876d6c99b791fda605` |
-| Local checkout | `~/.local/opt/gut-src` exists but is currently on `v9.7.0` (commit `3e53dbc69ff6ba4d975edf302bbce23c40686e1e`) — **one release behind the pin.** |
-| Status | Pinned, not yet vendored into a fixture project. Vendoring GUT as an addon inside a real Godot project is BP02/BP03 work (fixtures don't exist yet), so it is out of scope for this document beyond recording the version to use. |
-
-Action item for BP02: check out or fetch `v9.7.1` into the fixture project's `addons/gut/`, rather than reusing the stale local `v9.7.0` checkout as-is.
+| Local checkout | `~/.local/opt/gut-src`, updated to `v9.7.1` (commit `aeb5d4f3f7f0a6c9b5e178876d6c99b791fda605`) during BP02. |
+| Status | **Closed.** Vendored (full addon, including the GUI scenes the CLI runner depends on even headless) into `pilot/fixtures/cases/f064_zero_requested_tests/addons/gut/` for the F064 fixture. Confirmed working end-to-end against the pinned Godot 4.7.1 binary. |
 
 ## Pilot schedule
 

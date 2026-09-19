@@ -1,0 +1,26 @@
+{
+  "id": "F062",
+  "tier": 0,
+  "domain": "failures",
+  "case": "Injected instrumentation failure",
+  "requirement": "Collection failure cannot become a complete successful measurement",
+  "primary_realization": {
+    "note": "The concrete, real-tool realization of this requirement is F008: gd-tools 0.4.0's own gdtoolkit-based parser rejects a legitimate engine-valid file (UTF-8 BOM prefix), and the resulting CoveragePlan silently omits it with no durable record. See oracles/F008.json for the measured evidence. This requirement therefore already has a verified failing case against a real tool, not just a synthetic one.",
+    "requirement_met_by_gd_tools_0_4_0": false
+  },
+  "harness_synthetic_control": {
+    "note": "Independent of any specific tool, pilot/harness/faults.py provides a generic fault-injection primitive (make_unwritable) so this requirement can be tested against future adapters that use a write-based instrumentation strategy, not just gd-tools' parse-based one.",
+    "mechanism": "chmod a fixture source file to read-only, then attempt to write instrumented content to it",
+    "measured": {
+      "write_raises": "PermissionError",
+      "source_left_unchanged": true
+    },
+    "harness_requirement": "An adapter wrapper that catches this write failure must report the affected file as failed/excluded in its own structured outcome record (see pilot/harness/comparator.py's missing_files handling), never as a silent success or a false zero."
+  },
+  "notes": "This case is intentionally satisfied two ways: by an already-real finding against gd-tools (F008), and by a generic, tool-independent fault-injection primitive in the harness for use against later adapters (Nano Coverage, godot-code-coverage) that may fail via a different mechanism than a second parser. No fixture-specific GDScript files are needed here beyond F008's.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "If a future adapter's instrumentation writes to a NEW file rather than overwriting the original (e.g. writing to a build/cache directory), make_unwritable on the source file won't trigger a failure the same way; a make_dir_unwritable variant targeting the adapter's actual output path would be needed then."
+  ]
+}
