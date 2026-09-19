@@ -24,13 +24,14 @@ The initial research covers GDScript and Godot 4.7, with adjacent C# and native 
 | [Benchmark study plan](docs/benchmarks/README.md) | Research questions, correctness/performance/profiling protocols, catalogs, reproduction, and public reporting. |
 | [Implementation plan](docs/benchmarks/implementation-plan.md) | Ordered benchmark work packages, first executable slice, completion evidence, and resource estimates. |
 | [Pilot environment pin](docs/benchmarks/pilot-environment.md) | BP01: pinned engine binary/hash, machine record, gd-tools/GUT candidate pins, pilot schedule, explicit unavailable modes. |
+| [BP04 adapter run](pilot/adapter-run/README.md) | First real gd-tools+GUT run: a clean match on one fixture, and two confirmed findings plus one open discrepancy on another. |
 | [Roadmap](docs/ROADMAP.md) | Project milestones and current status. |
 | [GUT bugs to report upstream](docs/upstream/gut-bugs.md) | Twelve unfiled defects found reading `bitwes/Gut`'s source as an adapter candidate, tracked for a future small-PR contribution. |
 | [Contributing](CONTRIBUTING.md) | How to contribute research, fixtures, reproducible results, and corrections. |
 
 The survey and benchmark protocol draft are dated 6 September 2026. They distinguish documentation, selected source inspection, and proposed experiments from runtime verification. Coverage accuracy, performance, profiler overhead, and PyCharm compatibility still need practical evaluation.
 
-The benchmark plan specifies 88 correctness/integration cases, 20 workloads, and 28 experiment families. These are planned catalogs, not implemented tests. Execution starts with a 15-case vertical slice and one adapter before expanding to the full study. Compare gd-tools, Nano Coverage, and godot-code-coverage, with GdUnit4 Coverage as a separately scoped feature comparator.
+The benchmark plan specifies 88 correctness/integration cases, 20 workloads, and 28 experiment families; most remain planned catalogs, not implemented tests. The 15-case tier-0 vertical slice and the first gd-tools+GUT adapter run are now implemented and reproducible under `pilot/` (see the pilot environment pin and BP04 adapter run rows above) before expanding to the full study. Compare gd-tools, Nano Coverage, and godot-code-coverage, with GdUnit4 Coverage as a separately scoped feature comparator.
 
 The [methods addendum](docs/benchmarks/methods-addendum.md) incorporates lessons from the broader ecosystem and separates profiling an application from profiling the benchmark harness. A [local environment probe](docs/research/2026-09-06-profiling-environment-probe.json) records tool availability and engine help/hash checks; application captures and benchmark execution remain pending.
 

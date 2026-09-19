@@ -1,0 +1,43 @@
+[godot]
+
+[test]
+test_dirs = [
+    "test",
+    "tests",
+]
+prefix = "test_"
+suffix = ".gd"
+gutconfig = ".gutconfig.json"
+
+[lint]
+exclude = [
+    "addons",
+    ".godot",
+    ".gd-tools",
+    ".git",
+]
+
+[format]
+exclude = [
+    "addons",
+    ".godot",
+    ".gd-tools",
+    ".git",
+]
+max_line_length = 100
+
+[coverage]
+enabled = true
+min_percent = 0
+format = "lcov"
+output_dir = ".gd-tools/coverage"
+exclude = [
+    "addons",
+    ".godot",
+    ".gd-tools",
+    ".git",
+]
+test_dirs = [
+    "test",
+    "tests",
+]

@@ -166,6 +166,16 @@ venv.bak/
 pilot/godot/*
 !pilot/godot/.gitkeep
 
+# BP04 adapter-run projects: vendored GUT/gd-tools-coverage addons and
+# Godot's local import cache are reproducible from the pinned versions
+# in docs/benchmarks/pilot-environment.md (GUT is already vendored once,
+# in full, under pilot/fixtures/cases/f064_zero_requested_tests/addons/
+# -- no need to duplicate ~7MB per adapter-run case). The measured
+# evidence itself (.gd-tools/coverage/*.json, *.info, results.xml) is
+# small and IS committed.
+pilot/adapter-run/*/addons/
+pilot/adapter-run/*/.godot/
+
 # Rope project settings
 .ropeproject
 
