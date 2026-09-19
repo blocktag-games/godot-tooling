@@ -1,12 +1,12 @@
 # Benchmark implementation roadmap
 
-Status on 6 September 2026: protocol and catalogs drafted; implementation and execution have not started. Work packages below are ordered by dependency. Estimates are planning ranges for one active contributor and will be revised after the first runnable slice.
+Status on 19 September 2026: protocol and catalogs drafted; BP01 is closed (see [pilot-environment.md](pilot-environment.md)). BP02 onward have not started. Work packages below are ordered by dependency. Estimates are planning ranges for one active contributor and will be revised after the first runnable slice.
 
 ## Work packages and completion evidence
 
 | ID | Package | Depends on | Completion evidence | Initial effort |
 | --- | --- | --- | --- | --- |
-| BP01 | Freeze pilot scope and environment identity. | This draft | Actual engine/hash/build, chosen machine, candidate pins, runner pairings, pilot schedule, explicit unavailable modes. | 1–2 days |
+| BP01 | Freeze pilot scope and environment identity. | This draft | **Closed 2026-09-19.** [pilot-environment.md](pilot-environment.md): Godot 4.7.1 (`a13da4feb`, sha256 pinned), gd-tools-cli 0.4.0 via Pipenv, GUT v9.7.1 pinned (not yet vendored), machine record, pilot schedule, explicit unavailable modes. | 1–2 days |
 | BP02 | Implement the first independent fixtures and oracles. | BP01 | Tier-0 cases compile/run uninstrumented; documented inputs, expected behavior, hashes, reviewed obligations. | 2–4 days |
 | BP03 | Implement minimal orchestration and evidence records. | BP01 | Isolated workspaces, structured outcomes, logs, timeouts, source checks, artifact validation; synthetic failure controls pass. | 2–4 days |
 | BP04 | Add the first coverage adapter. | BP02, BP03 | Baseline and covered runs of the same case; native/normalized reports; exact mismatches; one-command reproduction. | 2–4 days |

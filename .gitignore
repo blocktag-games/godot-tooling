@@ -161,6 +161,11 @@ venv.bak/
 .spyderproject
 .spyproject
 
+# Pilot environment: pinned engine binaries are recorded by hash in
+# docs/benchmarks/pilot-environment.md, not committed as blobs.
+pilot/godot/*
+!pilot/godot/.gitkeep
+
 # Rope project settings
 .ropeproject
 

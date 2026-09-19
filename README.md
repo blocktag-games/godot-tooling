@@ -23,6 +23,7 @@ The initial research covers GDScript and Godot 4.7, with adjacent C# and native 
 | [Application profiling guide](docs/profiling/application-profiling.md) | External resource/CPU measurements and Godot script, rendering, memory, and tracing workflows. |
 | [Benchmark study plan](docs/benchmarks/README.md) | Research questions, correctness/performance/profiling protocols, catalogs, reproduction, and public reporting. |
 | [Implementation plan](docs/benchmarks/implementation-plan.md) | Ordered benchmark work packages, first executable slice, completion evidence, and resource estimates. |
+| [Pilot environment pin](docs/benchmarks/pilot-environment.md) | BP01: pinned engine binary/hash, machine record, gd-tools/GUT candidate pins, pilot schedule, explicit unavailable modes. |
 | [Roadmap](docs/ROADMAP.md) | Project milestones and current status. |
 | [GUT bugs to report upstream](docs/upstream/gut-bugs.md) | Twelve unfiled defects found reading `bitwes/Gut`'s source as an adapter candidate, tracked for a future small-PR contribution. |
 | [Contributing](CONTRIBUTING.md) | How to contribute research, fixtures, reproducible results, and corrections. |
