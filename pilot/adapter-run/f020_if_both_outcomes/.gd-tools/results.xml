@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites name="GutTests" failures="0" tests="2" >
-  <testsuite name="tests/test_subject.gd" tests="2" failures="0" skipped="0" time="0.000438" >
-      <testcase name="test_true_branch" assertions="1" status="pass" classname="tests/test_subject.gd" time="0.000267" >
+  <testsuite name="tests/test_subject.gd" tests="2" failures="0" skipped="0" time="0.000563" >
+      <testcase name="test_true_branch" assertions="1" status="pass" classname="tests/test_subject.gd" time="0.000353" >
       </testcase>
-      <testcase name="test_false_branch" assertions="1" status="pass" classname="tests/test_subject.gd" time="0.000171" >
+      <testcase name="test_false_branch" assertions="1" status="pass" classname="tests/test_subject.gd" time="0.00021" >
       </testcase>
   </testsuite>
 </testsuites>

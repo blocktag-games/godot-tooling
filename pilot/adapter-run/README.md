@@ -23,6 +23,24 @@ committed once in full under `pilot/fixtures/cases/f064_zero_requested_tests/add
 The measured evidence itself (`.gd-tools/coverage/{plan,coverage}.json`,
 `coverage.info`, `results.xml`) is small and is committed directly.
 
+## Reproduce from a clean checkout
+
+```sh
+pilot/adapter-run/reproduce.sh f010_straight_line
+pilot/adapter-run/reproduce.sh f020_if_both_outcomes
+```
+
+This is the literal one-command reproduction: it restores `addons/` (copying
+GUT from its one full committed copy and gd-tools' bundled coverage addon from
+the installed package), clears any prior `.godot`/`.gd-tools` state, rebuilds
+the import cache, runs the real `gd-tools test --coverage`, and finally runs
+`compare.py` -- against freshly generated artifacts, not leftovers from a
+previous run. Verified by actually deleting `addons/`, `.godot/`, and
+`.gd-tools/` and re-running from that state: both cases reproduce their
+committed results exactly (the only diffs in the regenerated evidence are
+nondeterministic timestamps -- `generated_at`, test durations -- the hit data
+itself is byte-for-byte identical).
+
 ## F010 (straight-line body) -- clean match
 
 ```sh
@@ -89,12 +107,11 @@ Result: **not a clean match against the oracle**, for three specific, confirmed 
   not re-verified here.
 - Does **not** re-run F040/F091/F045/F060's real-adapter equivalents (autoload
   timing, await, reload-with-real-instrumentation) -- those remain source-read
-  predictions pending their own BP04/BP05-style real runs. Note also that
-  `pilot/fixtures/oracles/F040.json`'s claim that gd-tools "rewrites source files
-  on disk before Godot ever imports the project" is itself unverified against the
-  real tool and contradicts `coverage.gd`'s own doc comment, which describes
-  in-memory `reload(true)` instrumentation, not a disk rewrite -- flagged as an
-  open correction, not yet fixed in that oracle.
+  predictions pending their own BP05-style real runs. (An earlier version of
+  this note flagged `oracles/F040.json`'s disk-rewrite claim as an open
+  correction; that was fixed on 2026-09-19 -- see `F040.json`'s
+  `correction_2026-09-19` field. gd-tools instruments in memory via
+  `Script.reload(true)`, not by rewriting files on disk.)
 - Does **not** constitute the full tier-0 or tier-1 corpus run -- per
   `implementation-plan.md`, "the first usable contribution is BP04, not
   completion of every catalog case."
