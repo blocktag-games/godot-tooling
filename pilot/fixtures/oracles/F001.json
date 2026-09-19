@@ -1,0 +1,34 @@
+{
+  "id": "F001",
+  "tier": 0,
+  "domain": "population",
+  "case": "Never-loaded selected file",
+  "requirement": "Selected source remains accounted for; unknown differs from measured zero",
+  "files": [
+    {
+      "path": "cases/f001_never_loaded/loaded.gd",
+      "sha256": "25d491b8f4e20201fe6931dd2a0522da93287ebf6b2b7252ab3e3d91e1196163",
+      "role": "loaded",
+      "obligations": [
+        { "line": 4, "kind": "statement", "text": "return 42", "expected_hit": true }
+      ]
+    },
+    {
+      "path": "cases/f001_never_loaded/unloaded.gd",
+      "sha256": "34b28f0c98153ee92b68c8561298f8614280068ce97dc7a40984ace5371f2c2a",
+      "role": "unloaded",
+      "obligations": [
+        { "line": 4, "kind": "statement", "text": "return 0", "expected_hit": false }
+      ]
+    }
+  ],
+  "inputs": [
+    { "name": "default", "call": "loaded.gd:run()", "expected_result": 42 }
+  ],
+  "notes": "unloaded.gd is never load()/preload()d by driver.gd or by loaded.gd. Its only relationship to the fixture is being present in the case directory, which is what makes it part of the declared selected-file manifest. A provider that cannot see this file at all (rather than seeing it and reporting zero hits) fails this case differently than one that reports a false zero -- both outcomes must be distinguished in the completeness accounting, per correctness-protocol.md's population/completeness dimensions. Line numbering is one-based; lines 1-3 (extends, blank, func signature) are not body-line obligations under our convention.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "If a candidate declares class_name on a loaded/preloaded script elsewhere in a later fixture, Godot's global class cache may register the class during project import even without any code path loading it. This plain-file variant sidesteps that; a class_name variant is deferred to a later tier."
+  ]
+}

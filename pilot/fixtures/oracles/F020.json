@@ -1,0 +1,28 @@
+{
+  "id": "F020",
+  "tier": 0,
+  "domain": "control_flow",
+  "case": "If with both outcomes",
+  "requirement": "Separate runs and union distinguish true/false outcomes",
+  "files": [
+    {
+      "path": "cases/f020_if_both_outcomes/subject.gd",
+      "sha256": "568e031677b8eb0d864bfbb3c41a540bbaddb26cf17e37b00519f793b2f77e42",
+      "obligations": [
+        { "line": 4, "kind": "statement", "text": "var outcome: int", "expected_hit": {"value_gt_0": true, "value_lte_0": true} },
+        { "line": 5, "kind": "decision", "text": "if value > 0:", "branch_outcomes": {"true": {"reached": ["value_gt_0"]}, "false": {"reached": ["value_lte_0"]}} },
+        { "line": 6, "kind": "statement", "text": "outcome = 1", "expected_hit": {"value_gt_0": true, "value_lte_0": false} },
+        { "line": 8, "kind": "statement", "text": "outcome = -1", "expected_hit": {"value_gt_0": false, "value_lte_0": true} },
+        { "line": 9, "kind": "statement", "text": "return outcome", "expected_hit": {"value_gt_0": true, "value_lte_0": true} }
+      ]
+    }
+  ],
+  "inputs": [
+    { "name": "value_gt_0", "call": "subject.gd:run(2)", "expected_result": 1 },
+    { "name": "value_lte_0", "call": "subject.gd:run(-2)", "expected_result": -1 }
+  ],
+  "notes": "Neither single run exercises both branch outcomes; the union of the two runs must show both outcomes taken. Line 7 (`else:`) is a non-executable decision keyword, not a body-line obligation.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": []
+}

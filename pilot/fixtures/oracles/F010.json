@@ -1,0 +1,25 @@
+{
+  "id": "F010",
+  "tier": 0,
+  "domain": "lines",
+  "case": "Straight-line body",
+  "requirement": "Reached body lines match hand-traced execution",
+  "files": [
+    {
+      "path": "cases/f010_straight_line/subject.gd",
+      "sha256": "90d828bd26a0e2c299bc99d0963f5ae9ec92d2eea6f204267a54f4e3e4815c77",
+      "obligations": [
+        { "line": 4, "kind": "statement", "text": "var doubled: int = x * 2", "expected_hit": true, "expected_count": 1 },
+        { "line": 5, "kind": "statement", "text": "var result: int = doubled + 1", "expected_hit": true, "expected_count": 1 },
+        { "line": 6, "kind": "statement", "text": "return result", "expected_hit": true, "expected_count": 1 }
+      ]
+    }
+  ],
+  "inputs": [
+    { "name": "default", "call": "subject.gd:run(3)", "expected_result": 7 }
+  ],
+  "notes": "No branches; every body line is reached exactly once per call. Baseline positive control for the harness before any control-flow or population edge case is layered on.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": []
+}

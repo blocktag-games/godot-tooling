@@ -1,0 +1,30 @@
+{
+  "id": "F012",
+  "tier": 0,
+  "domain": "lines",
+  "case": "Multiline expression",
+  "requirement": "Continuation lines follow a documented line convention",
+  "files": [
+    {
+      "path": "cases/f012_multiline_expression/subject.gd",
+      "sha256": "2257b78d53da505aec107329e427530c60f1b33b5ec8519076cfb9b8c3eb07a8",
+      "obligations": [
+        { "line": 4, "kind": "statement", "text": "var total: int = (", "expected_hit": true, "expected_count": 1, "note": "Anchor line: obligation covers the whole assignment statement spanning lines 4-8." },
+        { "line": 5, "kind": "continuation", "text": "a", "expected_hit": "not_a_separate_obligation" },
+        { "line": 6, "kind": "continuation", "text": "+ b", "expected_hit": "not_a_separate_obligation" },
+        { "line": 7, "kind": "continuation", "text": "+ c", "expected_hit": "not_a_separate_obligation" },
+        { "line": 8, "kind": "continuation", "text": ")", "expected_hit": "not_a_separate_obligation" },
+        { "line": 9, "kind": "statement", "text": "return total", "expected_hit": true, "expected_count": 1 }
+      ]
+    }
+  ],
+  "inputs": [
+    { "name": "default", "call": "subject.gd:run(1, 2, 3)", "expected_result": 6 }
+  ],
+  "notes": "This fixture's whole point is the line convention, not the arithmetic. Our chosen convention: a multi-line statement is one obligation, anchored to its first physical line (line 4). Lines 5-8 are continuation lines of that same statement, not independent obligations. A provider that instead reports every physical line as hit (5, 6, 7, 8 each individually) is not wrong -- it uses a different, equally defensible convention -- but its result must be explicitly remapped to ours before comparison, never silently treated as a mismatch. This directly probes gd-tools 0.4.0's line-injection approach, since its plan generator walks a separately-parsed (gdtoolkit/Lark) syntax tree rather than the engine's own tree, and continuation lines are a plausible place for that second parser's line attribution to diverge from Godot's own executed-statement notion.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Whether 'not_a_separate_obligation' should instead be represented as 'expected_hit: null' with a separate 'not_applicable' status enum is an open schema question for BP03's normalization step."
+  ]
+}
