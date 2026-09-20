@@ -27,6 +27,7 @@ which named inputs, bound to the fixture file's exact SHA-256 hash.
 | F026 | Break and continue (tier 1) | `cases/f026_break_continue/subject.gd` |
 | F027 | Match and fallback (tier 1) | `cases/f027_match_fallback/subject.gd` |
 | F029 | Conditional expression (tier 1) | `cases/f029_conditional_expression/subject.gd` |
+| F030 | Short-circuit and/or (tier 1) | `cases/f030_short_circuit/subject.gd` |
 
 F022 is tier 1, not tier 0, but lives here since it's pure GDScript with no
 live-process/harness needs, matching this group. It's the first fixture

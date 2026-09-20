@@ -100,6 +100,27 @@ func _initialize() -> void:
 	_check("F029", "run(5) true arm", f029.run(5), "positive")
 	_check("F029", "run(-5) false arm", f029.run(-5), "non_positive")
 
+	# F030: short-circuit and/or. The return value alone cannot prove
+	# short-circuiting happened (e.g. "false and X" returns false whether
+	# or not X ran), so a log array records whether the right operand's
+	# lambda body actually executed -- the real, observable ground truth.
+	var f030 = load("res://cases/f030_short_circuit/subject.gd")
+	var log_and_eval: Array = []
+	_check("F030", "run_and(true, true) result", f030.run_and(true, true, log_and_eval), true)
+	_check("F030", "run_and(true, true) right WAS evaluated", log_and_eval, ["right_evaluated"])
+
+	var log_and_short: Array = []
+	_check("F030", "run_and(false, true) result", f030.run_and(false, true, log_and_short), false)
+	_check("F030", "run_and(false, true) right NOT evaluated", log_and_short, [])
+
+	var log_or_eval: Array = []
+	_check("F030", "run_or(false, true) result", f030.run_or(false, true, log_or_eval), true)
+	_check("F030", "run_or(false, true) right WAS evaluated", log_or_eval, ["right_evaluated"])
+
+	var log_or_short: Array = []
+	_check("F030", "run_or(true, false) result", f030.run_or(true, false, log_or_short), true)
+	_check("F030", "run_or(true, false) right NOT evaluated", log_or_short, [])
+
 	print("")
 	if failures.is_empty():
 		print("All tier-0 group 1 fixtures match their behavioral specification.")
