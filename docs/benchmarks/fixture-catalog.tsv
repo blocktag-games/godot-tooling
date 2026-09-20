@@ -76,8 +76,8 @@ F076	1	robustness	User-data isolation	Run does not consume another profile or le
 F077	2	robustness	Read-only or full output target	Write/flush failure produces explicit incomplete result	fault_injection_supported	Disposable constrained destination and recorded error	planned
 F078	2	robustness	Large stdout/stderr volume	No deadlock or unmarked evidence loss under backpressure	all_supported	Known emitted bytes and bounded capture	planned
 F079	2	robustness	Concurrent disk instrumentation	Independent workspaces stay separate; shared target conflict is explicit	disk_mode_supported	Distinct copies plus controlled shared-target conflict	planned
-F080	1	integration	GUT and GdUnit4 parity	Thin drivers invoke identical application behavior	runner_modes_available	Matching input/event traces; timing strata separate	planned
-F081	1	integration	Standalone/manual driver	Coverage is validated independently of an available test framework	manual_supported	Recorded input script or exact manual action log	planned
+F080	1	integration	GUT and GdUnit4 parity	Thin drivers invoke identical application behavior	runner_modes_available	Matching input/event traces; timing strata separate	fixture-built
+F081	1	integration	Standalone/manual driver	Coverage is validated independently of an available test framework	manual_supported	Recorded input script or exact manual action log	fixture-built
 F082	2	integration	Original-source breakpoint	Breakpoint binds and stops at the intended user location	debugger_supported	Verified breakpoint response and observed state	planned
 F083	2	integration	Step stack and variables	Instrumented source does not mislead navigation and state inspection	debugger_supported	Step transcript and expected variable/frame values	planned
 F084	2	integration	Await breakpoint resumption	Post-await stop and source location remain useful	debugger_async_supported	Controlled continuation and expected stop	planned

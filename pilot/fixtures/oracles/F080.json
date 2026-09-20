@@ -1,0 +1,31 @@
+{
+  "id": "F080",
+  "tier": 1,
+  "domain": "integration",
+  "case": "GUT and GdUnit4 parity",
+  "requirement": "Thin drivers invoke identical application behavior",
+  "files": [
+    { "path": "../../adapter-run/f080_gut_gdunit4_parity/project_gut/subject/subject.gd", "sha256": "039a64216355b85fa68691df4f6db70e17eb99df003c1148741fe8770a2cfda8", "note": "Byte-identical to project_gdunit4's copy -- confirmed via matching sha256, not merely 'the same by construction'." },
+    { "path": "../../adapter-run/f080_gut_gdunit4_parity/project_gut/test/test_subject.gd", "sha256": "eb4739dc14bc53f806b561ffc2ea623d4f8cb8c86157139808bea76f7d726da9" },
+    { "path": "../../adapter-run/f080_gut_gdunit4_parity/project_gdunit4/subject/subject.gd", "sha256": "039a64216355b85fa68691df4f6db70e17eb99df003c1148741fe8770a2cfda8" },
+    { "path": "../../adapter-run/f080_gut_gdunit4_parity/project_gdunit4/test/test_subject.gd", "sha256": "868c3fbc7f77e1318d38ffa0d9dbd7c0c73d2c6820eb410c1d7d8c0f6850b1e4" },
+    { "path": "../../adapter-run/f080_gut_gdunit4_parity/check.py", "sha256": "7026768b3f7f5abceb9fde2684d000b5fa13ea4c25b679730f3839bc4e5a0837" }
+  ],
+  "inputs": [
+    { "name": "default", "call": "check.py -> real GUT v9.7.1 run (project_gut) and real GdUnit4 v6.2.1 run (project_gdunit4), each a thin wrapper calling subject.gd:run(3, log) then run(-1, log) and writing the resulting log+results to its own user://trace.json" }
+  ],
+  "measured_with_gut_9_7_1_and_gdunit4_6_2_1": {
+    "gut_trace": { "log": ["start:3", "positive_branch", "end:6", "start:-1", "non_positive_branch", "end:0"], "results": [6, 0] },
+    "gdunit4_trace": { "log": ["start:3", "positive_branch", "end:6", "start:-1", "non_positive_branch", "end:0"], "results": [6, 0] },
+    "traces_byte_identical": true,
+    "requirement_met": true,
+    "finding": "The two runners' thin test wrappers, driving byte-identical subject.gd source with the same inputs, produce a byte-for-byte identical event trace. Neither runner's own test-execution machinery (assertion style, suite discovery, reporting) alters the application code's own observable behavior in any way -- exactly the requirement, confirmed by direct file comparison rather than eyeballing similar-looking output."
+  },
+  "notes": "The trace is written to user://trace.json, not stdout -- GUT and GdUnit4 format console output completely differently (GdUnit4's is ANSI-colored and structured very differently from GUT's), so comparing stdout would diff runner presentation noise, not application behavior. Each project has its own project.godot with a distinct config/name (per F076's established isolation fact), so each runner's trace lands in its own separate app_userdata directory and check.py reads each one back by its own absolute path. Two separate real end-to-end runs (GUT via addons/gut/gut_cmdln.gd, GdUnit4 via addons/gdUnit4/runtest.sh), following the F080-appropriate variant of the one-input-one-measured-run rule: this fixture's single 'input' legitimately spans two runs because the requirement is explicitly a CROSS-RUNNER comparison, not a claim about either run's coverage state in isolation (contrast with F041/F044/F048, where two runs would have falsely conflated cumulative-report state).",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "This fixture establishes APPLICATION BEHAVIOR parity, not gd-tools COVERAGE parity across runners -- gd-tools' coverage collection is bound to GUT's own hook system (pre_run_hook.gd/post_run_hook.gd, see F081's oracle), and was not invoked in the GdUnit4 run at all here. Whether a gd-tools coverage measurement of the GdUnit4 run (e.g. via F081's manual-driver technique, adapted to GdUnit4's own execution model) would match the GUT-measured coverage for the same subject.gd is a materially different, unbuilt question -- explicitly out of this fixture's scope, not silently assumed.",
+    "Only a simple RefCounted subject with no scene-tree dependency is exercised. Parity for a lifecycle-domain-style subject (autoloads, signals, scene tree) that behaves differently under each runner's own scene/process setup is untested."
+  ]
+}

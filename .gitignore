@@ -194,6 +194,12 @@ pilot/adapter-run/*/.godot/
 pilot/adapter-run/f076_user_data_isolation/*/addons/gut/
 pilot/adapter-run/f076_user_data_isolation/*/addons/gd-tools-coverage/
 pilot/adapter-run/f076_user_data_isolation/*/.godot/
+# F080 (GUT/GdUnit4 parity) has the same two-sub-project shape as F076,
+# one per test runner, and needs both runners' addons ignored.
+pilot/adapter-run/f080_gut_gdunit4_parity/*/addons/gut/
+pilot/adapter-run/f080_gut_gdunit4_parity/*/addons/gdUnit4/
+pilot/adapter-run/f080_gut_gdunit4_parity/*/.godot/
+pilot/adapter-run/f080_gut_gdunit4_parity/*/reports/
 
 # BP05 candidate source clones (Nano Coverage's full checkout with
 # godot-cpp/tree-sitter/gdUnit4 submodules is ~460MB, and it's a git

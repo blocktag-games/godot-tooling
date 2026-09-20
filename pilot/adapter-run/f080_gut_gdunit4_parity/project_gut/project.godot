@@ -1,0 +1,10 @@
+config_version=5
+
+[application]
+
+config/name="f080-gut-gdunit4-parity-gut"
+config/features=PackedStringArray("4.7")
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gut/plugin.gd")

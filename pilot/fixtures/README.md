@@ -209,6 +209,8 @@ is a real, verified **positive** result, not a defect:
 | F072 | Duplicate input merge (tier 1) | `cases/f072_duplicate_input_merge/` | Real gd-tools-cli 0.4.0: merging the identical coverage file with itself silently **doubles** the hit count, with no duplicate-input detection or warning of any kind — compounds with F069's finding for a CI retry/re-submission scenario. |
 | F075 | Source restoration (tier 1) | `pilot/adapter-run/f075_source_restoration/` | Real gd-tools-cli 0.4.0 + GUT v9.7.1: subject.gd is byte-for-byte unchanged on disk after a mixed pass/fail run — a structural consequence of gd-tools' in-memory `Script.reload(true)` instrumentation, which never writes to the source file at all. |
 | F076 | User-data isolation (tier 1) | `pilot/adapter-run/f076_user_data_isolation/` | Real gd-tools-cli 0.4.0 + GUT v9.7.1: two differently-named projects' test runs write to and read from completely separate `user://` profiles, with no leakage in either direction — inherited from Godot's own per-`config/name` user-data resolution. |
+| F080 | GUT and GdUnit4 parity (tier 1) | `pilot/adapter-run/f080_gut_gdunit4_parity/` | Real GUT v9.7.1 + GdUnit4 v6.2.1: two thin test wrappers over byte-identical `subject.gd`, one per runner, produce a **byte-for-byte identical** event trace for the same inputs — the choice of test framework does not alter application behavior. Does **not** establish gd-tools coverage parity across runners (gd-tools' collection is bound to GUT's own hooks); see the oracle's ambiguities. |
+| F081 | Standalone/manual driver (tier 1) | `pilot/adapter-run/f081_standalone_manual_driver/` | Real gd-tools-cli 0.4.0: a from-scratch manual driver — no GUT, no gd-tools CLI, just the raw `_GDTCoverage` autoload plus ~15 lines of hand-written glue replicating `pre_run_hook.gd`/`post_run_hook.gd` — produces coverage data **exactly equal** to the real GUT-path artifact. Found and fixed a real timing bug along the way: `_GDTCoverage`'s `_ready()` (where instrumentation happens) fires on the autoload's first idle frame, not synchronously before a driver script's `_initialize()`. |
 
 Reproduce (each has its own driver/check script and, where noted, its own
 mini Godot project):
@@ -242,6 +244,12 @@ cd ../f076_user_data_isolation && python3 check.py   # two sub-projects, own app
 # F070/F072: real gd-tools-cli 0.4.0 merge, hand-crafted coverage-data inputs
 cd ../../fixtures/cases/f070_complementary_run_merge && python3 check.py
 cd ../f072_duplicate_input_merge && python3 check.py
+
+# F080: real GUT v9.7.1 + GdUnit4 v6.2.1, two sub-projects, own app_userdata each
+cd ../../adapter-run/f080_gut_gdunit4_parity && python3 check.py
+
+# F081: real gd-tools-cli 0.4.0, GUT reference + a from-scratch manual driver
+cd ../f081_standalone_manual_driver && python3 check.py
 ```
 
 F061-F076's failures/merge/robustness fixtures follow the F005/F071
