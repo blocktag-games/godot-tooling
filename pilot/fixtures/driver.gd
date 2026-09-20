@@ -155,6 +155,44 @@ func _initialize() -> void:
 	_check("F016", "run(1) call 2", f016.run(1), 2)
 	_check("F016", "run(1) call 3", f016.run(1), 2)
 
+	# F032: static function calling another static function -- both must
+	# attribute hits to their own original source lines.
+	var f032 = load("res://cases/f032_static_functions/subject.gd")
+	_check("F032", "run(3)", f032.run(3), 7)
+
+	# F033: lambda and Callable. Creating the lambda (line 4-6, the
+	# closure literal) is distinct from invoking it (line 5's body only
+	# hits when the Callable is actually called).
+	var f033 = load("res://cases/f033_lambda_and_callable/subject.gd")
+	_check("F033", "run(5, true) invoked", f033.run(5, true), 15)
+	_check("F033", "run(5, false) lambda made but never invoked", f033.run(5, false), -1)
+
+	# F034: nested-class inheritance and super -- base and derived
+	# methods share a method name but must attribute hits to the correct
+	# class body, and super.greet() must dispatch to Base's method.
+	var f034 = load("res://cases/f034_inheritance_and_super/subject.gd")
+	_check("F034", "run(true) derived dispatch with super call", f034.run(true), "derived:base")
+	_check("F034", "run(false) base dispatch directly", f034.run(false), "base")
+
+	# F035: property getter/setter -- implicit accessor calls (obj.value
+	# = input triggers the setter; obj.value triggers the getter) must
+	# be attributed to the accessor body lines, not the call site alone.
+	var f035 = load("res://cases/f035_property_getter_setter/subject.gd")
+	_check("F035", "run(5) setter doubles, getter reads back", f035.run(5), 10)
+
+	# F036: typed Array[int] parameter and Dictionary return/body --
+	# syntax-validated tier: confirms the file parses and runs correctly
+	# with these typed collection forms, not detailed branch obligations.
+	var f036 = load("res://cases/f036_typed_collections_signatures/subject.gd")
+	var f036_input: Array[int] = [1, 2, 3]
+	_check("F036", "run([1, 2, 3])", f036.run(f036_input), {1: 1, 2: 4, 3: 9})
+
+	# F037: default arguments -- omitted vs. supplied call forms both
+	# reach the same single function body line.
+	var f037 = load("res://cases/f037_default_arguments/subject.gd")
+	_check("F037", "run(4) omitted multiplier uses default", f037.run(4), 12)
+	_check("F037", "run(4, 10) supplied multiplier", f037.run(4, 10), 40)
+
 	print("")
 	if failures.is_empty():
 		print("All tier-0 group 1 fixtures match their behavioral specification.")

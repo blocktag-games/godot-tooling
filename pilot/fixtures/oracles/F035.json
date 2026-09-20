@@ -1,0 +1,33 @@
+{
+  "id": "F035",
+  "tier": 1,
+  "domain": "language",
+  "case": "Property getter and setter",
+  "requirement": "Implicit accessor calls and recursion guards retain behavior",
+  "files": [
+    {
+      "path": "cases/f035_property_getter_setter/subject.gd",
+      "sha256": "cdb6930fb85d261f6773fe18ef6e3f29232801ca449bb7487ab69cdc475269f3"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "default",
+      "call": "subject.gd:run(5)",
+      "expected_result": 10,
+      "obligations": [
+        { "file": "cases/f035_property_getter_setter/subject.gd", "line": 6, "kind": "statement", "expected_hit": true, "note": "getter body, reached implicitly by `obj.value` (the read on line 13), not by a visible function-call syntax" },
+        { "file": "cases/f035_property_getter_setter/subject.gd", "line": 8, "kind": "statement", "expected_hit": true, "note": "setter body, reached implicitly by `obj.value = input` (the assignment on line 12)" },
+        { "file": "cases/f035_property_getter_setter/subject.gd", "line": 11, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f035_property_getter_setter/subject.gd", "line": 12, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f035_property_getter_setter/subject.gd", "line": 13, "kind": "statement", "expected_hit": true }
+      ]
+    }
+  ],
+  "notes": "obj.value = input (line 12) and return obj.value (line 13) are both plain-looking attribute accesses with no call syntax at their use site, yet each implicitly invokes a getter/setter body elsewhere in the file (lines 6 and 8). A tool that only instruments explicit call expressions could miss these entirely. The setter doubles its input (5 -> _value=10) and the getter reads it back unchanged, so the 10 result also confirms both accessors actually ran, not just that the file parsed. Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "The catalog's requirement also mentions 'recursion guards' (e.g. a setter that reads its own property, which GDScript guards against infinite recursion for). That case is not built here -- this fixture only covers the ordinary non-recursive accessor path."
+  ]
+}

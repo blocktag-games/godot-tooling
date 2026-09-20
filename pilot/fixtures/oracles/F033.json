@@ -1,0 +1,51 @@
+{
+  "id": "F033",
+  "tier": 1,
+  "domain": "language",
+  "case": "Lambda and Callable",
+  "requirement": "Invocation identity and captured-value behavior are preserved",
+  "files": [
+    {
+      "path": "cases/f033_lambda_and_callable/subject.gd",
+      "sha256": "105db26723342db1b765c0cc0a6b8347b0f4d6892d0579018ad2a98d57b2e212"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "invoked",
+      "call": "subject.gd:run(5, true)",
+      "expected_result": 15,
+      "obligations": [
+        { "file": "cases/f033_lambda_and_callable/subject.gd", "line": 4, "kind": "statement", "expected_hit": true, "note": "the lambda literal is created (reached), independent of whether it's ever called" },
+        { "file": "cases/f033_lambda_and_callable/subject.gd", "line": 5, "kind": "statement", "expected_hit": true, "note": "the lambda BODY only hits when the Callable is actually invoked -- captured base=5 is used here" },
+        { "file": "cases/f033_lambda_and_callable/subject.gd", "line": 6, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f033_lambda_and_callable/subject.gd", "line": 9, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f033_lambda_and_callable/subject.gd", "line": 10, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f033_lambda_and_callable/subject.gd", "line": 10, "kind": "branch", "branch_type": "if_true", "expected_hit": true },
+        { "file": "cases/f033_lambda_and_callable/subject.gd", "line": 11, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f033_lambda_and_callable/subject.gd", "line": 12, "kind": "statement", "expected_hit": false }
+      ]
+    },
+    {
+      "name": "made_but_not_invoked",
+      "call": "subject.gd:run(5, false)",
+      "expected_result": -1,
+      "obligations": [
+        { "file": "cases/f033_lambda_and_callable/subject.gd", "line": 4, "kind": "statement", "expected_hit": true, "note": "the lambda is still created here even though it's never called" },
+        { "file": "cases/f033_lambda_and_callable/subject.gd", "line": 5, "kind": "statement", "expected_hit": false, "note": "never reached: creating a Callable does not execute its body -- only c.call() would, and that never happens this run" },
+        { "file": "cases/f033_lambda_and_callable/subject.gd", "line": 6, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f033_lambda_and_callable/subject.gd", "line": 9, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f033_lambda_and_callable/subject.gd", "line": 10, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f033_lambda_and_callable/subject.gd", "line": 10, "kind": "branch", "branch_type": "if_true", "expected_hit": false },
+        { "file": "cases/f033_lambda_and_callable/subject.gd", "line": 11, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f033_lambda_and_callable/subject.gd", "line": 12, "kind": "statement", "expected_hit": true }
+      ]
+    }
+  ],
+  "notes": "The core fact this fixture isolates: creating a lambda literal (line 4) and invoking it (line 5, its body) are two distinct events, and a tool that conflates 'this closure was constructed' with 'this closure ran' would falsely mark line 5 hit in the made_but_not_invoked case. base=5 being correctly captured and used is confirmed by the invoked case's result (10 + 5 = 15), not by a separate obligation -- captured-value correctness is a return-value fact here, not a coverage fact. Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Only one Callable is created and either invoked once or not at all. Repeated invocation of the same Callable object, or invoking two different Callables built from the same lambda literal (to test whether hits are per-literal-site or per-closure-instance), is not exercised here."
+  ]
+}

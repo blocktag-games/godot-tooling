@@ -1,0 +1,28 @@
+{
+  "id": "F032",
+  "tier": 1,
+  "domain": "language",
+  "case": "Static functions",
+  "requirement": "Static entry/calls map to original source",
+  "files": [
+    {
+      "path": "cases/f032_static_functions/subject.gd",
+      "sha256": "7bb20358c46b62f5b31c072add0ae0d490c94ce0647e5784eef80df811d4dd29"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "default",
+      "call": "subject.gd:run(3)",
+      "expected_result": 7,
+      "obligations": [
+        { "file": "cases/f032_static_functions/subject.gd", "line": 4, "kind": "statement", "expected_hit": true, "note": "helper()'s body, called from run()" },
+        { "file": "cases/f032_static_functions/subject.gd", "line": 7, "kind": "statement", "expected_hit": true }
+      ]
+    }
+  ],
+  "notes": "One static function calling another. Confirms both functions' hits attribute to their own original source lines rather than collapsing into a single call-site fact (e.g. only line 7 being marked hit because that's the only line the driver directly references). Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": []
+}

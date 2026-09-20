@@ -33,6 +33,20 @@ which named inputs, bound to the fixture file's exact SHA-256 hash.
 | F014 | Early return (tier 1) | `cases/f014_early_return/subject.gd` |
 | F015 | Runtime error within an expression (tier 1) | `cases/f015_runtime_error_in_expression/subject.gd` |
 | F016 | Repeated invocation (tier 1) | `cases/f016_repeated_invocation/subject.gd` |
+| F032 | Static functions (tier 1) | `cases/f032_static_functions/subject.gd` |
+| F033 | Lambda and Callable (tier 1) | `cases/f033_lambda_and_callable/subject.gd` |
+| F034 | Inheritance and super (tier 1) | `cases/f034_inheritance_and_super/subject.gd` |
+| F035 | Property getter and setter (tier 1) | `cases/f035_property_getter_setter/subject.gd` |
+| F036 | Typed arrays, dictionaries, and signatures (tier 1) | `cases/f036_typed_collections_signatures/subject.gd` |
+| F037 | Default arguments (tier 1) | `cases/f037_default_arguments/subject.gd` |
+
+F032-F037 build out the `language` domain. F034 is the sharpest case: two
+nested classes (`Base`, `Derived`) declare a same-named method, and
+`Derived.greet()`'s `super.greet()` call reaches `Base`'s body without ever
+calling it directly -- confirming hits attribute to the correct class body's
+line, not to whichever class was instantiated at the top level. F033 shows
+that creating a lambda literal and invoking it are distinct events (the
+lambda body only hits when the Callable is actually called).
 
 F011/F013-F016 open the `lines` domain (F012 was its tier-0 case). F013 and
 F015 both use a runtime division-by-zero error (routed through a parameter,

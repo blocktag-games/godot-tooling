@@ -30,12 +30,12 @@ F028	2	control_flow	Match guards and patterns	Guard evaluation and selected arm 
 F029	1	control_flow	Conditional expression	Selected expression arm is distinct from whole-line hit	branch_optional	Both values and expression obligations	fixture-built
 F030	1	control_flow	Short-circuit and/or	Unevaluated operand remains distinguishable from false operand	condition_optional	Operand side effects and truth table	fixture-built
 F031	2	control_flow	Compound condition independence	Condition and MC/DC requirements are separate from decision coverage	condition_optional	Explicit independence pairs; no inferred support	planned
-F032	1	language	Static functions	Static entry/calls map to original source	all_supported	Known calls and return values	planned
-F033	1	language	Lambda and Callable	Invocation identity and captured-value behavior are preserved	all_supported	Fixed capture inputs and call counts	planned
-F034	1	language	Inheritance and super	Base/derived method hits and return behavior remain distinct	all_supported	Known dispatch and super-call trace	planned
-F035	1	language	Property getter and setter	Implicit accessor calls and recursion guards retain behavior	all_supported	Read/write sequence and expected values	planned
-F036	1	language	Typed arrays dictionaries and signatures	Supported typed syntax is preserved during instrumentation	syntax_validated	Baseline type/parse validation and results	planned
-F037	1	language	Default arguments	Default-expression and supplied-argument paths follow contract	all_supported	Two invocation forms and observed defaults	planned
+F032	1	language	Static functions	Static entry/calls map to original source	all_supported	Known calls and return values	fixture-built
+F033	1	language	Lambda and Callable	Invocation identity and captured-value behavior are preserved	all_supported	Fixed capture inputs and call counts	fixture-built
+F034	1	language	Inheritance and super	Base/derived method hits and return behavior remain distinct	all_supported	Known dispatch and super-call trace	fixture-built
+F035	1	language	Property getter and setter	Implicit accessor calls and recursion guards retain behavior	all_supported	Read/write sequence and expected values	fixture-built
+F036	1	language	Typed arrays dictionaries and signatures	Supported typed syntax is preserved during instrumentation	syntax_validated	Baseline type/parse validation and results	fixture-built
+F037	1	language	Default arguments	Default-expression and supplied-argument paths follow contract	all_supported	Two invocation forms and observed defaults	fixture-built
 F038	2	language	Class names and nested classes	Class discovery and source/function identity are preserved	syntax_validated	Cross-file instantiation and dispatch trace	planned
 F039	2	language	Recursion and re-entry	Counts and state survive nested invocations	all_supported	Bounded call tree and return result	planned
 F040	0	lifecycle	Autoload initialization, ordered before the collector autoload	Pre-hook initialization is measured or explicitly out of scope	all_supported	Ordered startup events and collection start boundary	fixture-built
