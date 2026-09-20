@@ -93,26 +93,36 @@ exits" -- implying memory-mode instrumentation, run outside the full
 editor-plugin-loaded context (which normally registers this runtime via
 `plugin.gd`'s `_enter_tree()`), has no runtime object for injected `hit()`
 calls to call into. The documented example script never mentions needing to
-set this up manually. Whether this is a documentation gap (a manual runtime
-setup step the example omits) or a genuine defect in the memory-mode path
-outside the editor plugin's lifecycle was not resolved -- doing so would
-mean reverse-engineering the C++ source's exact initialization contract,
-which is out of scope for this pass's time budget.
+set this up manually.
+
+**Resolved 2026-09-19** (see
+`pilot/adapter-run/nano-coverage-gdunit4-f010_straight_line/`): this is
+**not** a defect in Nano Coverage's memory-instrumentation mode itself. Its
+one shipped real integration -- the GdUnit4 session hook
+(`integrations/gdunit_hook.gd`), which calls the exact same
+`ProjectBootstrapper.instrument_all_scripts()` -- works correctly. Enabling
+`nano_coverage/integrations/gdunit4` and running the editor-plugin import
+step once (to register the session hook) is enough: `addons/gdUnit4/runtest.sh`
+then produces a correct `lcov.info` for F010's `subject.gd` (`DA:4,1 DA:5,1
+DA:6,1`, matching `oracles/F010.json` exactly). The defect is narrower than
+originally stated: it's specific to the documented
+`coverage_api_example.gd` reference script being incomplete for a bare
+headless invocation, not to the memory-mode runtime as a whole. Still worth
+an upstream documentation report, since the README calls that script "the
+reference if you are building a CI/CD pipeline script" -- but Nano Coverage
+is now a real, viable BP06 candidate via GdUnit4.
 
 ## What this does and doesn't establish
 
 - Nano Coverage's disk-instrumentation mode (its flagship, "no test
   framework needed" feature) was **not tested** -- it requires toggling an
   editor UI button, and a headless-equivalent path was not identified in
-  the time available. This is the single most important untested surface
-  for this candidate, since it's advertised as needing no test-framework
-  integration.
-- The GdUnit4 integration (the only currently-shipped test-framework
-  integration) was **not tested** -- GdUnit4 itself wasn't installed in this
-  pass. Testing Nano Coverage's memory mode via a real GdUnit4 session
-  (rather than the raw `ProjectBootstrapper` call this pass used) is a
-  distinct, cheaper next step, since the GdUnit4 session hook may perform
-  the runtime setup step `coverage_api_example.gd` appears to skip.
+  the time available. This is the single most important remaining untested
+  surface for this candidate, since it's advertised as needing no
+  test-framework integration.
+- The GdUnit4 integration **was tested** and works correctly -- see
+  `pilot/adapter-run/nano-coverage-gdunit4-f010_straight_line/`: correct
+  line hits for F010's `subject.gd`, matching its oracle exactly.
 - Per BP01's setup-effort budget: build and load succeeded; the
   memory-instrumentation runtime path did not, using the tool's own
   documented reference script. Recorded and moving on rather than
