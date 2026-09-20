@@ -16,13 +16,10 @@
       "call": "subject.gd:run(true)",
       "expected_result": "derived:base",
       "obligations": [
-        { "file": "cases/f034_inheritance_and_super/subject.gd", "line": 4, "kind": "statement", "expected_hit": false, "note": "Base.greet() is never called directly this run" },
         { "file": "cases/f034_inheritance_and_super/subject.gd", "line": 5, "kind": "statement", "expected_hit": true, "note": "reached only via Derived.greet()'s super.greet() call, not a direct call -- must still attribute to Base's line 5, not Derived's line 10" },
-        { "file": "cases/f034_inheritance_and_super/subject.gd", "line": 9, "kind": "statement", "expected_hit": true },
         { "file": "cases/f034_inheritance_and_super/subject.gd", "line": 10, "kind": "statement", "expected_hit": true },
-        { "file": "cases/f034_inheritance_and_super/subject.gd", "line": 12, "kind": "statement", "expected_hit": true },
-        { "file": "cases/f034_inheritance_and_super/subject.gd", "line": 12, "kind": "branch", "branch_type": "if_true", "expected_hit": true },
         { "file": "cases/f034_inheritance_and_super/subject.gd", "line": 13, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f034_inheritance_and_super/subject.gd", "line": 13, "kind": "branch", "branch_type": "if_true", "expected_hit": true },
         { "file": "cases/f034_inheritance_and_super/subject.gd", "line": 14, "kind": "statement", "expected_hit": true },
         { "file": "cases/f034_inheritance_and_super/subject.gd", "line": 15, "kind": "statement", "expected_hit": true },
         { "file": "cases/f034_inheritance_and_super/subject.gd", "line": 16, "kind": "statement", "expected_hit": false },
@@ -34,13 +31,10 @@
       "call": "subject.gd:run(false)",
       "expected_result": "base",
       "obligations": [
-        { "file": "cases/f034_inheritance_and_super/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
         { "file": "cases/f034_inheritance_and_super/subject.gd", "line": 5, "kind": "statement", "expected_hit": true, "note": "reached via a direct Base.greet() call this time" },
-        { "file": "cases/f034_inheritance_and_super/subject.gd", "line": 9, "kind": "statement", "expected_hit": false },
         { "file": "cases/f034_inheritance_and_super/subject.gd", "line": 10, "kind": "statement", "expected_hit": false },
-        { "file": "cases/f034_inheritance_and_super/subject.gd", "line": 12, "kind": "statement", "expected_hit": true },
-        { "file": "cases/f034_inheritance_and_super/subject.gd", "line": 12, "kind": "branch", "branch_type": "if_true", "expected_hit": false },
-        { "file": "cases/f034_inheritance_and_super/subject.gd", "line": 13, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f034_inheritance_and_super/subject.gd", "line": 13, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f034_inheritance_and_super/subject.gd", "line": 13, "kind": "branch", "branch_type": "if_true", "expected_hit": false },
         { "file": "cases/f034_inheritance_and_super/subject.gd", "line": 14, "kind": "statement", "expected_hit": false },
         { "file": "cases/f034_inheritance_and_super/subject.gd", "line": 15, "kind": "statement", "expected_hit": false },
         { "file": "cases/f034_inheritance_and_super/subject.gd", "line": 16, "kind": "statement", "expected_hit": true },
@@ -48,7 +42,7 @@
       ]
     }
   ],
-  "notes": "Base and Derived are nested classes in the same file, each declaring a method with the same name (greet). derived_dispatch reaches Base's line 5 ONLY through Derived.greet()'s super.greet() call, never through a direct Base call -- this is the sharpest test that hits attribute to the correct class body's line, not to whichever class was instantiated at the top level. Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd: super.greet() dispatches correctly and the two nested classes with an identically-named method do not get confused.",
+  "notes": "Base and Derived are nested classes in the same file, each declaring a method with the same name (greet). derived_dispatch reaches Base's line 5 ONLY through Derived.greet()'s super.greet() call, never through a direct Base call -- this is the sharpest test that hits attribute to the correct class body's line, not to whichever class was instantiated at the top level. Function signature lines (4, 9, 12) are never statement obligations, matching the established convention (F011/F032/F037). Line 13 (`if use_derived:`) is hit=true in BOTH inputs since the if-header is always evaluated; only the branch obligation and the arms it guards differ between the two calls -- this was caught and corrected after an earlier draft of this oracle mistakenly attributed the if-statement's hit/branch facts to line 12 (the func signature above it) and marked line 13 unreached in base_dispatch, which was wrong on both counts. Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd.",
   "author": "godot-tooling-session-2026-09-19",
   "reviewer": null,
   "ambiguities": [

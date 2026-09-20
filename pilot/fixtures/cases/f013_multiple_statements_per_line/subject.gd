@@ -1,5 +1,5 @@
 extends RefCounted
 
-static func run(divisor: int) -> int:
-	var ok: bool = true; var result: int = 100 / divisor
+static func run(divisor: int, log: Array) -> int:
+	log.append("first"); var result: int = 100 / divisor; log.append("second")
 	return result

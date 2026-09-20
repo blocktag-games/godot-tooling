@@ -16,6 +16,7 @@
       "call": "subject.gd:run(5)",
       "expected_result": 10,
       "obligations": [
+        { "file": "cases/f035_property_getter_setter/subject.gd", "line": 3, "kind": "statement", "expected_hit": true, "note": "member initializer, runs during .new() on line 11" },
         { "file": "cases/f035_property_getter_setter/subject.gd", "line": 6, "kind": "statement", "expected_hit": true, "note": "getter body, reached implicitly by `obj.value` (the read on line 13), not by a visible function-call syntax" },
         { "file": "cases/f035_property_getter_setter/subject.gd", "line": 8, "kind": "statement", "expected_hit": true, "note": "setter body, reached implicitly by `obj.value = input` (the assignment on line 12)" },
         { "file": "cases/f035_property_getter_setter/subject.gd", "line": 11, "kind": "statement", "expected_hit": true },

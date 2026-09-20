@@ -126,13 +126,18 @@ func _initialize() -> void:
 	var f011 = load("res://cases/f011_blank_comments_annotations/subject.gd")
 	_check("F011", "run(3)", f011.run(3), 6)
 
-	# F013: two statements on one physical line via a semicolon. A
-	# runtime error mid-line lets the first statement complete while the
-	# second (and the following line) never do, even though the line was
-	# reached.
+	# F013: three semicolon-joined statements on one physical line. A
+	# return-value-only check can't prove which of them actually ran
+	# (the coverage schema can only mark the whole line hit either way),
+	# so a log side-channel makes it observable, same technique as F030.
 	var f013 = load("res://cases/f013_multiple_statements_per_line/subject.gd")
-	_check("F013", "run(2) both statements complete", f013.run(2), 50)
-	_check("F013", "run(0) second statement errors, first still ran", f013.run(0), 0)
+	var f013_log_ok: Array = []
+	_check("F013", "run(2, log) result", f013.run(2, f013_log_ok), 50)
+	_check("F013", "run(2, log) all three statements ran", f013_log_ok, ["first", "second"])
+
+	var f013_log_err: Array = []
+	_check("F013", "run(0, log) result coerces to 0", f013.run(0, f013_log_err), 0)
+	_check("F013", "run(0, log) only the pre-error statement ran", f013_log_err, ["first"])
 
 	# F014: early return -- code textually after the taken return must
 	# not be falsely marked hit for that call.

@@ -7,33 +7,35 @@
   "files": [
     {
       "path": "cases/f013_multiple_statements_per_line/subject.gd",
-      "sha256": "a23f7903c665c027a580d49d3e10318e5ed42f60ea21a026cd324ea0327d89f1"
+      "sha256": "51104d920b98ebdc4f23c03778e57cc9e0267875bfd0cb2b6a4bd32dfbea8ea0"
     }
   ],
   "inputs": [
     {
-      "name": "both_complete",
-      "call": "subject.gd:run(2)",
+      "name": "all_complete",
+      "call": "subject.gd:run(2, log=[])",
       "expected_result": 50,
+      "expected_log": ["first", "second"],
       "obligations": [
-        { "file": "cases/f013_multiple_statements_per_line/subject.gd", "line": 4, "kind": "statement", "expected_hit": true, "note": "both semicolon-joined statements complete" },
+        { "file": "cases/f013_multiple_statements_per_line/subject.gd", "line": 4, "kind": "statement", "expected_hit": true, "note": "all three semicolon-joined statements complete; ground truth for which ones is the log side-channel, not this obligation alone" },
         { "file": "cases/f013_multiple_statements_per_line/subject.gd", "line": 5, "kind": "statement", "expected_hit": true }
       ]
     },
     {
-      "name": "second_statement_errors",
-      "call": "subject.gd:run(0)",
+      "name": "middle_statement_errors",
+      "call": "subject.gd:run(0, log=[])",
       "expected_result": 0,
+      "expected_log": ["first"],
       "obligations": [
-        { "file": "cases/f013_multiple_statements_per_line/subject.gd", "line": 4, "kind": "statement", "expected_hit": true, "note": "reached and the first statement (ok = true) completes; the second statement (100 / divisor) raises a runtime division-by-zero error mid-evaluation and never completes. A line-granularity tool can only report this line as hit=true either way -- it cannot express that one of the two statements on it did not finish. That gap is exactly what this fixture documents, not a defect to fix in this oracle." },
+        { "file": "cases/f013_multiple_statements_per_line/subject.gd", "line": 4, "kind": "statement", "expected_hit": true, "note": "reached, and the first statement (log.append(\"first\")) completes; the second statement (100 / divisor) raises a runtime division-by-zero error mid-evaluation, aborting the line before the third statement (log.append(\"second\")) ever runs. A line-granularity tool can only report this line as hit=true either way -- it cannot express that two of the three statements on it did not finish. The log array is the actual ground truth for that finer-grained fact; this obligation alone is NOT sufficient to distinguish this input from all_complete, and is not meant to be -- see notes." },
         { "file": "cases/f013_multiple_statements_per_line/subject.gd", "line": 5, "kind": "statement", "expected_hit": false, "note": "never reached: the function aborts on line 4's error before returning" }
       ]
     }
   ],
-  "notes": "GDScript allows semicolon-separated simple statements on one physical line (confirmed on the pinned Godot 4.7.1 engine: `var a: int = 1; var b: int = 2` runs both statements left to right). This fixture makes the second statement fail at runtime (division by zero) so it never completes, while the first statement on the same line already ran. Confirmed via pilot/fixtures/driver.gd; run(0) prints a SCRIPT ERROR to stderr and the function returns the GDScript-coerced default (0) for its declared int return type, matching F015's coercion behavior for the same underlying error.",
+  "notes": "GDScript allows semicolon-separated simple statements on one physical line (confirmed on the pinned Godot 4.7.1 engine). This fixture's line-4 obligation is deliberately identical (hit=true) across both inputs -- that IS the point being demonstrated, not an oversight: a line-granularity coverage schema genuinely cannot discriminate 'all three statements ran' from 'only the first one did' using hits alone, since both produce the same single line-hit fact. The `expected_log` field carries the actual finer-grained ground truth (which statements ran, via an explicit log.append() side-channel each statement performs), the same technique used in F030 to make short-circuit evaluation observable where a boolean return value alone would be insufficient. `expected_log` is fixture-specific, not part of the general Obligation schema, and is checked directly by pilot/fixtures/driver.gd rather than by pilot/harness/comparator.py.",
   "author": "godot-tooling-session-2026-09-19",
   "reviewer": null,
   "ambiguities": [
-    "Only two statements are exercised, and the failure mode used to differentiate them is a runtime error (shared with F015), not an independent mechanism (e.g. an early return mid-line, which GDScript does not support since a bare `return` statement itself would need to be one of the semicolon-joined statements -- untested here). A tool that reports statement-level (not just line-level) hits would need a different, non-erroring case to fully exercise this requirement; none is built."
+    "A real coverage tool with only line-granularity hits (which is what most GDScript tools, including gd-tools 0.4.0, provide) has no way to surface the finer-grained fact this fixture documents at all -- there is no statement-level obligation kind in the schema to bind a 'partial line' report to. This fixture records the gap; closing it would require extending the schema with a statement-index concept, out of scope here."
   ]
 }
