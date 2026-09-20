@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="GutTests" failures="0" tests="1" >
+  <testsuite name="tests/test_app.gd" tests="1" failures="0" skipped="0" time="0.000287" >
+      <testcase name="test_run_calls_excluded_dependency" assertions="1" status="pass" classname="tests/test_app.gd" time="0.000287" >
+      </testcase>
+  </testsuite>
+</testsuites>

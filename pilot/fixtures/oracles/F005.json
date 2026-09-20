@@ -1,0 +1,28 @@
+{
+  "id": "F005",
+  "tier": 1,
+  "domain": "population",
+  "case": "Loaded dependency outside selection",
+  "requirement": "Dependency execution does not silently broaden or shrink declared scope",
+  "files": [
+    { "path": "../../adapter-run/f005_loaded_dependency_outside_selection/subject/app.gd", "sha256": "c1513146b23b4bceb6a5853b6671472e19205e286c6a5e61c81e5db466211486", "note": "Selected; preloads and calls the excluded vendor.gd. Path is relative to this oracle's own directory (pilot/fixtures/oracles/), not the usual pilot/fixtures/-relative convention, since this fixture lives under pilot/adapter-run/ -- it needs a real end-to-end GUT+gd-tools run, not a standalone driver, to observe the runtime effect of calling excluded code." },
+    { "path": "../../adapter-run/f005_loaded_dependency_outside_selection/addons/vendor_lib/vendor.gd", "sha256": "bfdd9d01b334ecdb6ecb70fc22e9e309b6f5c885b1eb7530563db8a988d19f9b", "note": "Excluded by gd-tools' default addons/ rule, but actually loaded and executed at runtime by app.gd." },
+    { "path": "../../adapter-run/f005_loaded_dependency_outside_selection/check.py", "sha256": "2a9fd821d2ee7f9faec12ea9fab70f43504b040fe1eedd2830c3990e73deb055" }
+  ],
+  "inputs": [
+    { "name": "default", "call": "check.py -> real gd-tools test --coverage (gd-tools-cli 0.4.0 + GUT v9.7.1)" }
+  ],
+  "measured_with_gd_tools_0_4_0": {
+    "test_result": "1/1 passed, App.run() == 11 (10 from excluded vendor.gd + 1)",
+    "plan_files": ["res://subject/app.gd"],
+    "app_gd_line_6_hit": true,
+    "requirement_met": true,
+    "finding": "Calling excluded vendor.gd from selected app.gd neither crashes instrumentation nor broadens the plan -- vendor.gd never appears in plan.json despite executing successfully at runtime, and app.gd's own line (the one calling into vendor.gd) is correctly measured as hit."
+  },
+  "notes": "A third real, verified positive finding (with F003 and F004): gd-tools' scope boundary holds even when excluded code is genuinely reachable and executed, not just present on disk unused. This is a stronger test than F004 alone, which only checked static file discovery -- F005 confirms the exclusion survives actual cross-boundary execution.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Only tested one direction: selected code calling excluded code. The reverse (excluded code calling back into selected code, e.g. a vendor callback invoking an app-provided function) is untested and could plausibly behave differently."
+  ]
+}

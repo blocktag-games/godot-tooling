@@ -1,0 +1,27 @@
+{
+  "id": "F004",
+  "tier": 1,
+  "domain": "population",
+  "case": "Include and exclude rules",
+  "requirement": "Selected application and excluded vendor/test sources are distinguished",
+  "files": [
+    { "path": "cases/f004_include_exclude/app.gd", "sha256": "2c5b73b27966732f2c3d63df08b10c2e9fcaea3b4075c5bb212e07d924a26fa9", "role": "should be selected" },
+    { "path": "cases/f004_include_exclude/addons/vendor_lib/vendor.gd", "sha256": "af205c55d5068ccbc9baa0f476d9c6d9acf9c0eb865ef7463f05945de641e754", "role": "should be excluded (addons/ is in gd-tools' DEFAULT_EXCLUDES)" },
+    { "path": "cases/f004_include_exclude/tests/test_something.gd", "sha256": "a3fad68fc1ce8ab06c1061cdd686f890ad69d925bd1ddb97e1bfa5eed0ea46e2", "role": "should be excluded (tests/ is a default test_dir)" },
+    { "path": "cases/f004_include_exclude/check.py", "sha256": "789c9945fbde5b1d42b51ebe130fab6335ae3c75326fb9b256ab9e3bd9794578" }
+  ],
+  "inputs": [
+    { "name": "default", "call": "check.py -> real gd_tools.coverage.plan_generator.generate_plan() against this directory" }
+  ],
+  "measured_with_gd_tools_0_4_0": {
+    "plan_files": ["res://app.gd"],
+    "requirement_met": true,
+    "finding": "gd-tools' default exclude_dirs (addons, .godot, .gd-tools, .git) and default test_dirs (test, tests) correctly filter the plan to exactly app.gd, with no configuration needed beyond the defaults."
+  },
+  "notes": "Another real, verified positive finding, like F003. Confirmed directly against the real gd-tools-cli 0.4.0 Python API: exactly one file (app.gd) selected from a three-file population.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Only default exclude/test_dir configuration was tested. gd-tools.toml supports custom exclude lists; a custom-configuration variant is unbuilt."
+  ]
+}

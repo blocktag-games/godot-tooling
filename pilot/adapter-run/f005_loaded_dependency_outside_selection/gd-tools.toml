@@ -1,0 +1,4 @@
+[coverage]
+enabled = true
+min_percent = 0
+format = "lcov"

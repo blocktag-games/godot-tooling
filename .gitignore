@@ -166,14 +166,24 @@ venv.bak/
 pilot/godot/*
 !pilot/godot/.gitkeep
 
-# BP04 adapter-run projects: vendored GUT/gd-tools-coverage addons and
-# Godot's local import cache are reproducible from the pinned versions
-# in docs/benchmarks/pilot-environment.md (GUT is already vendored once,
-# in full, under pilot/fixtures/cases/f064_zero_requested_tests/addons/
-# -- no need to duplicate ~7MB per adapter-run case). The measured
-# evidence itself (.gd-tools/coverage/*.json, *.info, results.xml) is
-# small and IS committed.
-pilot/adapter-run/*/addons/
+# BP04/05/06 adapter-run projects: vendored addons and Godot's local
+# import cache are reproducible from the pinned versions in
+# docs/benchmarks/pilot-environment.md and each candidate's PIN.md (GUT
+# is already vendored once, in full, under
+# pilot/fixtures/cases/f064_zero_requested_tests/addons/ -- no need to
+# duplicate ~7MB/8.5MB per adapter-run case). Named by the specific
+# vendored addon directories actually restored by check.py/reproduce.sh
+# scripts, NOT a blanket "addons/" pattern -- some fixtures (e.g. F005)
+# have genuine fixture content living inside their own addons/<name>/
+# subdirectory (modeling gd-tools' default addons/ exclusion rule) that
+# must stay committed. The measured evidence itself
+# (.gd-tools/coverage/*.json, *.info, results.xml, coverage-report/)
+# is small and IS committed.
+pilot/adapter-run/*/addons/gut/
+pilot/adapter-run/*/addons/gd-tools-coverage/
+pilot/adapter-run/*/addons/gdUnit4/
+pilot/adapter-run/*/addons/nano_coverage_godot/
+pilot/adapter-run/*/addons/coverage/
 pilot/adapter-run/*/.godot/
 
 # BP05 candidate source clones (Nano Coverage's full checkout with
@@ -183,8 +193,6 @@ pilot/adapter-run/*/.godot/
 # nano-coverage-godot-PIN.md (a sibling file, not inside the ignored
 # clone) instead of vendoring the source tree or compiled binaries.
 pilot/candidates/nano-coverage-godot/
-pilot/adapter-run/nano-coverage-*/addons/
-pilot/adapter-run/nano-coverage-*/.godot/
 
 # Rope project settings
 .ropeproject
