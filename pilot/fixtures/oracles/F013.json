@@ -1,0 +1,39 @@
+{
+  "id": "F013",
+  "tier": 1,
+  "domain": "lines",
+  "case": "Multiple statements on one line",
+  "requirement": "Line-hit result does not imply every statement executed",
+  "files": [
+    {
+      "path": "cases/f013_multiple_statements_per_line/subject.gd",
+      "sha256": "a23f7903c665c027a580d49d3e10318e5ed42f60ea21a026cd324ea0327d89f1"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "both_complete",
+      "call": "subject.gd:run(2)",
+      "expected_result": 50,
+      "obligations": [
+        { "file": "cases/f013_multiple_statements_per_line/subject.gd", "line": 4, "kind": "statement", "expected_hit": true, "note": "both semicolon-joined statements complete" },
+        { "file": "cases/f013_multiple_statements_per_line/subject.gd", "line": 5, "kind": "statement", "expected_hit": true }
+      ]
+    },
+    {
+      "name": "second_statement_errors",
+      "call": "subject.gd:run(0)",
+      "expected_result": 0,
+      "obligations": [
+        { "file": "cases/f013_multiple_statements_per_line/subject.gd", "line": 4, "kind": "statement", "expected_hit": true, "note": "reached and the first statement (ok = true) completes; the second statement (100 / divisor) raises a runtime division-by-zero error mid-evaluation and never completes. A line-granularity tool can only report this line as hit=true either way -- it cannot express that one of the two statements on it did not finish. That gap is exactly what this fixture documents, not a defect to fix in this oracle." },
+        { "file": "cases/f013_multiple_statements_per_line/subject.gd", "line": 5, "kind": "statement", "expected_hit": false, "note": "never reached: the function aborts on line 4's error before returning" }
+      ]
+    }
+  ],
+  "notes": "GDScript allows semicolon-separated simple statements on one physical line (confirmed on the pinned Godot 4.7.1 engine: `var a: int = 1; var b: int = 2` runs both statements left to right). This fixture makes the second statement fail at runtime (division by zero) so it never completes, while the first statement on the same line already ran. Confirmed via pilot/fixtures/driver.gd; run(0) prints a SCRIPT ERROR to stderr and the function returns the GDScript-coerced default (0) for its declared int return type, matching F015's coercion behavior for the same underlying error.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Only two statements are exercised, and the failure mode used to differentiate them is a runtime error (shared with F015), not an independent mechanism (e.g. an early return mid-line, which GDScript does not support since a bare `return` statement itself would need to be one of the semicolon-joined statements -- untested here). A tool that reports statement-level (not just line-level) hits would need a different, non-erroring case to fully exercise this requirement; none is built."
+  ]
+}

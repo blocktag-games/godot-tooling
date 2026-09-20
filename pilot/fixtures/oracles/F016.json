@@ -1,0 +1,29 @@
+{
+  "id": "F016",
+  "tier": 1,
+  "domain": "lines",
+  "case": "Repeated invocation",
+  "requirement": "Hit set remains stable; counts match only a defined event contract",
+  "files": [
+    {
+      "path": "cases/f016_repeated_invocation/subject.gd",
+      "sha256": "ae0b716c8d9994f0b004e8240f2af118a7bd999a169c03debdc62d7daf082acc"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "three_identical_calls",
+      "call": "subject.gd:run(1) three times in the same process",
+      "expected_result": 2,
+      "obligations": [
+        { "file": "cases/f016_repeated_invocation/subject.gd", "line": 4, "kind": "statement", "expected_hit": true, "note": "hit=true after any number of calls >= 1; this obligation is scoped to reached-at-least-once, not a specific count" }
+      ]
+    }
+  ],
+  "notes": "Calling the same function three times with the same input returns the same result each time (deterministic, no hidden state), and the line's hit status stays true -- it does not toggle or reset between calls within one process. This oracle deliberately does NOT assert a specific hit *count* (e.g. exactly 3): the schema's obligations are reached/not-reached facts, not counters, and different tools may legitimately report count semantics differently (e.g. once per line vs. once per statement vs. per-invocation). The requirement this fixture documents is narrower and tool-agnostic: whatever counting convention a tool uses, it must be a defined, consistent contract -- not a value that drifts across repeated identical calls. Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "This fixture cannot, by itself, catch a tool that reports a wrong but internally-consistent count (e.g. always reporting count=1 regardless of actual invocations) -- doing so would require the oracle to commit to one specific counting convention, which the schema does not yet define. That is a real gap, noted here rather than papered over."
+  ]
+}

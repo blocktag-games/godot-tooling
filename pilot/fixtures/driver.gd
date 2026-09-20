@@ -121,6 +121,40 @@ func _initialize() -> void:
 	_check("F030", "run_or(true, false) result", f030.run_or(true, false, log_or_short), true)
 	_check("F030", "run_or(true, false) right NOT evaluated", log_or_short, [])
 
+	# F011: blank lines, comments, and annotations are nonexecuting text --
+	# only the var assignment and return are real obligations.
+	var f011 = load("res://cases/f011_blank_comments_annotations/subject.gd")
+	_check("F011", "run(3)", f011.run(3), 6)
+
+	# F013: two statements on one physical line via a semicolon. A
+	# runtime error mid-line lets the first statement complete while the
+	# second (and the following line) never do, even though the line was
+	# reached.
+	var f013 = load("res://cases/f013_multiple_statements_per_line/subject.gd")
+	_check("F013", "run(2) both statements complete", f013.run(2), 50)
+	_check("F013", "run(0) second statement errors, first still ran", f013.run(0), 0)
+
+	# F014: early return -- code textually after the taken return must
+	# not be falsely marked hit for that call.
+	var f014 = load("res://cases/f014_early_return/subject.gd")
+	_check("F014", "run(true) early return taken", f014.run(true), "early")
+	_check("F014", "run(false) falls through to later code", f014.run(false), "late")
+
+	# F015: runtime error within an expression -- the line is reached
+	# (evaluation starts) but never completes (assignment never happens,
+	# the function aborts, and the following return is never reached).
+	var f015 = load("res://cases/f015_runtime_error_in_expression/subject.gd")
+	_check("F015", "run(4) completes normally", f015.run(4), 25)
+	_check("F015", "run(0) reached but not completed, coerces to 0", f015.run(0), 0)
+
+	# F016: repeated invocation -- the hit set stays stable across
+	# multiple identical calls; this only asserts return-value stability,
+	# not any specific count semantics (that's a per-tool question).
+	var f016 = load("res://cases/f016_repeated_invocation/subject.gd")
+	_check("F016", "run(1) call 1", f016.run(1), 2)
+	_check("F016", "run(1) call 2", f016.run(1), 2)
+	_check("F016", "run(1) call 3", f016.run(1), 2)
+
 	print("")
 	if failures.is_empty():
 		print("All tier-0 group 1 fixtures match their behavioral specification.")

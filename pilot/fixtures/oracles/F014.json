@@ -1,0 +1,43 @@
+{
+  "id": "F014",
+  "tier": 1,
+  "domain": "lines",
+  "case": "Early return",
+  "requirement": "Code after the selected return is not falsely hit",
+  "files": [
+    {
+      "path": "cases/f014_early_return/subject.gd",
+      "sha256": "326f0d93f88ecfe401e277e9a082119440b94b8e3888ac5c1e5deadeaec7634f"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "early_return_taken",
+      "call": "subject.gd:run(true)",
+      "expected_result": "early",
+      "obligations": [
+        { "file": "cases/f014_early_return/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f014_early_return/subject.gd", "line": 4, "kind": "branch", "branch_type": "if_true", "expected_hit": true },
+        { "file": "cases/f014_early_return/subject.gd", "line": 5, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f014_early_return/subject.gd", "line": 6, "kind": "statement", "expected_hit": false, "note": "never reached: line 5's return exits the function before line 6" },
+        { "file": "cases/f014_early_return/subject.gd", "line": 7, "kind": "statement", "expected_hit": false, "note": "never reached for this call" }
+      ]
+    },
+    {
+      "name": "falls_through",
+      "call": "subject.gd:run(false)",
+      "expected_result": "late",
+      "obligations": [
+        { "file": "cases/f014_early_return/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f014_early_return/subject.gd", "line": 4, "kind": "branch", "branch_type": "if_true", "expected_hit": false },
+        { "file": "cases/f014_early_return/subject.gd", "line": 5, "kind": "statement", "expected_hit": false, "note": "never reached: the if is not taken this run" },
+        { "file": "cases/f014_early_return/subject.gd", "line": 6, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f014_early_return/subject.gd", "line": 7, "kind": "statement", "expected_hit": true }
+      ]
+    }
+  ],
+  "notes": "Guards against a naive coverage tool that marks an entire function 'covered' once any line inside it is hit, rather than tracking which specific lines executed on a given call. Line 6 sits textually after the early return on line 5 and must read as unreached for the flag=true call despite line 5 (in the same function body) being hit. Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": []
+}

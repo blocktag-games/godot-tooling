@@ -28,6 +28,18 @@ which named inputs, bound to the fixture file's exact SHA-256 hash.
 | F027 | Match and fallback (tier 1) | `cases/f027_match_fallback/subject.gd` |
 | F029 | Conditional expression (tier 1) | `cases/f029_conditional_expression/subject.gd` |
 | F030 | Short-circuit and/or (tier 1) | `cases/f030_short_circuit/subject.gd` |
+| F011 | Blank, comments, and annotations (tier 1) | `cases/f011_blank_comments_annotations/subject.gd` |
+| F013 | Multiple statements on one line (tier 1) | `cases/f013_multiple_statements_per_line/subject.gd` |
+| F014 | Early return (tier 1) | `cases/f014_early_return/subject.gd` |
+| F015 | Runtime error within an expression (tier 1) | `cases/f015_runtime_error_in_expression/subject.gd` |
+| F016 | Repeated invocation (tier 1) | `cases/f016_repeated_invocation/subject.gd` |
+
+F011/F013-F016 open the `lines` domain (F012 was its tier-0 case). F013 and
+F015 both use a runtime division-by-zero error (routed through a parameter,
+not a literal, since a literal `100 / 0` is caught at parse time instead) to
+force a "reached but not completed" case — the error aborts only the
+`run()` call, the caller is unaffected, and GDScript coerces the aborted
+call's return value to the declared type's default.
 
 F022 is tier 1, not tier 0, but lives here since it's pure GDScript with no
 live-process/harness needs, matching this group. It's the first fixture

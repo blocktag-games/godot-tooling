@@ -1,0 +1,39 @@
+{
+  "id": "F015",
+  "tier": 1,
+  "domain": "lines",
+  "case": "Runtime error within an expression",
+  "requirement": "Reaching and completing an expression are distinguished",
+  "files": [
+    {
+      "path": "cases/f015_runtime_error_in_expression/subject.gd",
+      "sha256": "9a8f5dd6de7deaa977d06f10db03a7985d63bed1a95c7cc6f010d796e75585e5"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "completes_normally",
+      "call": "subject.gd:run(4)",
+      "expected_result": 25,
+      "obligations": [
+        { "file": "cases/f015_runtime_error_in_expression/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f015_runtime_error_in_expression/subject.gd", "line": 5, "kind": "statement", "expected_hit": true }
+      ]
+    },
+    {
+      "name": "reached_but_not_completed",
+      "call": "subject.gd:run(0)",
+      "expected_result": 0,
+      "obligations": [
+        { "file": "cases/f015_runtime_error_in_expression/subject.gd", "line": 4, "kind": "statement", "expected_hit": true, "note": "the division starts evaluating (reached) but raises a runtime division-by-zero error before the assignment to result completes. A tool that only distinguishes reached vs. not-reached will (correctly) call this line hit; a tool that additionally claims the assignment succeeded would be wrong." },
+        { "file": "cases/f015_runtime_error_in_expression/subject.gd", "line": 5, "kind": "statement", "expected_hit": false, "note": "never reached: the function aborts on line 4's error, so the return statement never executes" }
+      ]
+    }
+  ],
+  "notes": "Divisor 0 is passed as a variable, not a literal -- `100 / 0` written directly is caught at parse/constant-fold time (a SCRIPT ERROR before the script even loads), which is a different, uninteresting failure mode. Routing the zero through a parameter forces a genuine runtime error inside a running function, confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd: the error aborts only the run() call (prints SCRIPT ERROR to stderr), the caller is unaffected, and GDScript coerces the aborted call's return value to the declared type's default (int -> 0). This distinguishes 'reached' (line 4 started executing) from 'completed' (the assignment and the following return never happen).",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Only one error type (division by zero) is exercised. Other runtime errors that can occur mid-expression (null method calls, out-of-bounds indexing, type-cast failures) are assumed to abort the same way but are not individually tested."
+  ]
+}

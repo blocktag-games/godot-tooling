@@ -9,12 +9,12 @@ F007	2	population	Tracking-limit boundary	Limit and incomplete scope are explici
 F008	0	population	Selected file cannot be instrumented	Unmeasured selected file is visible in completeness accounting	all_supported	Known selected file and injected instrumentation rejection	fixture-built
 F009	2	population	Generated source	Generated/original identity and measurement scope remain explicit	dynamic_source_supported	Pinned generator output and mapping contract	planned
 F010	0	lines	Straight-line body	Reached body lines match hand-traced execution	all_supported	Exact values and line obligations	fixture-built
-F011	1	lines	Blank comments and annotations	Nonexecuting text is classified explicitly	all_supported	Reviewed executable-location set	planned
+F011	1	lines	Blank comments and annotations	Nonexecuting text is classified explicitly	all_supported	Reviewed executable-location set	fixture-built
 F012	0	lines	Multiline expression	Continuation lines follow a documented line convention	all_supported	Statement spans and reached-expression obligations	fixture-built
-F013	1	lines	Multiple statements on one line	Line-hit result does not imply every statement executed	syntax_validated	Separate statement obligations and derived line view	planned
-F014	1	lines	Early return	Code after the selected return is not falsely hit	all_supported	Input-to-return trace	planned
-F015	1	lines	Runtime error within an expression	Reaching and completing an expression are distinguished	all_supported	Observed baseline error point and preceding events	planned
-F016	1	lines	Repeated invocation	Hit set remains stable; counts match only a defined event contract	all_supported	Fixed invocation count and expected outputs	planned
+F013	1	lines	Multiple statements on one line	Line-hit result does not imply every statement executed	syntax_validated	Separate statement obligations and derived line view	fixture-built
+F014	1	lines	Early return	Code after the selected return is not falsely hit	all_supported	Input-to-return trace	fixture-built
+F015	1	lines	Runtime error within an expression	Reaching and completing an expression are distinguished	all_supported	Observed baseline error point and preceding events	fixture-built
+F016	1	lines	Repeated invocation	Hit set remains stable; counts match only a defined event contract	all_supported	Fixed invocation count and expected outputs	fixture-built
 F017	2	lines	Multiline string and source-like text	Text contents are not instrumented as executable GDScript	all_supported	Literal contents and unchanged output	planned
 F018	2	lines	Unicode and CRLF source	Source mapping and behavior survive supported encodings/line endings	platform_supported	Byte hashes and logical location mapping	planned
 F019	2	lines	Assertions and build modes	Eligibility and execution are explicit for each engine build mode	build_supported	Separate debug/release baseline behavior	planned
