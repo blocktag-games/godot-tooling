@@ -116,8 +116,13 @@ def run_one(test_func: str) -> tuple[dict, dict]:
         [str(GD_TOOLS_BIN), "test", "--coverage", "--test", test_func],
         cwd=str(SCRATCH), env=env, capture_output=True, text=True, timeout=60,
     )
-    if "All 1 test(s) passed" not in result.stdout and "1 passed" not in result.stdout:
-        raise RuntimeError(f"test {test_func} did not pass cleanly:\n{result.stdout}\n{result.stderr}")
+    # GUT 9.7.1 scores any engine error raised during a test as a failure,
+    # so the two deliberate runtime-error inputs fail under GUT by design;
+    # their coverage data is still valid (F063: outcome and coverage are
+    # independent). Every other input must pass.
+    passed = "All 1 test(s) passed" in result.stdout
+    if passed == (test_func in EXPECTED_GUT_FAILURES):
+        raise RuntimeError(f"unexpected GUT outcome for {test_func} (passed={passed}):\n{result.stdout}\n{result.stderr}")
     plan = json.loads((SCRATCH / ".gd-tools/coverage/plan.json").read_text())
     coverage_path = SCRATCH / ".gd-tools/coverage/coverage.json"
     coverage = json.loads(coverage_path.read_text()) if coverage_path.exists() else {"files": []}
@@ -132,6 +137,11 @@ def run_one(test_func: str) -> tuple[dict, dict]:
 # the same concept "loop_entered". This is a naming mismatch to
 # translate, not a behavioral deviation to report.
 BRANCH_TYPE_ALIASES = {"loop_body": "loop_entered"}
+
+EXPECTED_GUT_FAILURES = {
+    "test_F013_middle_statement_errors",
+    "test_F015_reached_but_not_completed",
+}
 
 
 def build_actual(plan: dict, coverage: dict) -> dict:

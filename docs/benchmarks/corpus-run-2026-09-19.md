@@ -143,3 +143,44 @@ See `pilot/adapter-run/corpus-sweep/README.md`. Raw results:
 `pilot/adapter-run/corpus-sweep/results.tsv` (53 rows, one per
 fixture/input, with match status and the exact false_hits/missing_hits
 tuples `comparator.compare()` returned).
+
+## Review addendum (same day)
+
+A review of these conclusions against the remaining work packages
+(BP07-BP13) produced two corrections and one new finding.
+
+### Correction: the sweep's pass-guard was vacuous
+
+`run_sweep.py` accepted a run if stdout contained `"1 passed"`, which
+GUT's `0/1 passed.` failure line also contains. A single batch run of
+all 53 tests shows 51 pass and 2 fail: `F013/middle_statement_errors`
+and `F015/reached_but_not_completed`, the two deliberate runtime-error
+inputs (GUT 9.7.1 scores any engine error during a test as a failure).
+Nothing was masked, and coverage data is independent of test outcome
+(F063), so `results.tsv` stands. The guard now asserts the expected
+outcome per input. The sweep was not re-run after this fix.
+
+### Correction: findings 2 and 3 are contract-dependent
+
+Whether `var outcome: int` (no initializer), a `match value:` header,
+or a not-taken `elif` line is an executable "statement" is an oracle
+CONVENTION, not an engine fact. Other ecosystems' collectors differ on
+exactly these. Per the plan's own rule ("record alternative contracts;
+never derive truth from a favored collector"), these are deviations
+from THIS corpus's contract and must be reported with the alternative
+contract beside them before BP09 freezes, not as defects. Finding 1
+(a counter labeled `if_true` that fires when the outcome is false) and
+finding 4 (no ternary tracking) do not depend on a convention.
+
+Also: "30/53 matched" is not a score. 13 mismatches share one root
+cause and inputs were not sampled. Report by root cause.
+
+### New finding: instrumentation shifts runtime error line numbers
+
+gd-tools inserts tracker lines into the in-memory source before
+`reload(true)`. Verified directly on F015 with the engine alone:
+uninstrumented, the division-by-zero reports `subject.gd:4` (correct);
+with `GD_TOOLS_COVERAGE_PLAN` set, the same error reports
+`subject.gd:5`. Every diagnostic from a covered run points at the
+wrong line, by an offset that grows down the file. No fixture covers
+this yet; it bears directly on BP11 (F082-F084).
