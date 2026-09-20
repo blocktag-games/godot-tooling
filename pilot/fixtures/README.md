@@ -21,6 +21,18 @@ which named inputs, bound to the fixture file's exact SHA-256 hash.
 | F020 | If with both outcomes | `cases/f020_if_both_outcomes/subject.gd` |
 | F021 | If without explicit else | `cases/f021_if_without_else/subject.gd` |
 | F025 | For loop zero/one/many elements | `cases/f025_for_loop_iteration/subject.gd` |
+| F022 | Elif chain (tier 1) | `cases/f022_elif_chain/subject.gd` |
+
+F022 is tier 1, not tier 0, but lives here since it's pure GDScript with no
+live-process/harness needs, matching this group. It's the first fixture
+built using the 2026-09-19 branch-obligation schema fix (see
+`pilot/harness/oracle.py`'s module docstring) from the start: decision
+lines are now first-class `{"kind": "branch", "branch_type": ...}`
+obligations expressing ground truth, independent of any tool's actual
+behavior -- this is what let F020's gd-tools branch-counter deviation be
+detected mechanically (a `false_hit` via `comparator.compare()`) instead of
+needing hand-written prose. F020 and F021 were retrofitted with decision-line
+obligations the same day for consistency.
 
 Each `subject.gd` exposes a single static entry function, called directly by
 `driver.gd` — no fixture is rewritten to suit a particular collector's

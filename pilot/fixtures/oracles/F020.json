@@ -17,7 +17,9 @@
       "expected_result": 1,
       "obligations": [
         { "file": "cases/f020_if_both_outcomes/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f020_if_both_outcomes/subject.gd", "line": 5, "kind": "branch", "branch_type": "if_true", "expected_hit": true, "note": "Ground truth: the true outcome IS taken for this input. gd-tools 0.4.0 reports this as hit for BOTH inputs (see measured_with_gd_tools_0_4_0) -- a real, confirmed deviation from this ground truth, not a schema gap." },
         { "file": "cases/f020_if_both_outcomes/subject.gd", "line": 6, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f020_if_both_outcomes/subject.gd", "line": 7, "kind": "branch", "branch_type": "if_false", "expected_hit": false, "note": "Ground truth: the false outcome is NOT taken for this input." },
         { "file": "cases/f020_if_both_outcomes/subject.gd", "line": 8, "kind": "statement", "expected_hit": false },
         { "file": "cases/f020_if_both_outcomes/subject.gd", "line": 9, "kind": "statement", "expected_hit": true }
       ]
@@ -28,13 +30,15 @@
       "expected_result": -1,
       "obligations": [
         { "file": "cases/f020_if_both_outcomes/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f020_if_both_outcomes/subject.gd", "line": 5, "kind": "branch", "branch_type": "if_true", "expected_hit": false, "note": "Ground truth: the true outcome is NOT taken for this input." },
         { "file": "cases/f020_if_both_outcomes/subject.gd", "line": 6, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f020_if_both_outcomes/subject.gd", "line": 7, "kind": "branch", "branch_type": "if_false", "expected_hit": true, "note": "Ground truth: the false outcome IS taken for this input." },
         { "file": "cases/f020_if_both_outcomes/subject.gd", "line": 8, "kind": "statement", "expected_hit": true },
         { "file": "cases/f020_if_both_outcomes/subject.gd", "line": 9, "kind": "statement", "expected_hit": true }
       ]
     }
   ],
-  "notes": "Neither single run exercises both branch outcomes; the union of the two runs (pilot/harness/oracle.py's union_obligations()) must show both outcomes taken. Line 5 (`if value > 0:`) and line 7 (`else:`) are decision/keyword lines, deliberately not listed as body-line obligations here -- see measured_with_gd_tools_0_4_0 below for how a real tool's branch-tracking obligations at those lines were evaluated separately, since branch semantics are a distinct concept from statement-line obligations and use a different comparison in BP04, not this oracle's per-input statement list.",
+  "notes": "Neither single run exercises both branch outcomes; the union of the two runs (pilot/harness/oracle.py's union_obligations()) must show both outcomes taken. Decision lines 5 and 7 are now first-class branch obligations (2026-09-19 schema fix -- see pilot/harness/oracle.py's module docstring), expressing the IDEAL ground truth (true outcome taken iff value_gt_0, false outcome taken iff value_lte_0), independent of any tool's actual behavior. This is what makes gd-tools' branch-counter deviation mechanically detectable: comparing these obligations against a real gd-tools run for the value_lte_0 input alone produces a false_hit on line 5 (ground truth says false, gd-tools reports hit=true), rather than requiring hand-written prose to explain the deviation.",
   "measured_with_gd_tools_0_4_0": {
     "godot_build": "4.7.1.stable.official.a13da4feb",
     "gd_tools_version": "0.4.0",
@@ -45,6 +49,6 @@
   "author": "godot-tooling-session-2026-09-19",
   "reviewer": "independent review agent (fable), 2026-09-19: re-hashed subject.gd, hand-traced both inputs, re-ran the real BP04 evidence (both-tests, true-only, false-only), and re-read coverage.gd's _inject_trackers(). Confirmed the line numbers, traces, and branch-placement finding are all correct. Found this oracle's measured_with_gd_tools_0_4_0.line_obligations_result wrongly said line 4 'matched correctly' when a mechanical comparison would score it as missing_hits -- corrected in this pass. Also found pilot/adapter-run/f020_if_both_outcomes/compare.py's docstring and print statements were stale, describing the old branch_outcomes oracle shape and a line-5 obligation this migrated oracle no longer has.",
   "ambiguities": [
-    "This oracle's obligations list only statement-line hits (4, 6, 8, 9), not the decision/branch points at lines 5 and 7 themselves, since this project's Obligation schema (file, line, expected_hit) doesn't yet have a distinct representation for 'this decision's true/false outcome was taken' as opposed to 'this line executed.' BP04's real gd-tools run found and required exactly that distinction (see measured_with_gd_tools_0_4_0) -- a branch-obligation schema extension is unbuilt BP06 work, not retrofitted here to avoid re-introducing a bespoke shape this project just removed."
+    "Resolved 2026-09-19: decision-line obligations (lines 5, 7) were added using the branch/branch_type convention now documented in pilot/harness/oracle.py. comparator.compare() does not yet weight a branch obligation differently from a statement obligation -- both are just (file, line, expected_hit) to it -- which is sufficient to detect gd-tools' deviation but not to produce a separate 'branch coverage percentage' metric; that remains unbuilt."
   ]
 }

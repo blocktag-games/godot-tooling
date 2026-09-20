@@ -24,6 +24,13 @@
         },
         {
           "file": "cases/f021_if_without_else/subject.gd",
+          "line": 5,
+          "kind": "branch",
+          "branch_type": "if_true",
+          "expected_hit": true
+        },
+        {
+          "file": "cases/f021_if_without_else/subject.gd",
           "line": 6,
           "kind": "statement",
           "expected_hit": true
@@ -49,6 +56,13 @@
         },
         {
           "file": "cases/f021_if_without_else/subject.gd",
+          "line": 5,
+          "kind": "branch",
+          "branch_type": "if_true",
+          "expected_hit": false
+        },
+        {
+          "file": "cases/f021_if_without_else/subject.gd",
           "line": 6,
           "kind": "statement",
           "expected_hit": false
@@ -62,8 +76,10 @@
       ]
     }
   ],
-  "notes": "There is no else clause, so the false outcome has no line of its own to hit -- it is defined as 'line 6 not reached, execution falls through to line 7.' A provider must treat this as a legitimate, fully-covered false outcome when both inputs are run, not as an uncoverable or ambiguous branch. Line 5 (`if value > 0:`) is a decision line, deliberately not listed as a body-line obligation here -- see F020's ambiguities note for why this project's current Obligation schema doesn't yet represent decision/branch points distinctly from statement lines.",
+  "notes": "There is no else clause, so the false outcome has no line of its own to hit -- it is defined as 'line 6 not reached, execution falls through to line 7.' A provider must treat this as a legitimate, fully-covered false outcome when both inputs are run, not as an uncoverable or ambiguous branch. Line 5 (`if value > 0:`) is now a first-class branch obligation (2026-09-19 schema fix, see pilot/harness/oracle.py), expressing ground truth: true taken iff value_gt_0. No separate if_false branch obligation exists since there is no else line for one to attach to -- the implicit false outcome is already fully captured by line 6's statement obligation being false for value_lte_0.",
   "author": "godot-tooling-session-2026-09-19",
   "reviewer": "independent review agent (fable), 2026-09-19: run(5)=5 and run(-5)=0 hand-traced; lines 4/6/7 confirmed; gd-tools tracks 4, 5(if_true), 6, 7 -- no line-4 gap here since it has an initializer, consistent with F020's finding.",
-  "ambiguities": []
+  "ambiguities": [
+    "Resolved 2026-09-19: added the line-5 if_true branch obligation using the branch/branch_type convention now documented in pilot/harness/oracle.py."
+  ]
 }

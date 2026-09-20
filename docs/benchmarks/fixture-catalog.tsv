@@ -20,7 +20,7 @@ F018	2	lines	Unicode and CRLF source	Source mapping and behavior survive support
 F019	2	lines	Assertions and build modes	Eligibility and execution are explicit for each engine build mode	build_supported	Separate debug/release baseline behavior	planned
 F020	0	control_flow	If with both outcomes	Separate runs and union distinguish true/false outcomes	branch_optional	Hand-traced complementary inputs	fixture-built
 F021	0	control_flow	If without explicit else	Implicit untaken/taken continuation is a defined outcome	branch_optional	Decision truth table and original spans	fixture-built
-F022	1	control_flow	Elif chain	Intermediate conditions/outcomes are mapped without invented equivalence	branch_optional	Inputs reaching each arm and no arm	planned
+F022	1	control_flow	Elif chain	Intermediate conditions/outcomes are mapped without invented equivalence	branch_optional	Inputs reaching each arm and no arm	fixture-built
 F023	1	control_flow	Nested decisions	Inner decision does not execute when outer path excludes it	branch_optional	Nested truth table	planned
 F024	1	control_flow	While loop zero/one/many iterations	Loop entry/body/exit semantics and counts are explicit	branch_optional	Fixed iteration counts and termination output	planned
 F025	0	control_flow	For loop zero/one/many elements	Iteration and exhaustion obligations match inputs	branch_optional	Known arrays and iteration event list	fixture-built

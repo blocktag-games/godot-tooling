@@ -1,0 +1,81 @@
+{
+  "id": "F022",
+  "tier": 1,
+  "domain": "control_flow",
+  "case": "Elif chain",
+  "requirement": "Intermediate conditions/outcomes are mapped without invented equivalence",
+  "files": [
+    {
+      "path": "cases/f022_elif_chain/subject.gd",
+      "sha256": "fb7a3ba9122ece2896932889daa1763bb042f429e667fe01b13ccdcad7f97242"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "big",
+      "call": "subject.gd:run(15)",
+      "expected_result": "big",
+      "obligations": [
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 5, "kind": "branch", "branch_type": "if_true", "expected_hit": true },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 6, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 7, "kind": "branch", "branch_type": "elif_true", "expected_hit": false, "note": "NEVER EVALUATED -- the first if already matched, so this elif's condition is not checked at all. Indistinguishable from 'evaluated but false' under this project's current (file, line, expected_hit) schema; see ambiguities." },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 8, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 9, "kind": "branch", "branch_type": "elif_true", "expected_hit": false, "note": "Also never evaluated, same limitation as line 7." },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 10, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 11, "kind": "statement", "expected_hit": true }
+      ]
+    },
+    {
+      "name": "small",
+      "call": "subject.gd:run(5)",
+      "expected_result": "small",
+      "obligations": [
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 5, "kind": "branch", "branch_type": "if_true", "expected_hit": false, "note": "Evaluated (5 is not > 10), outcome false." },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 6, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 7, "kind": "branch", "branch_type": "elif_true", "expected_hit": true },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 8, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 9, "kind": "branch", "branch_type": "elif_true", "expected_hit": false, "note": "NEVER EVALUATED -- the second elif already matched." },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 10, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 11, "kind": "statement", "expected_hit": true }
+      ]
+    },
+    {
+      "name": "zero",
+      "call": "subject.gd:run(0)",
+      "expected_result": "zero",
+      "obligations": [
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 5, "kind": "branch", "branch_type": "if_true", "expected_hit": false },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 6, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 7, "kind": "branch", "branch_type": "elif_true", "expected_hit": false, "note": "Evaluated (0 is not > 0), outcome false -- NOT the same situation as 'big's line 7, even though both show expected_hit: false here." },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 8, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 9, "kind": "branch", "branch_type": "elif_true", "expected_hit": true },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 10, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 11, "kind": "statement", "expected_hit": true }
+      ]
+    },
+    {
+      "name": "none",
+      "call": "subject.gd:run(-5)",
+      "expected_result": "none",
+      "obligations": [
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 5, "kind": "branch", "branch_type": "if_true", "expected_hit": false },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 6, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 7, "kind": "branch", "branch_type": "elif_true", "expected_hit": false, "note": "Evaluated (-5 is not > 0), outcome false." },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 8, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 9, "kind": "branch", "branch_type": "elif_true", "expected_hit": false, "note": "Evaluated (-5 != 0), outcome false. This is the 'no arm matched' case: every elif was evaluated and rejected, unlike 'big' where later arms were never reached at all." },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 10, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f022_elif_chain/subject.gd", "line": 11, "kind": "statement", "expected_hit": true }
+      ]
+    }
+  ],
+  "notes": "First tier-1 fixture, and the first built using the 2026-09-19 branch-obligation schema fix (see pilot/harness/oracle.py) from the start rather than retrofitted. Four inputs exercise each of the three arms plus the no-arm-matched fallthrough. All four confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "This oracle's branch obligations cannot distinguish 'this elif's condition was never evaluated because an earlier arm already matched' (line 7 and 9 for the 'big' input) from 'this elif's condition was evaluated and returned false' (line 7 for 'zero'/'none', line 9 for 'none') -- both show expected_hit: false under the current (file, line, expected_hit) schema. A real coverage tool's line-hit count would actually distinguish these (the line is executed at all vs. completely skipped), so a future schema extension to track 'reached' separately from 'outcome' would let this fixture assert that distinction explicitly, rather than only noting it in prose as done here."
+  ]
+}

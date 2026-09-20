@@ -59,6 +59,13 @@ func _initialize() -> void:
 	_check("F025", "run([10]) one iteration", f025.run([10]), 10)
 	_check("F025", "run([1, 2, 3]) many iterations", f025.run([1, 2, 3]), 6)
 
+	# F022: elif chain -- each arm, and the no-arm-matched case.
+	var f022 = load("res://cases/f022_elif_chain/subject.gd")
+	_check("F022", "run(15) first arm", f022.run(15), "big")
+	_check("F022", "run(5) second arm", f022.run(5), "small")
+	_check("F022", "run(0) third arm", f022.run(0), "zero")
+	_check("F022", "run(-5) no arm matched", f022.run(-5), "none")
+
 	print("")
 	if failures.is_empty():
 		print("All tier-0 group 1 fixtures match their behavioral specification.")

@@ -26,7 +26,23 @@ declaration) -- absence IS the answer, replacing the old ad hoc
 shapes that predated this loader. A line listed with expected_hit:
 false for one input and expected_hit: true for another is the SAME
 obligation, whose hit state legitimately varies by input -- exactly
-what a branch requires; there is no separate "decision" kind needed.
+what a branch requires.
+
+Decision/branch lines (an `if`, `elif`, `for`/`while` header, or `match`
+arm) ARE first-class obligations, listed exactly like a statement line:
+{"file": ..., "line": <the decision's own line>, "kind": "branch",
+"branch_type": "if_true" | "if_false" | "elif_true" | "loop_header" |
+"match_case", "expected_hit": bool}. `kind` and `branch_type` are
+documentation for a human reader (and for a future
+branch-vs-statement-aware comparator); comparator.compare() does not
+currently distinguish them from a statement obligation -- both are
+just a (file, line, expected_hit) fact to it. This was a real gap
+identified on 2026-09-19 (F020's original oracle omitted lines 5 and 7,
+the decision lines themselves, treating them as "keyword lines, not
+body-line obligations" -- which meant F020's real gd-tools comparison
+needed hand-written prose instead of a mechanical compare() call).
+Omitting decision lines is no longer this project's convention;
+tier-1's control-flow cases (F022 onward) include them.
 
 File paths in "files[].path" and "obligations[].file" are always
 relative to pilot/fixtures/ (i.e. include the "cases/<case>/" prefix),
