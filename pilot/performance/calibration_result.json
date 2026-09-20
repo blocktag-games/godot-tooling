@@ -1,0 +1,42 @@
+{
+  "w03": {
+    "n": 5599301,
+    "final_b0_seconds": 4.220519205002347,
+    "fit": {
+      "floor_seconds": 3.4642001977770605,
+      "slope_seconds_per_unit": 1.314092225613514e-07,
+      "low_n": 1000,
+      "low_seconds": 3.4643316069996217,
+      "high_n": 20000000,
+      "high_seconds": 6.092384649004089
+    }
+  },
+  "w05": {
+    "n_listeners": 50,
+    "n_direct": 47386,
+    "n_deferred": 47386,
+    "final_b0_seconds": 4.311532274005003,
+    "fit": {
+      "floor_seconds": 3.470523588282949,
+      "slope_seconds_per_unit": 1.5394457448583172e-05,
+      "low_n": 500,
+      "low_seconds": 3.478220817007241,
+      "high_n": 200000,
+      "high_seconds": 6.5494150779995834,
+      "engine_limit_note": "5,000,000 queued deferred calls (call_deferred('emit_signal', ...) with no frame drain in between) crashed the engine with 'Message queue out of memory' followed by a SIGSEGV -- confirmed directly 2026-09-20. A real ceiling on n_deferred well below what the calibration search would otherwise try, not a measurement artifact."
+    }
+  },
+  "w11": {
+    "n_steps": 568222,
+    "seed": 12345,
+    "final_b0_seconds": 3.748145356992609,
+    "fit": {
+      "floor_seconds": 3.49123015730392,
+      "slope_seconds_per_unit": 1.2473469733459326e-06,
+      "low_n": 100,
+      "low_seconds": 3.4913548920012545,
+      "high_n": 2000000,
+      "high_seconds": 5.985924103995785
+    }
+  }
+}

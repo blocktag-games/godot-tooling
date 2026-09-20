@@ -19,7 +19,7 @@ class ProcessResult:
     killed: bool
 
 
-def run(cmd: list[str], cwd: str, timeout_s: float = 30.0) -> ProcessResult:
+def run(cmd: list[str], cwd: str, timeout_s: float = 30.0, env: dict[str, str] | None = None) -> ProcessResult:
     """Run `cmd`, enforcing `timeout_s` against the whole process TREE it
     spawns, not just the direct child.
 
@@ -32,11 +32,16 @@ def run(cmd: list[str], cwd: str, timeout_s: float = 30.0) -> ProcessResult:
     against an artificially slow test with a short timeout_s left the
     Godot process alive and running well after this function returned,
     under the version of run() that used plain subprocess.run().
+
+    `env`, when given, REPLACES the environment entirely (matching
+    subprocess.Popen's own semantics) -- pass a copy of os.environ with
+    your own overrides merged in if the child needs to inherit the
+    ambient environment plus additions (e.g. GODOT_BIN).
     """
     start = time.monotonic()
     proc = subprocess.Popen(
         cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-        text=True, start_new_session=True,
+        text=True, start_new_session=True, env=env,
     )
     try:
         stdout, stderr = proc.communicate(timeout=timeout_s)
@@ -60,7 +65,7 @@ def run(cmd: list[str], cwd: str, timeout_s: float = 30.0) -> ProcessResult:
             stderr=stderr or "",
             duration_s=time.monotonic() - start,
             timed_out=True,
-            killed=False,
+            killed=True,
         )
 
 

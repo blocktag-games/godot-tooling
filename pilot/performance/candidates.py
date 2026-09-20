@@ -19,9 +19,9 @@ source directly, not assumed:
   sets that env var when `--coverage` is passed, and never touches
   project.godot's `[autoload]` section itself (that's this project's
   own scratch-setup responsibility, same as throughout BP06). So:
-    B0 = autoload NOT registered in project.godot; `gd-tools test`
-    B1 = autoload registered; `gd-tools test` (no --coverage)
-    C  = autoload registered; `gd-tools test --coverage`
+    B0 = gd-tools-coverage addon NOT present at all; `gd-tools test`
+    B1 = addon present, autoload registered; `gd-tools test` (no --coverage)
+    C  = addon present, autoload registered; `gd-tools test --coverage`
 
 - Nano Coverage has NO B1 (verified 2026-09-20 against
   nano_coverage_godot/integrations/gdunit_hook.gd): the GdUnit4 session
@@ -29,21 +29,48 @@ source directly, not assumed:
   registered in project.godot's `[gdunit4]` hooks/session_hooks --
   there is no flag or env var gating instrumentation once the hook
   exists. So:
-    B0 = hook NOT registered
-    C  = hook registered
+    B0 = nano_coverage_godot addon NOT present at all; only gdUnit4
+    C  = both addons present, hook registered
     B1 = does not exist for this candidate; never synthesized, per
          the protocol's explicit warning against doing so.
 
-Shader-cache state decision (flagged before any workload was written):
-every condition, for every candidate, gets its `.godot` import cache
-AND any `.godot/shader_cache`/first-run shader compilation state
-cleared before the run, applied IDENTICALLY across B0/B1/C. This is
-the same choice already used throughout BP06's corpus-sweep scripts
-(clear `.gd-tools`/`.godot` before every invocation) generalized to
-Nano Coverage's heavier GdUnit4 boot cost -- a cold-cache cost that is
-present in every condition equally cancels in the paired ratio, rather
-than risking a "pre-warmed for B0 but not C" asymmetry that would be
-invisible in the numbers and unfixable after collection.
+**Corrected 2026-09-20, second Fable review pass (first pilot run was
+invalid, see git history and pilot/performance/README.md's postmortem
+section):** `addon_sources` was previously keyed per-CANDIDATE, not
+per-CONDITION, meaning Nano Coverage's B0 still had the
+nano_coverage_godot addon copied in (its .gdextension loaded, its
+native classes registered -- confirmed via a leftover scratch
+project's extension_list.cfg and a "[NanoCoverage] Editor classes
+registered." log line under a B0 run) even though the GdUnit4 hook
+itself was correctly left unregistered. That is NOT "collector
+absent" per the protocol's own B0 definition (performance-protocol.md
+line 11) -- it is closer to the B1 state this module's own docstring
+says does not exist for this candidate. Fixed: addon_sources is now
+addon_sources_by_condition, so B0 for BOTH candidates only ever copies
+the bare test-runner addon (GUT or GdUnit4), never the coverage tool
+itself.
+
+**Shader-cache claim corrected 2026-09-20, same review pass:** this
+docstring previously claimed the `.godot/shader_cache`/first-run shader
+compilation state is cleared before every run, identically across
+B0/B1/C. That is FALSE and was never checked against where Godot
+actually stores it. `setup_scratch_project()` below only rebuilds the
+SCRATCH project directory (fresh `.godot` import cache via `--import`,
+rebuilt every run) -- it never touches the OS-level shader cache under
+`~/.local/share/godot/app_userdata/<project name>/shader_cache/`, which
+is keyed by `project.godot`'s `config/name` and is shared across every
+scratch project using that name, i.e. across every candidate and every
+condition in this pilot. Confirmed: that directory's mtime predates the
+whole 2026-09-20 pilot run, so it was warm (not cleared) for all 200
+runs. This does NOT bias the paired B0-vs-C ratios reported here -- the
+warm cache is equally warm for every condition of every candidate, so
+its cost cancels in the ratio the same way a genuinely-cleared cache
+would. But it DOES mean caches are not isolated PER CONDITION as
+`docs/benchmarks/performance-protocol.md` (line 48) asks for, and
+GdUnit4 also writes logs/objectdb snapshots into that same shared
+directory. Before BP10: isolate the OS-level user-data directory per
+condition (e.g. override `config/name` or `$HOME`/`$XDG_DATA_HOME` per
+scratch project) rather than relying on cancellation-by-symmetry.
 """
 from __future__ import annotations
 
@@ -53,15 +80,33 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent.parent.parent
 GODOT_BIN = REPO_ROOT / "pilot/godot/Godot_v4.7.1-stable_linux.x86_64"
+PERF_ROOT = Path(__file__).parent
 
 
 @dataclass(frozen=True)
 class CandidateConfig:
     name: str
     has_b1: bool
-    # Paths to vendored addon source directories, keyed by the name
-    # they get copied to under the scratch project's addons/.
-    addon_sources: dict[str, Path]
+    # Addon dirs to copy, PER CONDITION -- e.g. Nano Coverage's B0 must
+    # NOT get the nano_coverage_godot addon at all (true "collector
+    # absent"), only gdUnit4; its C condition gets both. Keyed by the
+    # name the addon gets copied to under the scratch project's addons/.
+    addon_sources_by_condition: dict[str, dict[str, Path]]
+    # Where this candidate's test-runner wrapper files live in this
+    # repo, and what directory name they must be copied to in the
+    # scratch project for that runner to actually find them.
+    #
+    # **This copy step was MISSING entirely in the first (invalid)
+    # version of this module** -- setup_scratch_project() copied
+    # workloads/ and drivers/ but never tests_gut/ or tests_gdunit/, so
+    # every pilot run found zero tests and exited 0 with nothing
+    # measured. Confirmed by an independent Fable review reading the
+    # actual .gd-tools/results.xml (tests="0") and Godot logs ("Given
+    # directory or file does not exists: tests_gdunit/test_w11.gd") from
+    # the first pilot's leftover scratch directories -- exactly BP06's
+    # own documented F064 failure mode (GUT exits 0 on zero tests found).
+    test_source_dir: Path
+    test_dest_name: str
     # project.godot fragments, one per condition that applies to this
     # candidate (never includes "B1" for a candidate where has_b1 is False).
     project_godot_fragments: dict[str, str] = field(default_factory=dict)
@@ -70,9 +115,16 @@ class CandidateConfig:
 GD_TOOLS = CandidateConfig(
     name="gd-tools",
     has_b1=True,
-    addon_sources={
-        "gut": REPO_ROOT / "pilot/fixtures/cases/f064_zero_requested_tests/addons/gut",
-        "gd-tools-coverage": REPO_ROOT / "pilot/gd-tools/.venv/lib/python3.13/site-packages/gd_tools/addons/gd-tools-coverage",
+    addon_sources_by_condition={
+        "B0": {"gut": REPO_ROOT / "pilot/fixtures/cases/f064_zero_requested_tests/addons/gut"},
+        "B1": {
+            "gut": REPO_ROOT / "pilot/fixtures/cases/f064_zero_requested_tests/addons/gut",
+            "gd-tools-coverage": REPO_ROOT / "pilot/gd-tools/.venv/lib/python3.13/site-packages/gd_tools/addons/gd-tools-coverage",
+        },
+        "C": {
+            "gut": REPO_ROOT / "pilot/fixtures/cases/f064_zero_requested_tests/addons/gut",
+            "gd-tools-coverage": REPO_ROOT / "pilot/gd-tools/.venv/lib/python3.13/site-packages/gd_tools/addons/gd-tools-coverage",
+        },
     },
     project_godot_fragments={
         "B0": """
@@ -99,14 +151,22 @@ enabled=PackedStringArray("res://addons/gut/plugin.gd")
 _GDTCoverage="*res://addons/gd-tools-coverage/coverage.gd"
 """,
     },
+    # gd-tools' default test_dirs is ["test", "tests"] (gd_tools/config.py)
+    # -- "tests_gut" is NOT scanned by default, so the destination name
+    # must be "tests", not a copy of the source directory's own name.
+    test_source_dir=PERF_ROOT / "tests_gut",
+    test_dest_name="tests",
 )
 
 NANO_COVERAGE = CandidateConfig(
     name="nano-coverage",
     has_b1=False,
-    addon_sources={
-        "gdUnit4": REPO_ROOT / "pilot/candidates/gdUnit4/addons/gdUnit4",
-        "nano_coverage_godot": REPO_ROOT / "pilot/candidates/nano-coverage-godot/demo/addons/nano_coverage_godot",
+    addon_sources_by_condition={
+        "B0": {"gdUnit4": REPO_ROOT / "pilot/candidates/gdUnit4/addons/gdUnit4"},
+        "C": {
+            "gdUnit4": REPO_ROOT / "pilot/candidates/gdUnit4/addons/gdUnit4",
+            "nano_coverage_godot": REPO_ROOT / "pilot/candidates/nano-coverage-godot/demo/addons/nano_coverage_godot",
+        },
     },
     project_godot_fragments={
         "B0": """
@@ -130,14 +190,18 @@ hooks/session_hooks=Dictionary[String, bool]({
 integrations/gdunit4=true
 """,
     },
+    # run_condition.py invokes "-a tests_gdunit/test_{workload}.gd" --
+    # the destination name must match that literally.
+    test_source_dir=PERF_ROOT / "tests_gdunit",
+    test_dest_name="tests_gdunit",
 )
 
 
 def setup_scratch_project(candidate: CandidateConfig, condition: str, scratch_dir: Path) -> None:
     """Build a fresh scratch project for one candidate/condition,
     clearing any prior .godot import cache -- applied identically
-    across every condition (see module docstring's shader-cache
-    decision)."""
+    across every condition. Does NOT clear the OS-level shader cache
+    (see module docstring's shader-cache correction)."""
     if condition not in candidate.project_godot_fragments:
         raise ValueError(
             f"{candidate.name} has no {condition} condition "
@@ -148,15 +212,15 @@ def setup_scratch_project(candidate: CandidateConfig, condition: str, scratch_di
         shutil.rmtree(scratch_dir)
     scratch_dir.mkdir(parents=True)
 
-    perf_root = Path(__file__).parent
-    shutil.copytree(perf_root / "workloads", scratch_dir / "workloads")
-    shutil.copytree(perf_root / "drivers", scratch_dir / "drivers")
+    shutil.copytree(PERF_ROOT / "workloads", scratch_dir / "workloads")
+    shutil.copytree(PERF_ROOT / "drivers", scratch_dir / "drivers")
+    shutil.copytree(candidate.test_source_dir, scratch_dir / candidate.test_dest_name)
 
-    base_project_godot = (perf_root / "project.godot").read_text()
+    base_project_godot = (PERF_ROOT / "project.godot").read_text()
     (scratch_dir / "project.godot").write_text(
         base_project_godot + candidate.project_godot_fragments[condition]
     )
 
     (scratch_dir / "addons").mkdir()
-    for addon_name, source in candidate.addon_sources.items():
+    for addon_name, source in candidate.addon_sources_by_condition[condition].items():
         shutil.copytree(source, scratch_dir / "addons" / addon_name)
