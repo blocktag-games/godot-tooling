@@ -15,13 +15,36 @@
       "name": "and_evaluated",
       "call": "subject.gd:run_and(true, true, [])",
       "expected_result": true,
-      "expected_log": ["right_evaluated"],
+      "expected_log": [
+        "right_evaluated"
+      ],
       "obligations": [
-        { "file": "cases/f030_short_circuit/subject.gd", "line": 3, "kind": "statement", "expected_hit": true },
-        { "file": "cases/f030_short_circuit/subject.gd", "line": 4, "kind": "statement", "expected_hit": true, "note": "creating the lambda object always happens, regardless of whether it's later called" },
-        { "file": "cases/f030_short_circuit/subject.gd", "line": 5, "kind": "statement", "expected_hit": true, "note": "left is true, so AND must evaluate the right operand -- mark.call() actually runs" },
-        { "file": "cases/f030_short_circuit/subject.gd", "line": 6, "kind": "statement", "expected_hit": true },
-        { "file": "cases/f030_short_circuit/subject.gd", "line": 7, "kind": "statement", "expected_hit": true }
+        {
+          "file": "cases/f030_short_circuit/subject.gd",
+          "line": 4,
+          "kind": "statement",
+          "expected_hit": true,
+          "note": "creating the lambda object always happens, regardless of whether it's later called"
+        },
+        {
+          "file": "cases/f030_short_circuit/subject.gd",
+          "line": 5,
+          "kind": "statement",
+          "expected_hit": true,
+          "note": "left is true, so AND must evaluate the right operand -- mark.call() actually runs"
+        },
+        {
+          "file": "cases/f030_short_circuit/subject.gd",
+          "line": 6,
+          "kind": "statement",
+          "expected_hit": true
+        },
+        {
+          "file": "cases/f030_short_circuit/subject.gd",
+          "line": 7,
+          "kind": "statement",
+          "expected_hit": true
+        }
       ]
     },
     {
@@ -30,24 +53,66 @@
       "expected_result": false,
       "expected_log": [],
       "obligations": [
-        { "file": "cases/f030_short_circuit/subject.gd", "line": 3, "kind": "statement", "expected_hit": true },
-        { "file": "cases/f030_short_circuit/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
-        { "file": "cases/f030_short_circuit/subject.gd", "line": 5, "kind": "statement", "expected_hit": false, "note": "THE case this fixture exists for: left is false, so AND short-circuits and mark.call() is NEVER invoked -- not 'called and returned false', genuinely never entered. Ground truth confirmed via an observable side channel (the log array), not inferred from the boolean result alone: 'false and X' returns false whether or not X ran, so the return value cannot itself prove this." },
-        { "file": "cases/f030_short_circuit/subject.gd", "line": 6, "kind": "statement", "expected_hit": false },
-        { "file": "cases/f030_short_circuit/subject.gd", "line": 7, "kind": "statement", "expected_hit": true }
+        {
+          "file": "cases/f030_short_circuit/subject.gd",
+          "line": 4,
+          "kind": "statement",
+          "expected_hit": true
+        },
+        {
+          "file": "cases/f030_short_circuit/subject.gd",
+          "line": 5,
+          "kind": "statement",
+          "expected_hit": false,
+          "note": "THE case this fixture exists for: left is false, so AND short-circuits and mark.call() is NEVER invoked -- not 'called and returned false', genuinely never entered. Ground truth confirmed via an observable side channel (the log array), not inferred from the boolean result alone: 'false and X' returns false whether or not X ran, so the return value cannot itself prove this."
+        },
+        {
+          "file": "cases/f030_short_circuit/subject.gd",
+          "line": 6,
+          "kind": "statement",
+          "expected_hit": false
+        },
+        {
+          "file": "cases/f030_short_circuit/subject.gd",
+          "line": 7,
+          "kind": "statement",
+          "expected_hit": true
+        }
       ]
     },
     {
       "name": "or_evaluated",
       "call": "subject.gd:run_or(false, true, [])",
       "expected_result": true,
-      "expected_log": ["right_evaluated"],
+      "expected_log": [
+        "right_evaluated"
+      ],
       "obligations": [
-        { "file": "cases/f030_short_circuit/subject.gd", "line": 10, "kind": "statement", "expected_hit": true },
-        { "file": "cases/f030_short_circuit/subject.gd", "line": 11, "kind": "statement", "expected_hit": true },
-        { "file": "cases/f030_short_circuit/subject.gd", "line": 12, "kind": "statement", "expected_hit": true, "note": "left is false, so OR must evaluate the right operand" },
-        { "file": "cases/f030_short_circuit/subject.gd", "line": 13, "kind": "statement", "expected_hit": true },
-        { "file": "cases/f030_short_circuit/subject.gd", "line": 14, "kind": "statement", "expected_hit": true }
+        {
+          "file": "cases/f030_short_circuit/subject.gd",
+          "line": 11,
+          "kind": "statement",
+          "expected_hit": true
+        },
+        {
+          "file": "cases/f030_short_circuit/subject.gd",
+          "line": 12,
+          "kind": "statement",
+          "expected_hit": true,
+          "note": "left is false, so OR must evaluate the right operand"
+        },
+        {
+          "file": "cases/f030_short_circuit/subject.gd",
+          "line": 13,
+          "kind": "statement",
+          "expected_hit": true
+        },
+        {
+          "file": "cases/f030_short_circuit/subject.gd",
+          "line": 14,
+          "kind": "statement",
+          "expected_hit": true
+        }
       ]
     },
     {
@@ -56,15 +121,35 @@
       "expected_result": true,
       "expected_log": [],
       "obligations": [
-        { "file": "cases/f030_short_circuit/subject.gd", "line": 10, "kind": "statement", "expected_hit": true },
-        { "file": "cases/f030_short_circuit/subject.gd", "line": 11, "kind": "statement", "expected_hit": true },
-        { "file": "cases/f030_short_circuit/subject.gd", "line": 12, "kind": "statement", "expected_hit": false, "note": "left is true, so OR short-circuits and mark.call() is NEVER invoked. The result (true) would be identical if this line ran and returned false -- the log array is what actually proves the short-circuit, not the return value." },
-        { "file": "cases/f030_short_circuit/subject.gd", "line": 13, "kind": "statement", "expected_hit": false },
-        { "file": "cases/f030_short_circuit/subject.gd", "line": 14, "kind": "statement", "expected_hit": true }
+        {
+          "file": "cases/f030_short_circuit/subject.gd",
+          "line": 11,
+          "kind": "statement",
+          "expected_hit": true
+        },
+        {
+          "file": "cases/f030_short_circuit/subject.gd",
+          "line": 12,
+          "kind": "statement",
+          "expected_hit": false,
+          "note": "left is true, so OR short-circuits and mark.call() is NEVER invoked. The result (true) would be identical if this line ran and returned false -- the log array is what actually proves the short-circuit, not the return value."
+        },
+        {
+          "file": "cases/f030_short_circuit/subject.gd",
+          "line": 13,
+          "kind": "statement",
+          "expected_hit": false
+        },
+        {
+          "file": "cases/f030_short_circuit/subject.gd",
+          "line": 14,
+          "kind": "statement",
+          "expected_hit": true
+        }
       ]
     }
   ],
-  "notes": "Uses an explicit log array (mutated by a captured lambda) as an observable side channel for whether the right operand was actually evaluated, rather than relying on the boolean return value -- the return value alone is provably insufficient here: 'run_and(false, true)' and a hypothetical buggy non-short-circuiting AND both return false, and 'run_or(true, false)' and a hypothetical buggy non-short-circuiting OR both return true. All four inputs' log contents confirmed directly via pilot/fixtures/driver.gd on the pinned Godot 4.7.1 engine -- this is a verified ground truth about short-circuit evaluation, not an assumption from language documentation. The right operand's own lambda body (lines 5-6, 12-13) provides a clean, ordinary statement-obligation signal for 'was it evaluated' -- no branch-evidence schema extension needed here, unlike F029's same-line ternary case, since the lambda body lines are genuinely separate physical lines.",
+  "notes": "Uses an explicit log array (mutated by a captured lambda) as an observable side channel for whether the right operand was actually evaluated, rather than relying on the boolean return value -- the return value alone is provably insufficient here: 'run_and(false, true)' and a hypothetical buggy non-short-circuiting AND both return false, and 'run_or(true, false)' and a hypothetical buggy non-short-circuiting OR both return true. All four inputs' log contents confirmed directly via pilot/fixtures/driver.gd on the pinned Godot 4.7.1 engine -- this is a verified ground truth about short-circuit evaluation, not an assumption from language documentation. The right operand's own lambda body (lines 5-6, 12-13) provides a clean, ordinary statement-obligation signal for 'was it evaluated' -- no branch-evidence schema extension needed here, unlike F029's same-line ternary case, since the lambda body lines are genuinely separate physical lines. Removed on 2026-09-19: obligations on lines 3 and 10 (the run_and/run_or func signatures), which predated the F032/F034 convention that function signature lines are never statement obligations -- found by a corpus-wide lint pass while building the lifecycle domain. Their removal changes no other fact in this oracle; both were always expected_hit=true in every input.",
   "author": "godot-tooling-session-2026-09-19",
   "reviewer": null,
   "ambiguities": []

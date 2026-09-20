@@ -97,6 +97,9 @@ than subdirectories of the shared `project.godot` above.
 | F042 | Enter-tree, ready, and exit-tree callbacks (tier 1) | `cases/f042_enter_ready_exit_tree/` |
 | F043 | Process and physics callbacks (tier 1) | `cases/f043_process_physics_callbacks/` |
 | F044 | Direct and deferred signals (tier 1) | `cases/f044_direct_deferred_signals/` |
+| F046 | Await never resumes (tier 1) | `cases/f046_await_never_resumes/` |
+| F048 | Deferred calls and queued deletion (tier 1) | `cases/f048_deferred_calls_queued_deletion/` |
+| F049 | Load versus preload (tier 1) | `cases/f049_load_vs_preload/` |
 
 F041 takes one CLI arg (`godot --headless --path . --script driver.gd -- <num_instances>`)
 so each named input is its own fresh process, per the catalog's "fresh-process
@@ -118,6 +121,22 @@ queued signal delivery) are carried by a log side-channel the driver
 checks directly, not by the coverage obligations -- the obligation
 schema can only express "this line was reached," never in what order,
 same limitation already noted in F013's and F030's oracles.
+
+F046 is F045's direct negative twin (resume_now never emitted, the
+post-await continuation stays genuinely unreached); F048 uses the same
+fresh-process-per-input rule as F041/F044 to make "queued work pending
+at shutdown never ran" a real, checkable fact, not an intermediate
+snapshot of a process that would later drain it. F049 completes tier-1
+lifecycle (F040/F045/F091/F041-F044/F046/F048/F049); F047 is tier 2,
+correctly deferred.
+
+A corpus-wide lint pass while building this domain (checking that no
+oracle obligation anchors to a blank/comment/signature line, and that
+no if/while/for header reads unreached while a line in its body reads
+reached in the same input) found and fixed one pre-existing violation
+in F030 (two `func` signature-line obligations predating the
+convention F032 established) -- see the 2026-09-19 note in
+oracles/F030.json.
 
 F040/F091 use identical fixture scripts (`event_log.gd`, `user_autoload.gd`,
 `collector_marker.gd`) with only the `[autoload]` order in `project.godot`

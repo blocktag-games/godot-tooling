@@ -1,0 +1,43 @@
+{
+  "id": "F048",
+  "tier": 1,
+  "domain": "lifecycle",
+  "case": "Deferred calls and queued deletion",
+  "requirement": "Lifecycle work pending at shutdown is explicitly included or excluded",
+  "files": [
+    {
+      "path": "cases/f048_deferred_calls_queued_deletion/subject.gd",
+      "sha256": "43e3eb8a5b9f47fb5566b97adb4f36123702fa9a53b9f1dc046c4007350a3579"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "drained",
+      "call": "fresh process: godot --headless --path . --script driver.gd (call_deferred + queue_free, then one awaited process_frame before quit)",
+      "expected_log": ["deferred_method_ran", "predelete"],
+      "obligations": [
+        { "file": "cases/f048_deferred_calls_queued_deletion/subject.gd", "line": 6, "kind": "statement", "expected_hit": true, "note": "deferred_method() body -- call_deferred() queues this, it does not run at the call site; reached once the frame drains" },
+        { "file": "cases/f048_deferred_calls_queued_deletion/subject.gd", "line": 9, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f048_deferred_calls_queued_deletion/subject.gd", "line": 9, "kind": "branch", "branch_type": "if_true", "expected_hit": true },
+        { "file": "cases/f048_deferred_calls_queued_deletion/subject.gd", "line": 10, "kind": "statement", "expected_hit": true, "note": "NOTIFICATION_PREDELETE fires as part of queue_free()'s actual deletion, which -- like the deferred call -- happens when the frame drains, not synchronously at the queue_free() call site" }
+      ]
+    },
+    {
+      "name": "shutdown_before_drain",
+      "call": "fresh process: godot --headless --path . --script driver.gd -- no_drain (call_deferred + queue_free, then quit immediately, no frame drains)",
+      "expected_log": [],
+      "obligations": [
+        { "file": "cases/f048_deferred_calls_queued_deletion/subject.gd", "line": 6, "kind": "statement", "expected_hit": false, "note": "never reached: the process quits before the frame that would have drained the deferred call queue. This is the requirement's core fact -- work that is merely QUEUED at shutdown must be reported as never having run, not credited as executed because it was scheduled." },
+        { "file": "cases/f048_deferred_calls_queued_deletion/subject.gd", "line": 9, "kind": "statement", "expected_hit": false, "note": "never reached: queue_free() only queues the deletion, it does not free the object or fire notifications synchronously" },
+        { "file": "cases/f048_deferred_calls_queued_deletion/subject.gd", "line": 9, "kind": "branch", "branch_type": "if_true", "expected_hit": false },
+        { "file": "cases/f048_deferred_calls_queued_deletion/subject.gd", "line": 10, "kind": "statement", "expected_hit": false }
+      ]
+    }
+  ],
+  "notes": "Two fresh processes, not two snapshots of one process (same rule established for F041 and F044): a coverage report is cumulative for its own process, so 'this pending work never ran' can only be a real fact in a process that quits before the drain point, never an intermediate snapshot inside a longer-running process that would eventually drain it. Confirmed empirically on the pinned Godot 4.7.1 engine that both call_deferred() and queue_free() queue their work for the end of the current frame rather than running synchronously at the call site -- accessing the node itself after the drained frame is a runtime error (the object has actually been freed by then), so the driver holds a direct reference to the log array captured before queue_free(), not the node.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Only one deferred call and one queue_free() are exercised together in the same frame. A case with multiple deferred calls queued in a specific order, or a queue_free() on a node with children (recursive deletion), is not built here."
+  ]
+}

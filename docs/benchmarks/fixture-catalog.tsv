@@ -45,10 +45,10 @@ F042	1	lifecycle	Enter-tree ready and exit-tree callbacks	Lifecycle ordering and
 F043	1	lifecycle	Process and physics callbacks	Fixed callback work is accounted for without assuming equal real-time counts	scene_supported	Explicit step counts and final state	fixture-built
 F044	1	lifecycle	Direct and deferred signals	Immediate/deferred delivery and callback hits remain correct	scene_supported	Explicit connections and expected delivered event sequence	fixture-built
 F045	0	lifecycle	Await suspension and resumption	Pre-await execution and post-resumption hits are distinguished	async_supported	Known signal trigger and continuation state	fixture-built
-F046	1	lifecycle	Await never resumes	Unreached continuation is not marked executed	async_supported	Controlled shutdown before trigger	planned
+F046	1	lifecycle	Await never resumes	Unreached continuation is not marked executed	async_supported	Controlled shutdown before trigger	fixture-built
 F047	2	lifecycle	Await with inheritance	Baseline engine regressions are separated from instrumentation regressions	syntax_validated	Pinned minimal derived-class coroutine and baseline output	planned
-F048	1	lifecycle	Deferred calls and queued deletion	Lifecycle work pending at shutdown is explicitly included or excluded	scene_supported	Known queue/drain/exit schedule	planned
-F049	1	lifecycle	Load versus preload	Eager/lazy script initialization and source discovery are explicit	all_supported	Separate fresh-process load scenarios	planned
+F048	1	lifecycle	Deferred calls and queued deletion	Lifecycle work pending at shutdown is explicitly included or excluded	scene_supported	Known queue/drain/exit schedule	fixture-built
+F049	1	lifecycle	Load versus preload	Eager/lazy script initialization and source discovery are explicit	all_supported	Separate fresh-process load scenarios	fixture-built
 F050	2	lifecycle	Script reload and source change	Old/new source identity and collection state do not silently mix	reload_supported	Two source hashes and separate expected records	planned
 F051	2	lifecycle	Tool script in editor	Editor-only execution is separated from game collection	editor_supported	Recorded editor action sequence and source scope	planned
 F052	2	lifecycle	Exit-time callbacks and flush	Final tracked event and completed report boundary are known	scene_supported	Controlled final event and flush evidence	planned

@@ -198,6 +198,18 @@ func _initialize() -> void:
 	_check("F037", "run(4) omitted multiplier uses default", f037.run(4), 12)
 	_check("F037", "run(4, 10) supplied multiplier", f037.run(4, 10), 40)
 
+	# F049: load vs. preload. preload() resolves eagerly, at the time
+	# subject.gd ITSELF is loaded/parsed -- before run() is ever called,
+	# and even if the load()-using branch is never taken. load() only
+	# resolves lazily, when its line actually executes.
+	var f049_cached_before = ResourceLoader.has_cached("res://cases/f049_load_vs_preload/dependency.gd")
+	var f049 = load("res://cases/f049_load_vs_preload/subject.gd")
+	var f049_cached_after_subject_load = ResourceLoader.has_cached("res://cases/f049_load_vs_preload/dependency.gd")
+	_check("F049", "dependency not cached before subject.gd is loaded", f049_cached_before, false)
+	_check("F049", "dependency IS cached immediately after subject.gd loads, before run() is ever called", f049_cached_after_subject_load, true)
+	_check("F049", "run(false) uses the preloaded reference", f049.run(false), 99)
+	_check("F049", "run(true) uses load() explicitly", f049.run(true), 99)
+
 	print("")
 	if failures.is_empty():
 		print("All tier-0 group 1 fixtures match their behavioral specification.")

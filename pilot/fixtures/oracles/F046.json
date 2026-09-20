@@ -1,0 +1,31 @@
+{
+  "id": "F046",
+  "tier": 1,
+  "domain": "lifecycle",
+  "case": "Await never resumes",
+  "requirement": "Unreached continuation is not marked executed",
+  "files": [
+    {
+      "path": "cases/f046_await_never_resumes/subject.gd",
+      "sha256": "f9f315f2f0fd814fd55c8191df4f4468fad2aafe559ff0369f4d33828dd0ee96"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "default",
+      "call": "subject.gd:run(), resume_now is never emitted",
+      "expected_log": ["before_await"],
+      "obligations": [
+        { "file": "cases/f046_await_never_resumes/subject.gd", "line": 9, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f046_await_never_resumes/subject.gd", "line": 10, "kind": "await", "expected_hit": true, "note": "the suspension point itself IS reached -- the coroutine genuinely suspends here, it just never resumes. Distinct from line 11 never being reached at all." },
+        { "file": "cases/f046_await_never_resumes/subject.gd", "line": 11, "kind": "statement", "expected_hit": false, "note": "never reached: resume_now is never emitted by anything in this fixture, so the coroutine remains suspended at line 10 forever (until the RefCounted instance itself is eventually freed). A tool that marks an entire async function 'covered' once it starts executing, without tracking that the continuation specifically never ran, would falsely mark this line hit." }
+      ]
+    }
+  ],
+  "notes": "Direct negative twin of F045 (await suspension and resumption): same shape, but the signal that would resume the coroutine is deliberately never emitted anywhere in this fixture. Calling subject.run() without awaiting its result from the driver lets the coroutine execute synchronously up to the suspension point and return control to the caller immediately -- confirmed empirically on the pinned Godot 4.7.1 engine that the process then quits cleanly with the coroutine still suspended, no hang and no error. This is the sharpest possible test of the requirement: it is not that the continuation is merely unlikely to run, it definitionally cannot, since nothing in the process ever emits resume_now.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Godot's shutdown behavior for a RefCounted instance with a coroutine suspended on a signal it will never receive is not independently verified beyond 'the process exits cleanly without error' -- whether the coroutine's suspended call frame is cleanly freed or leaked is an engine-internal detail out of scope for a coverage-correctness fixture."
+  ]
+}
