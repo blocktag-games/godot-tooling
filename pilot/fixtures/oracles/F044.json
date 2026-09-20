@@ -1,0 +1,62 @@
+{
+  "id": "F044",
+  "tier": 1,
+  "domain": "lifecycle",
+  "case": "Direct and deferred signals",
+  "requirement": "Immediate/deferred delivery and callback hits remain correct",
+  "files": [
+    {
+      "path": "cases/f044_direct_deferred_signals/subject.gd",
+      "sha256": "e0c92cf9409da1be43c70f865953c50022d57018fa1bd740ab0daf33d2e5b26a"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "default",
+      "call": "fresh process: godot --headless --path . --script driver.gd (direct emit, then deferred emit, then one awaited process_frame)",
+      "expected_log_sequence": [
+        { "subject": "direct_subject", "log": ["before_direct_emit", "direct_received", "after_direct_emit"] },
+        { "subject": "deferred_subject", "checked": "before_frame", "log": ["before_deferred_emit", "after_deferred_emit"] },
+        { "subject": "deferred_subject", "checked": "after_frame", "log": ["before_deferred_emit", "after_deferred_emit", "deferred_received"] }
+      ],
+      "obligations": [
+        { "file": "cases/f044_direct_deferred_signals/subject.gd", "line": 9, "kind": "statement", "expected_hit": true, "note": "_on_direct() body -- fires synchronously, inside the emit() call on line 17, before line 18 runs; the interleaving is only provable via expected_log_sequence, not this obligation alone" },
+        { "file": "cases/f044_direct_deferred_signals/subject.gd", "line": 12, "kind": "statement", "expected_hit": true, "note": "_on_deferred() body -- reached by process end, since the frame does turn in this run; whether it fired before or after the post-emit line is, again, only provable via the log, not this obligation" },
+        { "file": "cases/f044_direct_deferred_signals/subject.gd", "line": 15, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f044_direct_deferred_signals/subject.gd", "line": 16, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f044_direct_deferred_signals/subject.gd", "line": 17, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f044_direct_deferred_signals/subject.gd", "line": 18, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f044_direct_deferred_signals/subject.gd", "line": 21, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f044_direct_deferred_signals/subject.gd", "line": 22, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f044_direct_deferred_signals/subject.gd", "line": 23, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f044_direct_deferred_signals/subject.gd", "line": 24, "kind": "statement", "expected_hit": true }
+      ]
+    },
+    {
+      "name": "deferred_never_flushed",
+      "call": "fresh process: godot --headless --path . --script driver.gd -- no_flush (quits immediately after the deferred emit, before any frame turns)",
+      "expected_log_sequence": [
+        { "subject": "direct_subject", "log": ["before_direct_emit", "direct_received", "after_direct_emit"] },
+        { "subject": "deferred_subject", "checked": "before_quit", "log": ["before_deferred_emit", "after_deferred_emit"] }
+      ],
+      "obligations": [
+        { "file": "cases/f044_direct_deferred_signals/subject.gd", "line": 9, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f044_direct_deferred_signals/subject.gd", "line": 12, "kind": "statement", "expected_hit": false, "note": "genuinely never reached in this run's own process: the frame never turns before quit(), so the deferred callback never fires. This is the real discriminating obligation -- a tool that treats CONNECT_DEFERRED delivery as synchronous would show this as a false_hit." },
+        { "file": "cases/f044_direct_deferred_signals/subject.gd", "line": 15, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f044_direct_deferred_signals/subject.gd", "line": 16, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f044_direct_deferred_signals/subject.gd", "line": 17, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f044_direct_deferred_signals/subject.gd", "line": 18, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f044_direct_deferred_signals/subject.gd", "line": 21, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f044_direct_deferred_signals/subject.gd", "line": 22, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f044_direct_deferred_signals/subject.gd", "line": 23, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f044_direct_deferred_signals/subject.gd", "line": 24, "kind": "statement", "expected_hit": true, "note": "run_deferred() itself runs to completion, including line 24 -- emit() returns synchronously even for a deferred connection, it's only the CALLBACK delivery (line 12) that's queued, not the emit() call itself" }
+      ]
+    }
+  ],
+  "notes": "Both inputs are their own fresh process (per the F041 precedent): a single cumulative coverage report can only show whichever facts are true by process end, so 'the deferred callback never fired' can only be expressed by a process that quits before the frame that would have flushed it, not by an intermediate snapshot inside a longer-running process. default's obligations are all true and carry no discriminating power at the coverage level by themselves -- expected_log_sequence (fixture-specific, checked by the driver, not pilot/harness/comparator.py, same category as F013/F042's expected_log) is what actually proves the synchronous-vs-queued distinction for that run. deferred_never_flushed is what gives this fixture real coverage-level discriminating power, the same role F041's zero_instances input plays: a tool that (incorrectly) delivers CONNECT_DEFERRED callbacks synchronously would show a false_hit on line 12 in this run. Confirmed on the pinned Godot 4.7.1 engine via this fixture's own driver.gd.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Only connect()-time CONNECT_DEFERRED is tested, not the alternative call_deferred(\"emit_signal\", ...) form (deferring the emit call itself rather than the delivery). Both are expected to behave the same way (queued until the next frame) but only one form is verified here."
+  ]
+}

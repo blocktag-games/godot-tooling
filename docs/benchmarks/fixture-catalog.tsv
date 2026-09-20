@@ -41,9 +41,9 @@ F039	2	language	Recursion and re-entry	Counts and state survive nested invocatio
 F040	0	lifecycle	Autoload initialization, ordered before the collector autoload	Pre-hook initialization is measured or explicitly out of scope	all_supported	Ordered startup events and collection start boundary	fixture-built
 F091	0	lifecycle	Autoload initialization, ordered after the collector autoload	Same obligations as F040 with reversed autoload order; a difference between the two exposes an order-dependent blind spot	all_supported	Ordered startup events and collection start boundary, autoload list reversed relative to F040	fixture-built
 F041	1	lifecycle	Member and static initialization	Initialization location and timing follow declared collection scope	syntax_validated	Fresh-process initial state and init events	fixture-built
-F042	1	lifecycle	Enter-tree ready and exit-tree callbacks	Lifecycle ordering and reached locations remain correct	scene_supported	Expected callback order for a small tree	planned
-F043	1	lifecycle	Process and physics callbacks	Fixed callback work is accounted for without assuming equal real-time counts	scene_supported	Explicit step counts and final state	planned
-F044	1	lifecycle	Direct and deferred signals	Immediate/deferred delivery and callback hits remain correct	scene_supported	Explicit connections and expected delivered event sequence	planned
+F042	1	lifecycle	Enter-tree ready and exit-tree callbacks	Lifecycle ordering and reached locations remain correct	scene_supported	Expected callback order for a small tree	fixture-built
+F043	1	lifecycle	Process and physics callbacks	Fixed callback work is accounted for without assuming equal real-time counts	scene_supported	Explicit step counts and final state	fixture-built
+F044	1	lifecycle	Direct and deferred signals	Immediate/deferred delivery and callback hits remain correct	scene_supported	Explicit connections and expected delivered event sequence	fixture-built
 F045	0	lifecycle	Await suspension and resumption	Pre-await execution and post-resumption hits are distinguished	async_supported	Known signal trigger and continuation state	fixture-built
 F046	1	lifecycle	Await never resumes	Unreached continuation is not marked executed	async_supported	Controlled shutdown before trigger	planned
 F047	2	lifecycle	Await with inheritance	Baseline engine regressions are separated from instrumentation regressions	syntax_validated	Pinned minimal derived-class coroutine and baseline output	planned

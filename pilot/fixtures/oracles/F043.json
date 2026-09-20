@@ -1,0 +1,30 @@
+{
+  "id": "F043",
+  "tier": 1,
+  "domain": "lifecycle",
+  "case": "Process and physics callbacks",
+  "requirement": "Fixed callback work is accounted for without assuming equal real-time counts",
+  "files": [
+    {
+      "path": "cases/f043_process_physics_callbacks/subject.gd",
+      "sha256": "346cc056c5bca121f39044f25a6c9c41a2825f746d0c91f7f3089b4e19829642"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "default",
+      "call": "fresh process: godot --headless --path . --script driver.gd (drives until physics_count reaches 3)",
+      "expected_result": "physics_count=3 process_count_at_least_one=true",
+      "obligations": [
+        { "file": "cases/f043_process_physics_callbacks/subject.gd", "line": 7, "kind": "statement", "expected_hit": true, "note": "runs once per _process call -- how many times is not asserted, since it's nondeterministic real-time-driven" },
+        { "file": "cases/f043_process_physics_callbacks/subject.gd", "line": 10, "kind": "statement", "expected_hit": true, "note": "runs once per _physics_process call -- exactly 3 times this run, driven deterministically by the fixed physics tick rate" }
+      ]
+    }
+  ],
+  "notes": "Confirmed empirically on the pinned Godot 4.7.1 engine, run three times: physics_count is deterministically 3 (the fixed target the driver stops at), while process_count varied across runs (7, 6, 7) -- process/frame callback counts are real-time-driven and NOT expected to equal or have any fixed relationship to physics callback counts, which is the requirement this fixture documents. The driver overrides SceneTree._process(delta)->bool, returning true once the physics target is reached, which stops the main loop -- this drives the fixed amount of physics work deterministically without needing to guess a frame count or sleep for a fixed duration. Both obligations are simply reached-at-least-once and are IDENTICAL in shape (both true) -- they carry no discriminating power at the coverage level by themselves, same honest limitation as F016's count gap. The actual content this fixture verifies (physics deterministic at exactly 3, process nondeterministic but nonzero) lives entirely in expected_result, not in the obligations.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "process_count's exact value is nondeterministic and therefore not pinned in expected_result beyond 'at least one call happened' -- a real regression in process-callback delivery rate (e.g. it firing zero times) would still be caught, but a partial regression (firing at some reduced but nonzero rate) would not be."
+  ]
+}

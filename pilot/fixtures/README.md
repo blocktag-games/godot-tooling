@@ -94,12 +94,30 @@ than subdirectories of the shared `project.godot` above.
 | F045 | Await suspension and resumption | `cases/f045_await_resume/` |
 | F060 | Deterministic state preservation across script reload | `cases/f060_reload_state/` |
 | F041 | Member and static initialization (tier 1) | `cases/f041_member_static_init/` |
+| F042 | Enter-tree, ready, and exit-tree callbacks (tier 1) | `cases/f042_enter_ready_exit_tree/` |
+| F043 | Process and physics callbacks (tier 1) | `cases/f043_process_physics_callbacks/` |
+| F044 | Direct and deferred signals (tier 1) | `cases/f044_direct_deferred_signals/` |
 
 F041 takes one CLI arg (`godot --headless --path . --script driver.gd -- <num_instances>`)
 so each named input is its own fresh process, per the catalog's "fresh-process
 initial state" requirement -- static-vs-instance initialization timing can't
 be told apart from a single process's cumulative coverage report, only
 across two genuinely separate runs (0 instances created vs. 3).
+
+F044 similarly takes a CLI arg (`-- no_flush`) for its second input, which
+quits before the frame that would flush a CONNECT_DEFERRED callback --
+the only way to make "this callback never fired" a real fact in a
+coverage report, since a report is always cumulative for its own process.
+An earlier draft of both F041 and F044 tried to express this kind of
+negative fact as a second snapshot within one shared process; that's
+incoherent against any real report and was caught and restructured before
+committing (see the 2026-09-19 note in oracles/F041.json).
+
+F042's and F044's ordering claims (callback order; synchronous vs.
+queued signal delivery) are carried by a log side-channel the driver
+checks directly, not by the coverage obligations -- the obligation
+schema can only express "this line was reached," never in what order,
+same limitation already noted in F013's and F030's oracles.
 
 F040/F091 use identical fixture scripts (`event_log.gd`, `user_autoload.gd`,
 `collector_marker.gd`) with only the `[autoload]` order in `project.godot`

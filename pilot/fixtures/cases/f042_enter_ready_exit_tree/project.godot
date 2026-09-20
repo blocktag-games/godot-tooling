@@ -1,0 +1,6 @@
+config_version=5
+
+[application]
+
+config/name="f042-enter-ready-exit-tree"
+config/features=PackedStringArray("4.7")
