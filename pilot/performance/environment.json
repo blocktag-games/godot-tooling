@@ -1,0 +1,54 @@
+{
+  "cpu": {
+    "model_name": "11th Gen Intel(R) Core(TM) i7-11850H @ 2.50GHz",
+    "logical_cores": "16",
+    "governors_per_core": {
+      "cpu0": "powersave",
+      "cpu1": "powersave",
+      "cpu10": "powersave",
+      "cpu11": "powersave",
+      "cpu12": "powersave",
+      "cpu13": "powersave",
+      "cpu14": "powersave",
+      "cpu15": "powersave",
+      "cpu2": "powersave",
+      "cpu3": "powersave",
+      "cpu4": "powersave",
+      "cpu5": "powersave",
+      "cpu6": "powersave",
+      "cpu7": "powersave",
+      "cpu8": "powersave",
+      "cpu9": "powersave"
+    },
+    "governors_uniform": true
+  },
+  "memory": {
+    "meminfo_total_kb": "65549388"
+  },
+  "os": {
+    "kernel_release": "6.12.107+deb13-amd64",
+    "kernel_version": "Linux version 6.12.107+deb13-amd64 (debian-kernel@lists.debian.org) (x86_64-linux-gnu-gcc-14 (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44) #1 SMP PREEMPT_DYNAMIC Debian 6.12.107-1 (2026-08-29)",
+    "distro": "LMDE 7 (gigi)"
+  },
+  "power": {
+    "on_ac_power": true,
+    "upower_battery_state": "power supply:         yes\n  updated:              Sun 20 Sep 2026 10:57:56 AM MDT (687 seconds ago)\n  has history:          no\n  has statistics:       no\n  battery\n    present:             yes\n    state:               fully-charged\n    warning-level:       none\n    energy:              94.15 Wh\n    energy-full:         95.32 Wh\n    energy-rate:         0 W\n    charge-cycles:       N/A\n    percentage:          98%\n    icon-name:          'battery-full-charged-symbolic'",
+    "thermal_telemetry": "NOT AVAILABLE -- upower exposes battery state only on this machine, no confirmed temperature sensor path checked/validated this session"
+  },
+  "virtualization": {
+    "systemd_detect_virt": "not detected or systemd-detect-virt unavailable"
+  },
+  "engine": {
+    "godot_binary_path": "/home/wade/code/godot-tooling/pilot/godot/Godot_v4.7.1-stable_linux.x86_64",
+    "godot_version_output": "4.7.1.stable.official.a13da4feb",
+    "godot_binary_sha256": "32f8d7596c4b41185512b1c49d69f2da3be018fd784a53e349fa92a98a97bcde  /home/wade/code/godot-tooling/pilot/godot/Godot_v4.7.1-stable_linux.x86_64"
+  },
+  "background_workload": {
+    "note": "NOT a machine-quiescence check -- that gate is BP10-only per this project's established scope decision (docs/benchmarks/implementation-plan.md's BP10 row). This is a one-shot snapshot for the record, not a precondition enforced here.",
+    "top_processes_by_cpu": "PID %CPU COMMAND\n 187061 99.9 godot4.7.1\n 270392  6.2 python3\n   6955  4.7 gnome-terminal-\n2074749  4.6 claude\n2527529  3.8 claude\n   1553  3.6 dockerd\n   7804  2.9 tmux: server\n   4942  2.3 cinnamon\n   1555  1.4 nordvpnd\n   2540  0.8 redis-server\n    142  0.7 irq/9-acpi\n      1  0.5 systemd\n   1336  0.4 containerd\n  12008  0.4 mintreport-tray\n   1024  0.3 dbus-daemon\n   3203  0.2 chat_service\n   5650  0.2 gnome-software\n   3054  0.2 matchmaking_ser\n   2761  0.2 game_service"
+  },
+  "privileged_fields_not_captured": [
+    "hardware turbo-boost state (requires msr-tools/sudo, not available this session)",
+    "exact storage/filesystem device model (not probed -- low relevance to CPU-bound workloads here)"
+  ]
+}

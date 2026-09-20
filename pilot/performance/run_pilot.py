@@ -32,6 +32,7 @@ from __future__ import annotations
 
 import csv
 import hashlib
+import json
 import random
 import sys
 import time
@@ -45,10 +46,38 @@ WORKLOADS = ["w01", "w03", "w05", "w11"]
 N_SESSIONS = 2
 N_BLOCKS = 5
 
+# Loaded from calibration_result.json rather than relying on the
+# GDScript test wrappers' own DEFAULT_* fallback constants (or the
+# separate Python-side mirror of them in run_condition.py) matching --
+# a real bug during recalibration (this file's own git history):
+# calibrate.py froze new sizes into the GDScript files, but the
+# Python-side mirror constants used to build the independent expected-
+# value oracle were NOT updated in the same pass, so the pilot would
+# have silently checked every w03/w11 run against the WRONG expected
+# result. Passing the calibrated size explicitly here, sourced from the
+# same JSON file calibrate.py writes, means the actual pilot run never
+# depends on the GDScript defaults and the oracle computation agreeing
+# by separate manual edits -- there is exactly one frozen source of
+# truth for what size each real pilot run uses.
+_CALIBRATION = json.loads((Path(__file__).parent / "calibration_result.json").read_text())
+WORKLOAD_EXTRA_ENV: dict[str, dict[str, str]] = {
+    "w01": {},
+    "w03": {"PERF_W03_N": str(_CALIBRATION["w03"]["n"])},
+    "w05": {
+        "PERF_W05_N_LISTENERS": str(_CALIBRATION["w05"]["n_listeners"]),
+        "PERF_W05_N_DIRECT": str(_CALIBRATION["w05"]["n_direct"]),
+        "PERF_W05_N_DEFERRED": str(_CALIBRATION["w05"]["n_deferred"]),
+    },
+    "w11": {
+        "PERF_W11_N_STEPS": str(_CALIBRATION["w11"]["n_steps"]),
+        "PERF_W11_SEED": str(_CALIBRATION["w11"]["seed"]),
+    },
+}
+
 OUT_PATH = Path(__file__).parent / "pilot_results.tsv"
 FIELDNAMES = [
     "candidate", "workload", "session", "session_seed", "block", "condition",
-    "order_in_block", "process_interval_seconds", "exit_code", "behavior_ok",
+    "order_in_block", "process_interval_seconds", "work_time_seconds", "exit_code", "behavior_ok",
     "coverage_artifact_ok", "timed_out", "import_exit_code", "import_timed_out", "timestamp",
 ]
 
@@ -83,6 +112,7 @@ def run_cell(candidate: CandidateConfig, workload: str, writer: csv.DictWriter, 
             for idx, condition in enumerate(order):
                 result = run_condition(
                     candidate, workload, condition,
+                    extra_env=WORKLOAD_EXTRA_ENV.get(workload, {}),
                     scratch_label=f"pilot-{candidate.name}-{workload}",
                 )
                 row = {
@@ -94,6 +124,7 @@ def run_cell(candidate: CandidateConfig, workload: str, writer: csv.DictWriter, 
                     "condition": condition,
                     "order_in_block": idx,
                     "process_interval_seconds": f"{result.process_interval_seconds:.4f}",
+                    "work_time_seconds": f"{result.work_time_seconds:.6f}" if result.work_time_seconds is not None else "",
                     "exit_code": result.exit_code,
                     "behavior_ok": result.behavior_ok,
                     "coverage_artifact_ok": result.coverage_artifact_ok,

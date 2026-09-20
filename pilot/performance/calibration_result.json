@@ -1,42 +1,61 @@
 {
   "w03": {
-    "n": 5599301,
-    "final_b0_seconds": 4.220519205002347,
+    "n": 15667413,
+    "final_b0_work_seconds": 2.024,
+    "final_b0_work_seconds_note": "Mean of 3 independent post-hoc confirmation probes at this exact frozen n (2.007788, 2.034665, 2.030194), run 2026-09-20 to investigate a data-integrity anomaly -- see calibration_anomaly_note below. The ORIGINAL calibration run's single confirm probe for this n reported 1.962438s, IDENTICAL to 6 decimal places to that same run's w05 confirm value despite being a different workload, different scratch directory, and a different subprocess -- investigated directly (see note), never reproduced, root cause not found. All values across every probe (original 1.962438s; this run's 2.007788/2.034665/2.030194s) are comfortably within workload-catalog.tsv's 1-5s target band, so the frozen n itself is not in question -- only the single original data point was untrustworthy.",
+    "calibration_anomaly_note": "A review of this pilot pass found calibration_result.json's original w03 and w05 'final_b0_work_seconds' fields were BIT-IDENTICAL floats (1.962438) despite being independent measurements of different workloads in different scratch directories via different subprocess invocations -- a physical impossibility for two real, independent Time.get_ticks_usec() measurements. Investigated by (1) re-running both single confirm probes fresh (got 2.077743 and 1.94432 respectively -- immediately different, so NOT a reproducible artifact of this machine/workload), and (2) running calibrate.py fully from scratch (got yet another distinct pair, 1.963992/1.9916). No code path was found that could explain the original duplication (different scratch dirs via setup_scratch_project's rmtree+rebuild rule out stale-file reuse; different filenames work_time_w03.txt vs work_time_w05.txt rule out a shared-file collision). Resolution: the frozen n's (which predate this anomaly and were already independently exercised by the real 200-row pilot showing normal per-condition variance) were reconfirmed via fresh, independent probes instead of trusting the original suspect single data point or re-freezing to a recalibration run's slightly different solved n. This does NOT affect pilot_results.tsv's validity -- that data was never derived from this JSON file's suspect field, only from the frozen n itself, which multiple independent re-probes confirm behaves as expected.",
     "fit": {
-      "floor_seconds": 3.4642001977770605,
-      "slope_seconds_per_unit": 1.314092225613514e-07,
+      "floor_seconds": -6.378718935946798e-06,
+      "slope_seconds_per_unit": 1.293787189359468e-07,
       "low_n": 1000,
-      "low_seconds": 3.4643316069996217,
+      "low_work_seconds": 0.000123,
+      "low_process_seconds": 3.3540255329862703,
       "high_n": 20000000,
-      "high_seconds": 6.092384649004089
+      "high_work_seconds": 2.587568,
+      "high_process_seconds": 5.893664688017452,
+      "confirm_process_seconds": 5.220429166016402,
+      "c_condition_process_seconds": 27.70593175801332,
+      "note": "fit diagnostics (floor/slope/probes) are from the ORIGINAL calibration run that solved n=15667413 -- only that run's single-probe 'final_b0_work_seconds' summary field was suspect, not the fit itself, which is corroborated by the frozen n's real behavior in the pilot and in post-hoc reprobes."
     }
   },
   "w05": {
     "n_listeners": 50,
-    "n_direct": 47386,
-    "n_deferred": 47386,
-    "final_b0_seconds": 4.311532274005003,
+    "n_direct": 140701,
+    "n_deferred": 140701,
+    "final_b0_work_seconds": 2.079,
+    "final_b0_work_seconds_note": "Mean of 3 independent post-hoc confirmation probes at this exact frozen size (2.055613, 2.193994, 1.98865), run 2026-09-20 -- see w03's calibration_anomaly_note (same anomaly, same investigation, same resolution).",
     "fit": {
-      "floor_seconds": 3.470523588282949,
-      "slope_seconds_per_unit": 1.5394457448583172e-05,
+      "floor_seconds": 0.001424771929824562,
+      "slope_seconds_per_unit": 1.4204456140350876e-05,
       "low_n": 500,
-      "low_seconds": 3.478220817007241,
+      "low_work_seconds": 0.008527,
+      "low_process_seconds": 3.3539315050002187,
       "high_n": 200000,
-      "high_seconds": 6.5494150779995834,
-      "engine_limit_note": "5,000,000 queued deferred calls (call_deferred('emit_signal', ...) with no frame drain in between) crashed the engine with 'Message queue out of memory' followed by a SIGSEGV -- confirmed directly 2026-09-20. A real ceiling on n_deferred well below what the calibration search would otherwise try, not a measurement artifact."
+      "high_work_seconds": 2.842316,
+      "high_process_seconds": 6.237801783019677,
+      "confirm_process_seconds": 5.4343187419872265,
+      "c_condition_process_seconds": 5.662810245004948,
+      "engine_limit_note": "5,000,000 queued deferred calls (call_deferred('emit_signal', ...) with no frame drain in between) crashed the engine with 'Message queue out of memory' followed by a SIGSEGV -- confirmed directly 2026-09-20. A real ceiling on n_deferred well below what the calibration search would otherwise try, not a measurement artifact.",
+      "note": "fit diagnostics are from the ORIGINAL calibration run that solved n_direct=n_deferred=140701 -- only that run's single-probe 'final_b0_work_seconds' summary field was suspect (see w03's calibration_anomaly_note)."
     }
   },
   "w11": {
-    "n_steps": 568222,
+    "n_steps": 1671580,
     "seed": 12345,
-    "final_b0_seconds": 3.748145356992609,
+    "final_b0_work_seconds": 1.932,
+    "final_b0_work_seconds_note": "Mean of 3 independent post-hoc confirmation probes at this exact frozen size (1.843939, 1.944974, 2.006638), run 2026-09-20. W11 was NOT affected by the duplication anomaly (its original value, 1.761322, was distinct from w03/w05's) -- reprobed anyway for consistency of evidence across all three workloads.",
     "fit": {
-      "floor_seconds": 3.49123015730392,
-      "slope_seconds_per_unit": 1.2473469733459326e-06,
+      "floor_seconds": 0.0015497947798554,
+      "slope_seconds_per_unit": 1.2467288713165e-06,
       "low_n": 100,
-      "low_seconds": 3.4913548920012545,
+      "low_work_seconds": 0.0019,
+      "low_process_seconds": 3.348,
       "high_n": 2000000,
-      "high_seconds": 5.985924103995785
+      "high_work_seconds": 2.3926,
+      "high_process_seconds": 6.07,
+      "confirm_process_seconds": 5.408,
+      "c_condition_process_seconds": 11.813,
+      "note": "fit diagnostics are from the ORIGINAL calibration run that solved n_steps=1671580 (this workload's own confirm value, 1.761322, was not part of the duplication anomaly)."
     }
   }
 }

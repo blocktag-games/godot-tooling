@@ -2,11 +2,73 @@
 
 This file states plainly what has and has not been run, since that
 boundary was flagged mid-session as easy to blur by accident. Execution
-began 2026-09-20; see "Postmortem: the first pilot run was invalid"
-below before trusting anything in `pilot_results.tsv` from before that
-section's fix commit.
+began 2026-09-20; the pilot went through THREE passes before its data
+was trustworthy -- see both postmortems below before trusting
+`pilot_results.tsv`.
 
-## Postmortem: the first pilot run was invalid
+## Postmortem 2: the second pilot run calibrated the wrong metric
+
+An independent review of BP07-BP09's completed work (not a post-phase
+review of a single phase, a review of all three together against the
+catalog/protocol) found the second pilot run -- itself already a
+correction of postmortem 1 below -- had calibrated `calibrate.py`
+against TOTAL PROCESS TIME (`process_interval_seconds`), which is
+dominated by a ~3.4-3.6s fixed process/GUT-or-GdUnit4 startup floor.
+`docs/benchmarks/workload-catalog.tsv`'s calibration_rule asks for
+"1-5 seconds of B0 WORK", not process time -- at the second pass's
+frozen sizes, actual useful work was only 0.26-0.84s per workload,
+under the catalog's own 1s minimum, meaning most of every C/B0 ratio in
+that pilot was startup-floor dilution rather than real per-work
+overhead (e.g. gd-tools w03 read as "+206%" against process time; the
+real, work-time-based figure is "+1123%" -- nearly 6x larger, not just
+"more than double" as an earlier draft of this note wrongly claimed
+after only recomputing the ratio from `process_interval_seconds` again
+under a new label, rather than actually adding a work-time-based
+analysis path. `pilot_report.py` now has a genuine separate WORK-TIME
+log-ratio section, added after a review caught this: it never read
+`work_time_seconds` at all despite this project's own claims otherwise).
+
+The same review found three further real, if smaller, gaps: W03/W11's
+behavior checks verified only shape ("result has 5 keys") rather than
+the catalog's "known arm counts"/"known checkpoints and final state";
+no environment record (CPU/kernel/governor/engine hash/power state)
+existed alongside the timed data; and the P (profiler) factor had been
+marked "unavailable" for BOTH candidates without actually testing
+whether Godot's own `--profiling` flag could be threaded through via
+the `GODOT_BIN` environment variable both launchers already read (it
+can, for gd-tools; it genuinely cannot for Nano Coverage, whose own
+`GdUnitCopyLog.gd` step breaks with a real GDScript parse error under
+`--profiling` -- confirmed directly, not merely untested, once someone
+actually tried it).
+
+Fixed, all in the same remediation pass: an in-process
+`Time.get_ticks_usec()` timer around each workload's fixed-work call
+only (written to a file in the scratch project -- `print()` doesn't
+survive gd-tools' own stdout filtering, confirmed directly), feeding a
+new `work_time_seconds` field `calibrate.py` now targets instead of
+process time; `run_condition.py` now computes each run's expected
+result independently in Python (`verify_workloads.py`'s
+`w03_reference`/`w11_reference`) and hands it to the GDScript wrapper
+as a file (not an environment variable -- a large-n W11 probe's
+expected JSON hit ~270KB, over Linux's `MAX_ARG_STRLEN`, confirmed
+directly), which now asserts exact equality instead of a shape check;
+`capture_environment.py` records CPU/kernel/governor/engine-hash/power
+state alongside every pilot run; and the P-availability docs now state
+the correct, asymmetric, tested finding per candidate instead of an
+untested blanket claim. `run_pilot.py` also now sources every
+calibrated size from `calibration_result.json` directly rather than
+relying on the GDScript test wrappers' own `DEFAULT_*` constants and a
+separate Python-side mirror of them agreeing by hand -- a real bug hit
+during this very remediation (the mirror was one edit behind the
+GDScript freeze for several minutes, causing every w03/w11 run to fail
+its own new exact-match check against a stale expected value).
+
+The pilot was re-run in full afterward: 200/200 rows, 100%
+behavior-check pass rate against the strengthened exact-match checks,
+100% coverage-artifact presence. See the descriptive-statistics numbers
+elsewhere in this file's history (git log) for the corrected figures.
+
+## Postmortem 1: the first pilot run was invalid
 
 The first full 200-run BP07 pilot sweep measured **zero actual test
 executions**. Both gd-tools/GUT and Nano Coverage/GdUnit4 ran, found no
@@ -182,17 +244,19 @@ eligible cells are present with none synthesized or skipped, and the
 process-interval timing boundary matches the protocol's definition.
 It also surfaced real, non-blocking limitations to carry forward:
 
-- **Percentage overhead is not comparable across candidates.** gd-tools'
-  B0 floor (~3.5-4.2s: its Python CLI plus an internal redundant
-  `--import` launch of its own) is roughly 2x nano-coverage's B0 floor
-  (~1.7-2.5s: `bash runtest.sh` plus a windowed, non-headless GdUnit4
-  run). The same absolute added cost therefore yields a larger
-  percentage for whichever candidate has the smaller floor -- e.g. w03
-  shows gd-tools at +206% vs nano-coverage at +269% by percentage, but
-  gd-tools' absolute added cost (~8.45s) is actually *larger* than
-  nano-coverage's (~6.48s). `pilot_report.py` now prints absolute
-  deltas alongside ratios for this reason; compare deltas across
-  candidates, never percentages.
+- **Percentage overhead is not comparable across candidates, even in
+  work-time terms.** w03's WORK-TIME C/B0 ratio (the study's actual
+  primary metric, not process time -- see postmortem 2 above) shows
+  gd-tools at +1123% vs nano-coverage at +864% by percentage, but
+  gd-tools' absolute work-time delta (~22.7s) is still *larger* than
+  nano-coverage's (~17.6s) despite the smaller percentage, because
+  gd-tools' own GDScript execution of the identical subject.gd code
+  happens to run slightly slower under its coverage instrumentation
+  than Nano Coverage's does under its own. `pilot_report.py` now has a
+  dedicated WORK-TIME log-ratio section (see postmortem 2) and prints
+  absolute deltas alongside ratios in both the process-time and
+  work-time sections; compare deltas across candidates, never
+  percentages alone.
 - **Source scope instrumented differs slightly between tools.** Nano
   Coverage's lcov output covers 13 files (workloads/, drivers/, and
   tests_gdunit/); gd-tools' coverage plan covers 9 (workloads/ and

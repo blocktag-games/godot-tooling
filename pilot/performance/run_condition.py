@@ -11,9 +11,15 @@ in-process time, not a phase the tool itself reports.
 `extra_env` lets a caller override a workload's input size via the
 PERF_W03_N / PERF_W05_* / PERF_W11_* environment variables the
 tests_gut/tests_gdunit files read (see their module comments) --
-used by calibrate.py's search for a fixed size landing B0 in the
-protocol's target 1-5s window, BEFORE that size is frozen into the
-DEFAULT_* constants every subsequent run uses with no override needed.
+used by calibrate.py's search for a fixed size landing B0's WORK TIME
+(not process time -- see the "third pass" postmortem in pilot/
+performance/README.md) in the protocol's target 1-5s window. The
+frozen size is authoritatively recorded in calibration_result.json,
+which run_pilot.py loads directly and passes as extra_env for every
+real pilot run -- NOT via the GDScript test wrappers' own DEFAULT_*
+fallback constants, which exist only for manual/standalone invocation
+and are kept in sync by hand (a real bug hit once already: see
+`_DEFAULT_W03_N` etc. below).
 
 **Corrected 2026-09-20, second Fable review pass (the first pilot run
 was invalid -- see candidates.py's module docstring and pilot/
@@ -58,7 +64,35 @@ from candidates import REPO_ROOT, CandidateConfig, GODOT_BIN, setup_scratch_proj
 sys.path.insert(0, str(Path(__file__).parent.parent / "harness"))
 from runner import run as safe_run  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).parent))
+from verify_workloads import w03_reference, w11_reference  # noqa: E402
+
 SCRATCH_ROOT = Path("/tmp/perf-run")  # never inside the repo; never pilot/fixtures/ in place
+
+# Mirrors of tests_gut/test_workloads.gd's DEFAULT_* constants -- kept in
+# sync by hand (GDScript cannot import this Python module or vice
+# versa). Used ONLY to compute the independent expected-value oracle
+# below when a caller doesn't override the size via extra_env; the
+# GDScript side is still the single source of truth for what size
+# actually runs when no override is given.
+_DEFAULT_W03_N = 15667413
+_DEFAULT_W11_N_STEPS = 1671580
+_DEFAULT_W11_SEED = 12345
+
+
+def _read_work_time_seconds(scratch_dir: Path, workload: str) -> float | None:
+    # gd-tools' CLI filters/discards the child Godot process's raw
+    # stdout/stderr entirely (confirmed directly -- a stdout print
+    # marker never survived it even on a passing run), so the test
+    # wrappers write this to a file in the scratch project instead;
+    # works identically for both runners.
+    path = scratch_dir / f"work_time_{workload}.txt"
+    if not path.exists():
+        return None
+    try:
+        return int(path.read_text().strip()) / 1_000_000
+    except ValueError:
+        return None
 
 
 @dataclass
@@ -79,12 +113,22 @@ class ConditionResult:
     # stale/partial import cache and its cost would silently leak into
     # process_interval_seconds. Recorded so that scenario is visible in
     # the data rather than only in a log nobody reads. These fields did
-    # not exist during the 200-row BP07 pilot, so its import step's
+    # not exist during the SECOND pilot pass -- that run's import step's
     # outcome was never actually checked or recorded (unknown, not
-    # assumed clean) -- committed pilot_results.tsv rows predate these
-    # columns and read back as empty via csv.DictReader, not 0/False.
+    # assumed clean). The current (third) pilot_results.tsv DOES have
+    # these columns populated (0/False for every real row, confirmed).
     import_exit_code: int | None = None
     import_timed_out: bool = False
+    # BP07 remediation (added after a review found the pilot calibrated
+    # total PROCESS time, dominated by a ~3.5s startup floor, instead of
+    # the catalog's "1-5 seconds of USEFUL FIXED WORK"): an in-process
+    # monotonic timer around each workload's own fixed-work call, written
+    # by the test wrapper to a file in the scratch project (see
+    # _read_work_time_seconds below -- print() doesn't survive gd-tools'
+    # own stdout filtering, confirmed directly) and read back here. None
+    # for W01 (no useful work is defined for it) or if the wrapper didn't
+    # write the file (e.g. the run crashed first).
+    work_time_seconds: float | None = None
 
 
 def _gd_tools_behavior_ok(stdout: str) -> bool:
@@ -137,6 +181,31 @@ def run_condition(
     env["GODOT_BIN"] = str(GODOT_BIN)
     env.update(extra_env)
 
+    # Independent expected-value oracle: compute the reference result in
+    # PYTHON (verify_workloads.py's w03_reference/w11_reference, already
+    # cross-checked against the raw engine with no coverage tool
+    # involved) for whatever size THIS run actually uses -- including
+    # calibration probes at non-default sizes, not just the final frozen
+    # default -- and hand it to the GDScript test wrapper so it can
+    # assert exact equality instead of a shape-only check ("size==5",
+    # "has key 'score'") that a wrong bucket count or wrong final score
+    # would pass right through.
+    #
+    # Written to a FILE in the scratch project, not an environment
+    # variable: a large-n W11 calibration probe (n_steps=2,000,000) hits
+    # roughly 32,000 milestones, a ~270KB JSON blob that exceeds Linux's
+    # per-argument/environment-variable size limit (MAX_ARG_STRLEN,
+    # 128KB) and made subprocess.Popen fail outright with EINVAL/E2BIG
+    # -- confirmed directly during recalibration, not assumed. A file
+    # has no comparable size limit.
+    if workload == "w03":
+        n = int(env.get("PERF_W03_N", _DEFAULT_W03_N))
+        (scratch_dir / "expected_w03.json").write_text(json.dumps(w03_reference(n)))
+    elif workload == "w11":
+        n_steps = int(env.get("PERF_W11_N_STEPS", _DEFAULT_W11_N_STEPS))
+        seed_value = int(env.get("PERF_W11_SEED", _DEFAULT_W11_SEED))
+        (scratch_dir / "expected_w11.json").write_text(json.dumps(w11_reference(n_steps, seed_value)))
+
     # Import cache must exist before a timed run -- the fresh-import
     # cost is W14's own workload, not something to fold into every
     # other workload's timing by accident.
@@ -171,6 +240,8 @@ def run_condition(
         ok = _nano_coverage_behavior_ok(result.stdout)
         artifact_ok = _nano_coverage_artifact_ok(scratch_dir) if condition == "C" else None
 
+    work_time_seconds = _read_work_time_seconds(scratch_dir, workload)
+
     return ConditionResult(
         candidate=candidate.name,
         workload=workload,
@@ -184,4 +255,5 @@ def run_condition(
         stderr=result.stderr,
         import_exit_code=import_result.exit_code,
         import_timed_out=import_result.timed_out,
+        work_time_seconds=work_time_seconds,
     )

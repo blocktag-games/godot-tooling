@@ -1,6 +1,6 @@
 # Performance measurement protocol
 
-Draft settings for a future study; no timings have been collected. Consult the [workload catalog](workload-catalog.tsv) and [profiling protocol](profiling-protocol.md).
+Updated 2026-09-20: a BP07 pilot has been run (200 rows, exploratory, kept out of confirmatory estimates per this document's own rule) and BP08's harness-validation controls are in place; the controlled BP10 main study this document specifies has NOT been run. Consult the [workload catalog](workload-catalog.tsv) and [profiling protocol](profiling-protocol.md).
 
 ## Comparisons and baselines
 
