@@ -1,0 +1,25 @@
+candidate	workload	condition	eligible	note
+gd-tools	W01	B0	yes
+gd-tools	W01	B1	yes	autoload registered, GD_TOOLS_COVERAGE_PLAN unset -- verified real, not synthesized
+gd-tools	W01	C	yes
+gd-tools	W03	B0	yes
+gd-tools	W03	B1	yes
+gd-tools	W03	C	yes	branch-outcome metrics excluded from cross-tool comparison (BP06 corpus run: if_true/loop_body counters conflate reached-with-taken)
+gd-tools	W05	B0	yes
+gd-tools	W05	B1	yes
+gd-tools	W05	C	yes
+gd-tools	W11	B0	yes
+gd-tools	W11	B1	yes
+gd-tools	W11	C	yes	eligible only if F057's line-shift and BP06's branch findings don't affect this workload's own behavior_check -- verify at calibration time, not assumed
+nano-coverage	W01	B0	yes
+nano-coverage	W01	B1	no	no B1 exists for this candidate -- verified 2026-09-20 (gdunit_hook.gd instruments unconditionally on registration); never synthesized
+nano-coverage	W01	C	yes
+nano-coverage	W03	B0	yes
+nano-coverage	W03	B1	no	see W01/B1 note
+nano-coverage	W03	C	yes	no branch metrics at all for this candidate (BP06 corpus run: zero BRDA records) -- W03's branch_records metric is not applicable, report as such, not as a missing/failed measurement
+nano-coverage	W05	B0	yes
+nano-coverage	W05	B1	no	see W01/B1 note
+nano-coverage	W05	C	yes
+nano-coverage	W11	B0	yes
+nano-coverage	W11	B1	no	see W01/B1 note
+nano-coverage	W11	C	yes
