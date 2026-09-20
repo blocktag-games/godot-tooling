@@ -1,0 +1,93 @@
+{
+  "id": "F026",
+  "tier": 1,
+  "domain": "control_flow",
+  "case": "Break and continue",
+  "requirement": "Skipped statements and exit paths have correct hit states",
+  "files": [
+    {
+      "path": "cases/f026_break_continue/subject.gd",
+      "sha256": "2d07b782a7302948c10751f6555882764bed70928a13b8268d4007e5427bcca4"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "continue_only",
+      "call": "subject.gd:run([-1, 5])",
+      "expected_result": [5],
+      "obligations": [
+        { "file": "cases/f026_break_continue/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 5, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 5, "kind": "branch", "branch_type": "loop_entered", "expected_hit": true },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 6, "kind": "statement", "expected_hit": true, "note": "evaluated for both items" },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 6, "kind": "branch", "branch_type": "if_true", "expected_hit": true, "note": "taken for item=-1" },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 7, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 8, "kind": "statement", "expected_hit": true, "note": "reached only for item=5 -- item=-1's iteration never reaches this line at all, continue skips straight to the next iteration" },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 8, "kind": "branch", "branch_type": "if_true", "expected_hit": false },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 9, "kind": "statement", "expected_hit": false, "note": "break never taken this run" },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 10, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 11, "kind": "statement", "expected_hit": true }
+      ]
+    },
+    {
+      "name": "break_only",
+      "call": "subject.gd:run([200])",
+      "expected_result": [],
+      "obligations": [
+        { "file": "cases/f026_break_continue/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 5, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 5, "kind": "branch", "branch_type": "loop_entered", "expected_hit": true },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 6, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 6, "kind": "branch", "branch_type": "if_true", "expected_hit": false, "note": "continue never taken this run" },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 7, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 8, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 8, "kind": "branch", "branch_type": "if_true", "expected_hit": true, "note": "taken for item=200" },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 9, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 10, "kind": "statement", "expected_hit": false, "note": "never reached: break exits before the append" },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 11, "kind": "statement", "expected_hit": true }
+      ]
+    },
+    {
+      "name": "neither",
+      "call": "subject.gd:run([5])",
+      "expected_result": [5],
+      "obligations": [
+        { "file": "cases/f026_break_continue/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 5, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 5, "kind": "branch", "branch_type": "loop_entered", "expected_hit": true },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 6, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 6, "kind": "branch", "branch_type": "if_true", "expected_hit": false },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 7, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 8, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 8, "kind": "branch", "branch_type": "if_true", "expected_hit": false },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 9, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 10, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 11, "kind": "statement", "expected_hit": true }
+      ]
+    },
+    {
+      "name": "empty",
+      "call": "subject.gd:run([])",
+      "expected_result": [],
+      "obligations": [
+        { "file": "cases/f026_break_continue/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 5, "kind": "statement", "expected_hit": true, "note": "the for-loop header is evaluated once even for an empty array" },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 5, "kind": "branch", "branch_type": "loop_entered", "expected_hit": false },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 6, "kind": "statement", "expected_hit": false, "note": "never reached: loop body never entered" },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 6, "kind": "branch", "branch_type": "if_true", "expected_hit": false },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 7, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 8, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 8, "kind": "branch", "branch_type": "if_true", "expected_hit": false },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 9, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 10, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f026_break_continue/subject.gd", "line": 11, "kind": "statement", "expected_hit": true }
+      ]
+    }
+  ],
+  "notes": "Four inputs isolate continue, break, neither, and the empty/zero-iteration case, so each mechanism's effect on line-level and branch-level obligations is unambiguous rather than mixed into one complex run. Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd. Line 5 (the for-loop header) is included as a statement obligation here, unlike F025's oracle which omitted it entirely -- F025 predates this convention and was not retrofitted, a minor known inconsistency worth fixing in a future pass rather than expanding this fixture's scope to cover it.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Line-level hit obligations here report 'reached at least once during the whole run', not per-iteration. A run with multiple iterations that mix continue/break/normal behavior across different items (not built here -- see continue_only/break_only's deliberately single-relevant-item design) would need per-iteration granularity this schema doesn't yet have to avoid conflating 'never happened' with 'happened on some but not all iterations'."
+  ]
+}

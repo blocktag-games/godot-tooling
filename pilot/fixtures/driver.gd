@@ -79,6 +79,15 @@ func _initialize() -> void:
 	_check("F024", "run(1) one iteration", f024.run(1), 0)
 	_check("F024", "run(3) many iterations", f024.run(3), 3)
 
+	# F026: break and continue -- each isolated, plus a normal pass and
+	# an empty input so the loop header's own zero-iteration case is
+	# still covered here too.
+	var f026 = load("res://cases/f026_break_continue/subject.gd")
+	_check("F026", "run([-1, 5]) continue only", f026.run([-1, 5]), [5])
+	_check("F026", "run([200]) break only", f026.run([200]), [])
+	_check("F026", "run([5]) neither", f026.run([5]), [5])
+	_check("F026", "run([]) empty, loop never entered", f026.run([]), [])
+
 	print("")
 	if failures.is_empty():
 		print("All tier-0 group 1 fixtures match their behavioral specification.")
