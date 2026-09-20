@@ -1,0 +1,54 @@
+fixture	input	status	matched_count	false_hits	missing_hits	missing_files	stale_files	excluded_branch_obligations
+F001	default	match	2	[]	[]	[]	[][]	0
+F002	default	match	2	[]	[]	[]	[][]	0
+F010	default	match	3	[]	[]	[]	[][]	0
+F012	default	match	2	[]	[]	[]	[][]	0
+F020	value_gt_0	match	4	[]	[]	[]	[][]	2
+F020	value_lte_0	match	4	[]	[]	[]	[][]	2
+F021	value_gt_0	match	3	[]	[]	[]	[][]	1
+F021	value_lte_0	match	3	[]	[]	[]	[][]	1
+F022	big	match	8	[]	[]	[]	[][]	3
+F022	small	match	8	[]	[]	[]	[][]	3
+F022	zero	mismatch	7	[]	[('cases/f022_elif_chain/subject.gd', 7)]	[]	[][]	3
+F022	none	mismatch	6	[]	[('cases/f022_elif_chain/subject.gd', 7), ('cases/f022_elif_chain/subject.gd', 9)]	[]	[][]	3
+F023	both	match	5	[]	[]	[]	[][]	2
+F023	only_a	match	5	[]	[]	[]	[][]	2
+F023	neither	match	5	[]	[]	[]	[][]	2
+F024	zero	match	6	[]	[]	[]	[][]	1
+F024	one	match	6	[]	[]	[]	[][]	1
+F024	many	match	6	[]	[]	[]	[][]	1
+F025	zero	match	3	[]	[]	[]	[][]	0
+F025	one	match	3	[]	[]	[]	[][]	0
+F025	many	match	3	[]	[]	[]	[][]	0
+F026	continue_only	match	8	[]	[]	[]	[][]	3
+F026	break_only	match	8	[]	[]	[]	[][]	3
+F026	neither	match	8	[]	[]	[]	[][]	3
+F026	empty	match	8	[]	[]	[]	[][]	3
+F027	one	mismatch	6	[]	[('cases/f027_match_fallback/subject.gd', 5)]	[]	[][]	3
+F027	two	mismatch	5	[]	[('cases/f027_match_fallback/subject.gd', 5), ('cases/f027_match_fallback/subject.gd', 7)]	[]	[][]	3
+F027	other	mismatch	4	[]	[('cases/f027_match_fallback/subject.gd', 5), ('cases/f027_match_fallback/subject.gd', 7), ('cases/f027_match_fallback/subject.gd', 9)]	[]	[][]	3
+F029	positive	match	2	[]	[]	[]	[][]	2
+F029	non_positive	match	2	[]	[]	[]	[][]	2
+F030	and_evaluated	match	4	[]	[]	[]	[][]	0
+F030	and_short_circuited	match	4	[]	[]	[]	[][]	0
+F030	or_evaluated	match	4	[]	[]	[]	[][]	0
+F030	or_short_circuited	match	4	[]	[]	[]	[][]	0
+F011	default	match	2	[]	[]	[]	[][]	0
+F013	all_complete	match	2	[]	[]	[]	[][]	0
+F013	middle_statement_errors	match	2	[]	[]	[]	[][]	0
+F014	early_return_taken	match	4	[]	[]	[]	[][]	1
+F014	falls_through	match	4	[]	[]	[]	[][]	1
+F015	completes_normally	match	2	[]	[]	[]	[][]	0
+F015	reached_but_not_completed	match	2	[]	[]	[]	[][]	0
+F016	three_identical_calls	match	1	[]	[]	[]	[][]	0
+F032	default	match	2	[]	[]	[]	[][]	0
+F033	invoked	match	7	[]	[]	[]	[][]	1
+F033	made_but_not_invoked	match	7	[]	[]	[]	[][]	1
+F034	derived_dispatch	match	7	[]	[]	[]	[][]	1
+F034	base_dispatch	match	7	[]	[]	[]	[][]	1
+F035	default	mismatch	3	[]	[('cases/f035_property_getter_setter/subject.gd', 3), ('cases/f035_property_getter_setter/subject.gd', 6), ('cases/f035_property_getter_setter/subject.gd', 8)]	[]	[][]	0
+F036	default	match	4	[]	[]	[]	[][]	1
+F037	omitted_argument	match	1	[]	[]	[]	[][]	0
+F037	supplied_argument	match	1	[]	[]	[]	[][]	0
+F049	uses_preloaded	match	5	[]	[]	[]	[][]	1
+F049	uses_loaded	match	5	[]	[]	[]	[][]	1

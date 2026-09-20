@@ -119,10 +119,14 @@ def run_one(test_func: str) -> tuple[dict, dict]:
     # GUT 9.7.1 scores any engine error raised during a test as a failure,
     # so the two deliberate runtime-error inputs fail under GUT by design;
     # their coverage data is still valid (F063: outcome and coverage are
-    # independent). Every other input must pass.
+    # independent). Every other input must pass. Raise when the OBSERVED
+    # outcome != the EXPECTED outcome for this input -- this is a boolean
+    # XOR, not a subtraction: true when exactly one of "passed" and "is in
+    # the expected-failures set" is true (i.e. they disagree).
     passed = "All 1 test(s) passed" in result.stdout
-    if passed == (test_func in EXPECTED_GUT_FAILURES):
-        raise RuntimeError(f"unexpected GUT outcome for {test_func} (passed={passed}):\n{result.stdout}\n{result.stderr}")
+    expected_to_fail = test_func in EXPECTED_GUT_FAILURES
+    if passed == expected_to_fail:
+        raise RuntimeError(f"unexpected GUT outcome for {test_func} (passed={passed}, expected_to_fail={expected_to_fail}):\n{result.stdout}\n{result.stderr}")
     plan = json.loads((SCRATCH / ".gd-tools/coverage/plan.json").read_text())
     coverage_path = SCRATCH / ".gd-tools/coverage/coverage.json"
     coverage = json.loads(coverage_path.read_text()) if coverage_path.exists() else {"files": []}
@@ -135,7 +139,17 @@ def run_one(test_func: str) -> tuple[dict, dict]:
 # one collision exists in this corpus: gd-tools calls a while/for loop
 # header's branch point "loop_body"; every oracle in this corpus calls
 # the same concept "loop_entered". This is a naming mismatch to
-# translate, not a behavioral deviation to report.
+# translate, not a behavioral deviation to report. Evidence: a full
+# plan.json branch_type enumeration across this corpus (2026-09-19,
+# `python3 -c "import json; ... {l['branch_type'] for pf in plan['files'] for l in pf['lines'] if l['type']=='branch'}"`)
+# returned {'elif_true', 'if_false', 'if_true', 'loop_body', 'match_case'}
+# -- every oracle in pilot/fixtures/oracles/*.json enumerates
+# {'elif_true', 'if_false', 'if_true', 'loop_entered', 'match_case',
+# 'ternary_false', 'ternary_true'}. The two sets agree on everything
+# except loop_body/loop_entered (same construct, different label) and
+# gd-tools having no ternary_true/ternary_false entries at all (a real
+# capability gap -- see finding 4 in corpus-run-2026-09-19.md, not a
+# naming mismatch to alias away).
 BRANCH_TYPE_ALIASES = {"loop_body": "loop_entered"}
 
 EXPECTED_GUT_FAILURES = {
@@ -185,7 +199,57 @@ def build_actual(plan: dict, coverage: dict) -> dict:
     return {"files": actual_files}
 
 
+def verify_controls() -> None:
+    """Run BEFORE any sweep row is written or trusted: a known-answer
+    positive control (F010 -- no branches, every obligation
+    expected_hit=true -- must compare clean) and a known-answer negative
+    control (F020/value_lte_0 -- BP04's already-recorded false_hit on
+    line 5, where gd-tools' if_true counter fires even though the true
+    branch was not taken -- must reproduce that EXACT false_hit).
+
+    This is the guard against the failure mode that actually happened
+    once already in this script's own history: a broken translation
+    silently produces 53 plausible-looking rows instead of failing
+    loudly. If this function can't reproduce a finding this project
+    already has independently confirmed (via BP04's direct engine
+    inspection, not via this script), the SCRIPT is wrong and nothing
+    below this point may be trusted -- raise immediately rather than
+    writing a single row.
+    """
+    oracle = load_oracle(REPO_ROOT / "pilot/fixtures/oracles/F010.json")
+    obligations = obligations_for_input(oracle, "default")
+    plan, coverage = run_one("test_F010_default")
+    actual = build_actual(plan, coverage)
+    result = compare(obligations, actual, SCRATCH)
+    if not result.is_clean:
+        raise RuntimeError(
+            f"POSITIVE CONTROL FAILED: F010/default must compare clean "
+            f"(no branches, all statements expected hit) but got "
+            f"false_hits={result.false_hits} missing_hits={result.missing_hits} "
+            f"missing_files={result.missing_files}. The sweep script itself is "
+            f"broken -- do not trust any row from this run."
+        )
+    print("CONTROL OK: F010/default compares clean (positive control)")
+
+    oracle = load_oracle(REPO_ROOT / "pilot/fixtures/oracles/F020.json")
+    obligations = obligations_for_input(oracle, "value_lte_0")
+    plan, coverage = run_one("test_F020_value_lte_0")
+    actual = build_actual(plan, coverage)
+    result = compare(obligations, actual, SCRATCH)
+    expected_false_hit = ("cases/f020_if_both_outcomes/subject.gd", 5)
+    if result.is_clean or expected_false_hit not in result.false_hits:
+        raise RuntimeError(
+            f"NEGATIVE CONTROL FAILED: F020/value_lte_0 must reproduce BP04's "
+            f"already-known false_hit on line 5 (if_true fires even though the "
+            f"true branch was not taken this run), but got "
+            f"false_hits={result.false_hits}. The sweep script itself is "
+            f"broken -- do not trust any row from this run."
+        )
+    print(f"CONTROL OK: F020/value_lte_0 reproduces the known false_hit on line 5 (negative control)")
+
+
 def main() -> int:
+    verify_controls()
     rows = []
     for fixture_id, input_name, test_func in SWEEP:
         oracle = load_oracle(REPO_ROOT / f"pilot/fixtures/oracles/{fixture_id}.json")
