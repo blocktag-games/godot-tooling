@@ -14,19 +14,39 @@ Python call) and compares its "Elapsed (wall clock) time" against
 `pilot/harness/runner.py::run()`'s own process_interval_seconds for
 the identical command.
 
-Two things this specifically checks that a re-read of the code cannot:
+What this checks:
 1. Do the two independent mechanisms agree on elapsed wall time for
    the same command, within measurement noise?
-2. Does the harness's measured interval actually encompass every
-   process the command's process TREE spawns, not just its direct
-   child? `/usr/bin/time -v` reports "Elapsed (wall clock) time" for
-   the whole tree it launched (it waits via wait4 on its own direct
-   child, same as Python's communicate() does on its own direct
-   child) -- run against gd-tools (Python CLI -> internal godot
-   --import -> GUT) and Nano Coverage (bash -> godot --version ->
-   GdUnitCmdTool -> a second headless godot), agreement between the
-   two mechanisms is evidence neither loses track of a grandchild the
-   direct child spawns and detaches from (the F067 failure shape).
+
+**Corrected 2026-09-20, a Fable review of this BP08 phase: what this
+does NOT establish.** An earlier version of this docstring claimed
+that agreement between the two mechanisms was "evidence neither loses
+track of a grandchild the direct child spawns and detaches from (the
+F067 failure shape)". That inference is invalid and has been retracted:
+both `/usr/bin/time -v` and `runner.run()`'s `communicate()` stop their
+clock at the SAME boundary -- their own direct child's exit (wait4)
+plus that child's stdio pipes reaching EOF. A grandchild that
+double-forks and detaches from the child's stdio (the exact shape
+`os.killpg()`/F067 was fixed to handle on the TIMEOUT path, not the
+normal-exit path this script probes) would be invisible to BOTH
+mechanisms identically -- agreement in that case would be two
+instruments sharing one blind spot, not confirmation of anything. The
+review demonstrated this concretely with a synthetic child that spawns
+a stdio-detached grandchild sleeping 1.0s: both mechanisms under-report
+by ~98% and AGREE; a stdio-inheriting grandchild makes them disagree
+(the harness reports correctly, `/usr/bin/time` still doesn't).
+
+The actual evidence this script has for "the candidate's real process
+tree was fully waited-for," printed below as `child_cpu_mean`, is
+`/usr/bin/time -v`'s own User+System time, which sums the rusage of
+every REAPED descendant (not just the direct child) -- for gd-tools
+that is ~3.0s of ~3.4s wall, for Nano Coverage ~1.4s of ~1.8s wall,
+both a large majority of wall time. That is real (if partial) evidence
+the tree was reaped rather than detached; it does not rule out a
+detached grandchild contributing zero to the wall-time comparison
+above. This script's real, valid contribution is #1: a clock-arithmetic
+sanity check that two differently-implemented timers agree on elapsed
+wall time for the same command.
 
 Run: python3 independent_timing_check.py
 """
@@ -151,8 +171,20 @@ def main() -> int:
     # fraction of a millisecond -- flag only a disagreement that is both
     # >5% AND >20ms absolute, matched to that resolution floor.
     flagged = [r for r in RESULTS if abs(r["delta_pct"]) > 5.0 and abs(r["delta_s"]) > 0.02]
-    max_abs_pct = max(abs(r["delta_pct"]) for r in RESULTS if r["delta_pct"] == r["delta_pct"])  # skip NaN
-    print(f"Largest |delta| across all {len(RESULTS)} cross-checks: {max_abs_pct:.1f}%")
+    # /usr/bin/time -v's centisecond resolution means a near-floor
+    # command (w00, ~10ms) can report exactly 0.00s, making delta_pct a
+    # NaN (division by ~0) -- that row carries no signal either way and
+    # is reported separately rather than silently folded into "all N
+    # cross-checks" as if it had been meaningfully compared.
+    comparable = [r for r in RESULTS if r["delta_pct"] == r["delta_pct"]]  # drop NaN
+    nan_rows = [r["label"] for r in RESULTS if r["delta_pct"] != r["delta_pct"]]
+    if nan_rows:
+        print(f"Excluded from comparison (external timer's resolution too coarse to compare): {nan_rows}")
+    max_abs_pct = max((abs(r["delta_pct"]) for r in comparable), default=0.0)
+    print(f"Largest |delta| across {len(comparable)} comparable cross-checks (of {len(RESULTS)} total): {max_abs_pct:.1f}%")
+    for r in RESULTS:
+        if r["harness_s"] > 0:
+            print(f"  {r['label']}: child_cpu/wall = {r['child_cpu_s'] / r['harness_s'] * 100:.0f}% (reaped-descendant rusage share of wall time)")
     if flagged:
         for r in flagged:
             print(f"  DISAGREEMENT: {r['label']}: {r['delta_s']:+.4f}s ({r['delta_pct']:+.1f}%)")
@@ -164,9 +196,11 @@ def main() -> int:
         return 1
     print(
         "The harness's process_interval_seconds and an independent external timer "
-        "(/usr/bin/time -v) agree within measurement noise on every command checked, "
-        "including the two real candidate process TREES (multiple spawned children each) -- "
-        "no evidence the harness's timing window misses or double-counts a descendant process."
+        "(/usr/bin/time -v) agree on elapsed wall time within measurement noise on every "
+        "comparable command. This does NOT by itself rule out a stdio-detached grandchild "
+        "invisible to both mechanisms (see module docstring) -- child_cpu/wall above, from "
+        "/usr/bin/time's rusage of every REAPED descendant, is the actual (partial) evidence "
+        "the real candidate process trees were substantially waited-for."
     )
     return 0
 

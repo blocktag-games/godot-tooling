@@ -78,9 +78,11 @@ class ConditionResult:
     # times out or fails, the timed run below still proceeds against a
     # stale/partial import cache and its cost would silently leak into
     # process_interval_seconds. Recorded so that scenario is visible in
-    # the data rather than only in a log nobody reads. Both were 0/False
-    # for all 200 BP07 pilot rows (their import step was never actually
-    # checked at that time -- these fields did not exist yet).
+    # the data rather than only in a log nobody reads. These fields did
+    # not exist during the 200-row BP07 pilot, so its import step's
+    # outcome was never actually checked or recorded (unknown, not
+    # assumed clean) -- committed pilot_results.tsv rows predate these
+    # columns and read back as empty via csv.DictReader, not 0/False.
     import_exit_code: int | None = None
     import_timed_out: bool = False
 

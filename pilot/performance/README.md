@@ -159,18 +159,19 @@ directly rather than assuming a clean run.
   that cost into every other workload's number would be a measurement-
   boundary error the protocol explicitly warns against.
 
-## What remains for BP07-BP09
+## BP07 and BP08 status
 
-1. **The pilot itself** (BP07): calibrate each workload's fixed input
-   size against B0 timing (1-5s target per the protocol), replacing
-   `tests_gut/tests_gdunit`'s placeholder constants with frozen values.
-   Machine quiescence is a BP10 requirement (the controlled main
-   study), not a precondition for BP07's pilot -- the pilot's own
-   purpose is exploratory calibration, not a controlled measurement.
-2. Harness cross-checks and the observer matrix (BP08) -- native
-   `perf` profiling is unavailable on this machine (not installed,
-   kernel `perf_event_paranoid=3`, no sudo in this session); to be
-   marked unavailable and worked around, or installed by the user.
+Both done as of 2026-09-20 (see git history for the corrections each
+went through after adversarial review). BP07: the pilot itself,
+calibrated and frozen input sizes, valid 200-row `pilot_results.tsv`.
+BP08: harness timing validation, an independent timing cross-check,
+one available capture (`cProfile` of the harness, since native `perf`
+remains unavailable on this machine -- not installed, kernel
+`perf_event_paranoid=3`, no sudo in this session), and the reduced H/C
+pilot observer matrix at `docs/benchmarks/pilot-observer-matrix.tsv`
+(P unavailable for the reason recorded there, not simply "not tried").
+Machine quiescence is a BP10 requirement (the controlled main study)
+only, not a precondition for either of these phases.
 
 ## Known confounds in this pilot's numbers (independent review, 2026-09-20)
 
