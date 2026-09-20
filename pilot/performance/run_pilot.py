@@ -49,7 +49,7 @@ OUT_PATH = Path(__file__).parent / "pilot_results.tsv"
 FIELDNAMES = [
     "candidate", "workload", "session", "session_seed", "block", "condition",
     "order_in_block", "process_interval_seconds", "exit_code", "behavior_ok",
-    "coverage_artifact_ok", "timed_out", "timestamp",
+    "coverage_artifact_ok", "timed_out", "import_exit_code", "import_timed_out", "timestamp",
 ]
 
 # NOTE on scope (2026-09-20): the protocol's "balance AB/BA ordering"
@@ -98,6 +98,8 @@ def run_cell(candidate: CandidateConfig, workload: str, writer: csv.DictWriter, 
                     "behavior_ok": result.behavior_ok,
                     "coverage_artifact_ok": result.coverage_artifact_ok,
                     "timed_out": result.timed_out,
+                    "import_exit_code": result.import_exit_code,
+                    "import_timed_out": result.import_timed_out,
                     "timestamp": f"{time.time():.3f}",
                 }
                 writer.writerow(row)

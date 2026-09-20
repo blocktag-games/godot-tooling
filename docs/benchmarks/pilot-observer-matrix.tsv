@@ -1,0 +1,19 @@
+workload	factor	value	available	evidence
+W01	H	0 (minimal launcher)	yes	pilot/performance/minimal_launcher.py; spot-checked vs H=1 in pilot/performance/harness_overhead_check.py: ratio 0.9955, within 2x pooled stdev -- no measurable harness effect, consistent with run_condition.py's own Python bookkeeping occurring entirely outside the timed window (see pilot/performance/harness_profile.py's cProfile capture: cumulative time is ~100% Popen/communicate wait)
+W01	H	1 (full harness)	yes	pilot/performance/run_condition.py, exercised throughout BP07's 200-row pilot
+W01	C	0 (baseline)	yes	BP07 pilot_results.tsv: gd-tools/w01/B0, n=10
+W01	C	1 (coverage active)	yes	BP07 pilot_results.tsv: gd-tools/w01/C, n=10
+W01	P	0 (profiler inactive)	yes	trivially available (no profiler running is not a capability gap)
+W01	P	1 (profiler active)	no	Linux perf unavailable this session (not installed; kernel perf_event_paranoid=3; no sudo cached -- see implementation-plan.md's "Profiler access/build effort" row). Godot's built-in profiler and a Tracy-instrumented build were not validated this session (no debug-server automation set up, no Tracy build available). Only a script-level capture was demonstrated (harness_profile.py's cProfile of the Python harness itself, not the child Godot process) -- that is a different layer than this P factor, which targets the child process per profiling-protocol.md's layer table.
+W03	H	0 (minimal launcher)	yes	same launcher as W01; not independently re-spot-checked per workload (H is a harness-layer property, not workload-dependent -- see W01's evidence column)
+W03	H	1 (full harness)	yes	pilot/performance/run_condition.py, exercised throughout BP07's 200-row pilot
+W03	C	0 (baseline)	yes	BP07 pilot_results.tsv: gd-tools/w03/B0, n=10
+W03	C	1 (coverage active)	yes	BP07 pilot_results.tsv: gd-tools/w03/C, n=10
+W03	P	0 (profiler inactive)	yes	trivially available
+W03	P	1 (profiler active)	no	same unavailability as W01 -- see that row's evidence
+W11	H	0 (minimal launcher)	yes	same launcher as W01; not independently re-spot-checked per workload (see W01's evidence column)
+W11	H	1 (full harness)	yes	pilot/performance/run_condition.py, exercised throughout BP07's 200-row pilot
+W11	C	0 (baseline)	yes	BP07 pilot_results.tsv: gd-tools/w11/B0, n=10
+W11	C	1 (coverage active)	yes	BP07 pilot_results.tsv: gd-tools/w11/C, n=10
+W11	P	0 (profiler inactive)	yes	trivially available
+W11	P	1 (profiler active)	no	same unavailability as W01 -- see that row's evidence

@@ -73,6 +73,16 @@ class ConditionResult:
     timed_out: bool
     stdout: str
     stderr: str
+    # BP08 (added after a review of the BP07 pilot noted the untimed
+    # --import step's own outcome was silently discarded): if this step
+    # times out or fails, the timed run below still proceeds against a
+    # stale/partial import cache and its cost would silently leak into
+    # process_interval_seconds. Recorded so that scenario is visible in
+    # the data rather than only in a log nobody reads. Both were 0/False
+    # for all 200 BP07 pilot rows (their import step was never actually
+    # checked at that time -- these fields did not exist yet).
+    import_exit_code: int | None = None
+    import_timed_out: bool = False
 
 
 def _gd_tools_behavior_ok(stdout: str) -> bool:
@@ -128,10 +138,17 @@ def run_condition(
     # Import cache must exist before a timed run -- the fresh-import
     # cost is W14's own workload, not something to fold into every
     # other workload's timing by accident.
-    safe_run(
+    import_result = safe_run(
         [str(GODOT_BIN), "--headless", "--path", str(scratch_dir), "--import"],
         cwd=str(scratch_dir), timeout_s=60, env=env,
     )
+    if import_result.timed_out or import_result.exit_code != 0:
+        print(
+            f"WARNING: untimed --import step for {candidate.name}/{workload}/{condition} "
+            f"did not complete cleanly (exit={import_result.exit_code}, timed_out={import_result.timed_out}) "
+            f"-- the timed run below proceeds against a possibly stale/partial import cache.",
+            file=sys.stderr,
+        )
 
     if candidate.name == "gd-tools":
         gd_tools_bin = str(REPO_ROOT / "pilot/gd-tools/.venv/bin/gd-tools")
@@ -163,4 +180,6 @@ def run_condition(
         timed_out=result.timed_out,
         stdout=result.stdout,
         stderr=result.stderr,
+        import_exit_code=import_result.exit_code,
+        import_timed_out=import_result.timed_out,
     )
