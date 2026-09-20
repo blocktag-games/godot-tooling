@@ -1,7 +1,7 @@
 id	tier	domain	case	requirement	eligibility	oracle_basis	status
 F001	0	population	Never-loaded selected file	Selected source remains accounted for; unknown differs from measured zero	all_supported	Hand-listed file inventory and zero-execution obligations	fixture-built
 F002	0	population	Never-called function	Uncalled function/body remains eligible under the declared contract	all_supported	Reviewed call graph and zero body hits	fixture-built
-F003	1	population	Empty source population	Empty denominator is not automatically 100 percent	all_supported	Explicit empty source manifest	planned
+F003	1	population	Empty source population	Empty denominator is not automatically 100 percent	all_supported	Explicit empty source manifest	fixture-built
 F004	1	population	Include and exclude rules	Selected application and excluded vendor/test sources are distinguished	all_supported	Independent path selection manifest	planned
 F005	1	population	Loaded dependency outside selection	Dependency execution does not silently broaden or shrink declared scope	all_supported	Known preload graph and selected inventory	planned
 F006	2	population	Same basename in different directories	Distinct original sources do not share counters	all_supported	Two hashes and different expected paths	planned

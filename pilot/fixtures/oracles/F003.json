@@ -1,0 +1,35 @@
+{
+  "id": "F003",
+  "tier": 1,
+  "domain": "population",
+  "case": "Empty source population",
+  "requirement": "Empty denominator is not automatically 100 percent",
+  "files": [
+    {
+      "path": "cases/f003_empty_population/project.godot",
+      "note": "The fixture itself: a valid Godot project directory with deliberately zero .gd files, so gd-tools' own file discovery selects an empty population. No sha256 needed -- this is not a line-hit obligation case (see F008/F062/F064/F065/F071 for the same process/artifact-style shape)."
+    },
+    {
+      "path": "cases/f003_empty_population/check.py",
+      "sha256": "e0cdb0f1f9d6f370a9e129deea20f036d6ccc68c923387fd17487d0152de9422"
+    }
+  ],
+  "inputs": [
+    { "name": "default", "call": "check.py -> real gd_tools.coverage.plan_generator.generate_plan() and reporter.compute_summary() against this empty directory" }
+  ],
+  "measured_with_gd_tools_0_4_0": {
+    "call": "generate_plan(project_root) -> CoveragePlan(files=[]); compute_summary(plan, CoverageData(files=[]))",
+    "population_size": 0,
+    "line_rate": 0.0,
+    "branch_rate": 0.0,
+    "terminal_report_output": "Overall Line Coverage: 0.0%\nOverall Branch Coverage: 0.0%",
+    "requirement_met": true,
+    "finding": "gd-tools' reporter.py explicitly guards the division: `line_rate = covered_lines / total_lines if total_lines > 0 else 0.0`. An empty population reports 0.0 (0%), not 100%, not a crash (no ZeroDivisionError), and not NaN. Confirmed both via the Python API directly and via the real terminal report renderer."
+  },
+  "notes": "A real, verified POSITIVE finding: unlike several of the negative findings this project has recorded against gd-tools, this requirement is met correctly. Worth recording explicitly rather than only cataloging defects -- correctness-protocol.md's own philosophy is that a passing case establishes agreement, not just that failing cases are interesting.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Only gd-tools was tested. GdUnit4-as-runner has no coverage concept of its own to test this against; Nano Coverage and godot-code-coverage's behavior on an empty population is untested."
+  ]
+}

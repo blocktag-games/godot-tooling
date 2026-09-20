@@ -116,12 +116,14 @@ sha256sum cases/f010_straight_line/subject.gd
 
 ## Group 3 — harness-dependent, real-tool findings
 
-All five use `pilot/harness/`'s modules directly and, except F062, run the
-*actual* pinned tools (gd-tools-cli 0.4.0, GUT v9.7.1) rather than modeling
-them. Three produced real, reproducible defect findings, not synthetic ones:
+All six use `pilot/harness/`'s modules directly and, except F062/F065, run
+the *actual* pinned tools (gd-tools-cli 0.4.0, GUT v9.7.1) rather than
+modeling them. Three produced real, reproducible defect findings; one (F003)
+is a real, verified **positive** result, not a defect:
 
 | ID | Case | Directory | Real finding |
 | --- | --- | --- | --- |
+| F003 | Empty source population (tier 1) | `cases/f003_empty_population/` | Real gd-tools-cli 0.4.0: an empty selected population reports **0.0% coverage, not 100%** -- `reporter.py` explicitly guards the division (`... if total_lines > 0 else 0.0`), confirmed via both the Python API and the real terminal report renderer. A positive finding, recorded alongside the defects. |
 | F008 | Selected file cannot be instrumented | `cases/f008_cannot_be_instrumented/` | A UTF-8 BOM-prefixed `.gd` file is valid, runnable GDScript on Godot 4.7.1, but gd-tools' gdtoolkit-based parser rejects it and **silently drops it from the coverage plan** — no field anywhere in the plan/report schema records the omission, only a transient console warning. |
 | F062 | Injected instrumentation failure | `cases/f062_injected_instrumentation_failure/` (uses F008 as its real-tool realization; check.py self-tests `pilot/harness/faults.py`'s generic fault injection) | Reuses F008's finding as its concrete case; check.py commits and reproduces the harness's own `make_unwritable` fault-injection primitive, for future tool-independent use. |
 | F064 | Zero requested tests execute | `cases/f064_zero_requested_tests/` | Real GUT v9.7.1: correctly logs `[GUT ERROR]: Nothing was run.` and records `tests="0"` in JUnit XML output, but the **process exit code is still 0** — a CI pipeline gating on exit code alone would treat this as a passing build. |
