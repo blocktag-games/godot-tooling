@@ -1,0 +1,53 @@
+{
+  "id": "F041",
+  "tier": 1,
+  "domain": "lifecycle",
+  "case": "Member and static initialization",
+  "requirement": "Initialization location and timing follow declared collection scope",
+  "files": [
+    {
+      "path": "cases/f041_member_static_init/subject.gd",
+      "sha256": "9a4d79bb865ea5e56b7916a09179cc00230a09ddf8d2df6212f8c22282ebe16b"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "zero_instances",
+      "call": "fresh process: godot --headless --path . --script driver.gd -- 0",
+      "expected_result": { "static_init_count": 1, "num_instances_created": 0 },
+      "obligations": [
+        { "file": "cases/f041_member_static_init/subject.gd", "line": 3, "kind": "statement", "expected_hit": true, "note": "static var initializer, runs once at first script load, independent of any instance ever being created" },
+        { "file": "cases/f041_member_static_init/subject.gd", "line": 4, "kind": "statement", "expected_hit": false, "note": "member var initializer -- never runs, since no instance is created this run" },
+        { "file": "cases/f041_member_static_init/subject.gd", "line": 7, "kind": "statement", "expected_hit": true, "note": "_static_init() body, fires at load regardless of instance count" },
+        { "file": "cases/f041_member_static_init/subject.gd", "line": 10, "kind": "statement", "expected_hit": false, "note": "_init() body -- never runs, since new() is never called this run" },
+        { "file": "cases/f041_member_static_init/subject.gd", "line": 13, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f041_member_static_init/subject.gd", "line": 14, "kind": "statement", "expected_hit": true, "note": "the for-loop header is still evaluated once even for range(0)" },
+        { "file": "cases/f041_member_static_init/subject.gd", "line": 14, "kind": "branch", "branch_type": "loop_entered", "expected_hit": false },
+        { "file": "cases/f041_member_static_init/subject.gd", "line": 15, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f041_member_static_init/subject.gd", "line": 16, "kind": "statement", "expected_hit": true }
+      ]
+    },
+    {
+      "name": "three_instances",
+      "call": "fresh process: godot --headless --path . --script driver.gd -- 3",
+      "expected_result": { "static_init_count": 1, "num_instances_created": 3 },
+      "obligations": [
+        { "file": "cases/f041_member_static_init/subject.gd", "line": 3, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f041_member_static_init/subject.gd", "line": 4, "kind": "statement", "expected_hit": true, "note": "runs once per instance -- 3 times this run, but the schema only expresses reached-at-least-once" },
+        { "file": "cases/f041_member_static_init/subject.gd", "line": 7, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f041_member_static_init/subject.gd", "line": 10, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f041_member_static_init/subject.gd", "line": 13, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f041_member_static_init/subject.gd", "line": 14, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f041_member_static_init/subject.gd", "line": 14, "kind": "branch", "branch_type": "loop_entered", "expected_hit": true },
+        { "file": "cases/f041_member_static_init/subject.gd", "line": 15, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f041_member_static_init/subject.gd", "line": 16, "kind": "statement", "expected_hit": true }
+      ]
+    }
+  ],
+  "notes": "Each input is its own genuinely fresh process (own `godot --headless --path . --script driver.gd -- <n>` invocation), per the catalog's 'Fresh-process initial state and init events' oracle basis -- not two calls sharing one process's cumulative coverage report, which could never distinguish 'ran once at load' from 'ran once per call' since a real report only ever shows the whole process's cumulative hits. zero_instances gives this fixture real discriminating power at the coverage level: a tool that (incorrectly) treats the member initializer (line 4) or _init() (line 10) as running even with zero instances created would be caught as a false_hit, and a tool that treats the static initializer (line 3) or _static_init() (line 7) as instance-scoped would be caught as a missing_hit in the SAME input where line 4/10 correctly read false. An earlier draft of this oracle used two run() calls within one shared process and asserted contradictory per-call obligations for the same lines -- not evaluable against any real report, since one input must correspond to one measurable run. Corrected before commit. Confirmed on the pinned Godot 4.7.1 engine.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "The schema has no obligation kind for 'hit exactly N times' -- three_instances' line 4/10 obligations only assert 'hit at least once', so the exact instance count (3) is verified only via the return value, not via a coverage obligation."
+  ]
+}

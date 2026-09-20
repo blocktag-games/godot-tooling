@@ -93,6 +93,13 @@ than subdirectories of the shared `project.godot` above.
 | F091 | Autoload initialization, ordered after the collector autoload | `cases/f091_autoload_after_collector/` |
 | F045 | Await suspension and resumption | `cases/f045_await_resume/` |
 | F060 | Deterministic state preservation across script reload | `cases/f060_reload_state/` |
+| F041 | Member and static initialization (tier 1) | `cases/f041_member_static_init/` |
+
+F041 takes one CLI arg (`godot --headless --path . --script driver.gd -- <num_instances>`)
+so each named input is its own fresh process, per the catalog's "fresh-process
+initial state" requirement -- static-vs-instance initialization timing can't
+be told apart from a single process's cumulative coverage report, only
+across two genuinely separate runs (0 instances created vs. 3).
 
 F040/F091 use identical fixture scripts (`event_log.gd`, `user_autoload.gd`,
 `collector_marker.gd`) with only the `[autoload]` order in `project.godot`
