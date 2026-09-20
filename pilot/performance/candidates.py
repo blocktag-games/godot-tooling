@@ -197,11 +197,37 @@ integrations/gdunit4=true
 )
 
 
-def setup_scratch_project(candidate: CandidateConfig, condition: str, scratch_dir: Path) -> None:
+def user_data_dir_for(custom_user_dir_name: str) -> Path:
+    """The OS-level directory Godot's `application/config/
+    use_custom_user_dir` + `custom_user_dir_name` settings resolve to
+    on Linux -- confirmed directly against the pinned 4.7.1 binary
+    (`OS.get_user_data_dir()` returns `~/.local/share/<name>` exactly,
+    not nested under an org/app path)."""
+    return Path.home() / ".local/share" / custom_user_dir_name
+
+
+def isolated_user_dir_name(candidate: CandidateConfig, workload: str, condition: str) -> str:
+    """Deterministic per-(candidate, workload, condition) name -- NOT
+    per-run. Per docs/benchmarks/performance-protocol.md's frozen
+    mechanism: caches must be isolated BETWEEN conditions, not cleared
+    on every single run within one condition (repeated runs of the SAME
+    condition legitimately warming its own cache is realistic, unbiased
+    behavior; only cross-condition sharing is the confound)."""
+    return f"bp10-{candidate.name}-{workload}-{condition}"
+
+
+def setup_scratch_project(
+    candidate: CandidateConfig, condition: str, scratch_dir: Path,
+    isolate_user_dir_for_workload: str | None = None,
+) -> None:
     """Build a fresh scratch project for one candidate/condition,
     clearing any prior .godot import cache -- applied identically
     across every condition. Does NOT clear the OS-level shader cache
-    (see module docstring's shader-cache correction)."""
+    unless `isolate_user_dir_for_workload` is given (see module
+    docstring's shader-cache correction and docs/benchmarks/
+    performance-protocol.md's frozen isolation mechanism, added for
+    BP10 -- the BP07 pilot deliberately did not use this, since its
+    shared warm cache did not bias its within-candidate ratios)."""
     if condition not in candidate.project_godot_fragments:
         raise ValueError(
             f"{candidate.name} has no {condition} condition "
@@ -217,9 +243,15 @@ def setup_scratch_project(candidate: CandidateConfig, condition: str, scratch_di
     shutil.copytree(candidate.test_source_dir, scratch_dir / candidate.test_dest_name)
 
     base_project_godot = (PERF_ROOT / "project.godot").read_text()
-    (scratch_dir / "project.godot").write_text(
-        base_project_godot + candidate.project_godot_fragments[condition]
-    )
+    project_godot_text = base_project_godot + candidate.project_godot_fragments[condition]
+    if isolate_user_dir_for_workload is not None:
+        user_dir_name = isolated_user_dir_name(candidate, isolate_user_dir_for_workload, condition)
+        project_godot_text += (
+            f'\n[application]\n\n'
+            f'config/use_custom_user_dir=true\n'
+            f'config/custom_user_dir_name="{user_dir_name}"\n'
+        )
+    (scratch_dir / "project.godot").write_text(project_godot_text)
 
     (scratch_dir / "addons").mkdir()
     for addon_name, source in candidate.addon_sources_by_condition[condition].items():

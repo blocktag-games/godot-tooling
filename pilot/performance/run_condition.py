@@ -165,6 +165,7 @@ def run_condition(
     condition: str,
     extra_env: dict[str, str] | None = None,
     scratch_label: str | None = None,
+    isolate_user_dir: bool = False,
 ) -> ConditionResult:
     """Runs ONE process for ONE (candidate, workload, condition) triple
     and returns its process-interval elapsed time. Does not loop, does
@@ -172,10 +173,21 @@ def run_condition(
     block structure, repetition, ordering) is a separate layer on top
     of this single-shot primitive, per performance-protocol.md's
     block/session structure.
+
+    `isolate_user_dir=True` (BP10 main study only, per the protocol's
+    frozen per-condition cache-isolation mechanism -- see candidates.py)
+    gives this (candidate, workload, condition) its own OS-level
+    Godot user-data directory instead of sharing one across every
+    condition, the way the BP07 pilot deliberately did (harmless there,
+    since a shared warm cache doesn't bias a within-candidate ratio, but
+    not acceptable for the main study per BP09's freeze).
     """
     extra_env = extra_env or {}
     scratch_dir = SCRATCH_ROOT / (scratch_label or f"{candidate.name}-{workload}-{condition}")
-    setup_scratch_project(candidate, condition, scratch_dir)
+    setup_scratch_project(
+        candidate, condition, scratch_dir,
+        isolate_user_dir_for_workload=workload if isolate_user_dir else None,
+    )
 
     env = dict(os.environ)
     env["GODOT_BIN"] = str(GODOT_BIN)

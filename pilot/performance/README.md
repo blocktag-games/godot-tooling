@@ -279,11 +279,33 @@ None of these bias the B0-vs-C ratio *within* a candidate (the thing
 this study actually estimates), so the pilot's 200 rows stand as valid
 exploratory data. They matter for BP10's design and reporting.
 
+## BP10 runner: built, NOT yet executed
+
+`run_main_study.py` implements the frozen main-study design from
+`docs/benchmarks/performance-protocol.md`'s BP09 freeze -- 10 sessions
+x 6 blocks per cell, the permutation-balanced B0/B1/C and AB/BA
+schedules (`main_study_schedule.py`, self-tested: exact per-position
+balance confirmed across 20 seeds and in a real 18-run smoke test),
+per-condition OS-level cache isolation (`candidates.py`'s
+`isolate_user_dir_for_workload`, confirmed via `OS.get_user_data_dir()`
+resolving to distinct directories per condition), a measured idle-CPU
+quiescence GATE before every session (`quiescence.py` -- aborts the
+whole study with partial results retained, rather than proceeding on
+an unverified assumption of quiet), and per-session environment
+capture. Smoke-tested end to end against real Godot processes (one
+full 18-run session for one cell; an abort path forced and confirmed
+to fail cleanly with partial data preserved). NOT yet run at full
+scale -- that is BP10 execution itself, gated on machine readiness
+below.
+
 ## What remains before BP10 specifically can start
 
 **Machine readiness** (see `implementation-plan.md`'s BP10 row): CPU
-governor still `powersave`, and Firefox, another project's live GUT/
-test-runner process, and four of that project's background services
-have been observed running on this machine (most recently 2026-09-20).
-None of this has been touched by this session. This gate applies to
-BP10's controlled main study only, not to BP07-BP09.
+governor still `powersave`, and four of another project's background
+services have been observed running on this machine (most recently
+2026-09-20; Firefox was not running at last check). None of this has
+been touched by this session -- no sudo for the governor, and stopping
+another project's live processes is not this session's call to make.
+This gate applies to BP10's controlled main study only, not to
+BP07-BP09, and the runner script itself (`run_main_study.py`) is ready
+to execute once it's cleared.
