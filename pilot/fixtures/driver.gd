@@ -88,6 +88,12 @@ func _initialize() -> void:
 	_check("F026", "run([5]) neither", f026.run([5]), [5])
 	_check("F026", "run([]) empty, loop never entered", f026.run([]), [])
 
+	# F027: match with two literal arms and a fallback.
+	var f027 = load("res://cases/f027_match_fallback/subject.gd")
+	_check("F027", "run(1) first arm", f027.run(1), "one")
+	_check("F027", "run(2) second arm", f027.run(2), "two")
+	_check("F027", "run(99) fallback", f027.run(99), "other")
+
 	print("")
 	if failures.is_empty():
 		print("All tier-0 group 1 fixtures match their behavioral specification.")

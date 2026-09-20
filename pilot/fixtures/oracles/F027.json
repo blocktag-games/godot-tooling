@@ -1,0 +1,70 @@
+{
+  "id": "F027",
+  "tier": 1,
+  "domain": "control_flow",
+  "case": "Match and fallback",
+  "requirement": "Reached arms and default behavior are distinguished",
+  "files": [
+    {
+      "path": "cases/f027_match_fallback/subject.gd",
+      "sha256": "c81ef3534f9f2fbcc227b0498b423434af59e1a320865138e3d59e5b26dbb951"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "one",
+      "call": "subject.gd:run(1)",
+      "expected_result": "one",
+      "obligations": [
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 5, "kind": "statement", "expected_hit": true, "note": "reached: the first pattern is always checked" },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 5, "kind": "branch", "branch_type": "match_case", "expected_hit": true },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 6, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 7, "kind": "statement", "expected_hit": false, "note": "NOT reached: the first pattern already matched, so this pattern is never checked, matching the elif-chain short-circuit behavior found in F022" },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 7, "kind": "branch", "branch_type": "match_case", "expected_hit": false },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 8, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 9, "kind": "statement", "expected_hit": false, "note": "the catch-all pattern is also never checked once an earlier pattern matches" },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 9, "kind": "branch", "branch_type": "match_case", "expected_hit": false },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 10, "kind": "statement", "expected_hit": false }
+      ]
+    },
+    {
+      "name": "two",
+      "call": "subject.gd:run(2)",
+      "expected_result": "two",
+      "obligations": [
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 5, "kind": "statement", "expected_hit": true, "note": "reached, outcome false: value is 2, not 1" },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 5, "kind": "branch", "branch_type": "match_case", "expected_hit": false },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 6, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 7, "kind": "statement", "expected_hit": true, "note": "reached: first pattern failed, so this one IS checked" },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 7, "kind": "branch", "branch_type": "match_case", "expected_hit": true },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 8, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 9, "kind": "statement", "expected_hit": false, "note": "not reached: the second pattern already matched" },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 9, "kind": "branch", "branch_type": "match_case", "expected_hit": false },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 10, "kind": "statement", "expected_hit": false }
+      ]
+    },
+    {
+      "name": "other",
+      "call": "subject.gd:run(99)",
+      "expected_result": "other",
+      "obligations": [
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 5, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 5, "kind": "branch", "branch_type": "match_case", "expected_hit": false },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 6, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 7, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 7, "kind": "branch", "branch_type": "match_case", "expected_hit": false },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 8, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 9, "kind": "statement", "expected_hit": true, "note": "reached: both literal patterns failed, so the catch-all is checked and matches" },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 9, "kind": "branch", "branch_type": "match_case", "expected_hit": true },
+        { "file": "cases/f027_match_fallback/subject.gd", "line": 10, "kind": "statement", "expected_hit": true }
+      ]
+    }
+  ],
+  "notes": "GDScript's match checks patterns in declaration order and stops at the first match, the same short-circuit structure as F022's elif chain -- confirmed here by the same reached/outcome pattern: 'one' never even checks the later two patterns (not reached), while 'other' reaches and evaluates both literal patterns (reached, not matched) before falling through to the catch-all. Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": []
+}
