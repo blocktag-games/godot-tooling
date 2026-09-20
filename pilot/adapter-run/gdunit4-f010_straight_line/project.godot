@@ -1,0 +1,10 @@
+config_version=5
+
+[application]
+
+config/name="bp05-gdunit4-f010"
+config/features=PackedStringArray("4.7")
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg")
