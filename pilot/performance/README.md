@@ -95,20 +95,24 @@ been run.
   that cost into every other workload's number would be a measurement-
   boundary error the protocol explicitly warns against.
 
-## What remains before BP10 can start
+## What remains for BP07-BP09
 
 1. **The pilot itself** (BP07): calibrate each workload's fixed input
    size against B0 timing (1-5s target per the protocol), replacing
    `tests_gut/tests_gdunit`'s placeholder constants with frozen values.
-   This is real execution, gated on the machine-readiness item below.
-2. **Machine readiness** (see `implementation-plan.md`'s BP10 row):
-   CPU governor still `powersave`, and as of this preparation pass
-   Firefox, another project's live GUT/test-runner process, and four
-   of that project's background services were all running on this
-   machine. None of this has been touched by this session. Verify
-   quiescence (a measured idle-CPU% check, not an assumption) before
-   the pilot runs, not just before BP10's main study.
-3. Harness cross-checks and the observer matrix (BP08) -- native
+   Machine quiescence is a BP10 requirement (the controlled main
+   study), not a precondition for BP07's pilot -- the pilot's own
+   purpose is exploratory calibration, not a controlled measurement.
+2. Harness cross-checks and the observer matrix (BP08) -- native
    `perf` profiling is unavailable on this machine (not installed,
    kernel `perf_event_paranoid=3`, no sudo in this session); to be
    marked unavailable and worked around, or installed by the user.
+
+## What remains before BP10 specifically can start
+
+**Machine readiness** (see `implementation-plan.md`'s BP10 row): CPU
+governor still `powersave`, and Firefox, another project's live GUT/
+test-runner process, and four of that project's background services
+have been observed running on this machine (most recently 2026-09-20).
+None of this has been touched by this session. This gate applies to
+BP10's controlled main study only, not to BP07-BP09.
