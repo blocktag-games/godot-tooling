@@ -143,6 +143,76 @@ def test_oracle_stale_source_detected() -> None:
         )
 
 
+def test_branch_evidence_distinguished_from_hits() -> None:
+    """A branch obligation (evidence='branches') and a statement
+    obligation (evidence='hits') on the SAME line must be checked
+    against separate evidence sources, matching how LCOV keeps DA (line
+    hits) and BRDA (branch hits) as distinct record types -- a line can
+    be 'reached' independently of whether a specific outcome was
+    'taken'."""
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        _, sha = make_source(tmp)
+        obligations = [
+            Obligation(file="subject.gd", sha256=sha, line=4, expected_hit=True),  # reached
+            Obligation(
+                file="subject.gd", sha256=sha, line=4, expected_hit=False,
+                evidence="branches", branch_type="if_true",
+            ),  # reached, but this outcome was NOT taken
+        ]
+        actual = {
+            "files": [
+                {"path": "subject.gd", "sha256": sha, "hits": {"4": 1}, "branches": {"4:if_true": 0}}
+            ]
+        }
+        result = compare(obligations, actual, tmp)
+        check(
+            "branch_evidence_distinguished_from_hits [positive control]",
+            result.status == "match" and result.is_clean,
+            str(result),
+        )
+
+
+def test_branch_evidence_missing_branches_dict_reads_as_not_taken() -> None:
+    """If a report has no 'branches' entry at all for a file, a branch
+    obligation must read as not-taken (was_hit=False), not raise or be
+    silently skipped -- absence of branch evidence is itself a fact."""
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        _, sha = make_source(tmp)
+        obligations = [
+            Obligation(
+                file="subject.gd", sha256=sha, line=4, expected_hit=True,
+                evidence="branches", branch_type="if_true",
+            )
+        ]
+        actual = {"files": [{"path": "subject.gd", "sha256": sha, "hits": {"4": 1}}]}  # no "branches" key
+        result = compare(obligations, actual, tmp)
+        check(
+            "branch_evidence_missing_dict_reads_as_not_taken",
+            result.status == "mismatch" and ("subject.gd", 4) in result.missing_hits,
+            str(result),
+        )
+
+
+def test_obligation_rejects_invalid_evidence() -> None:
+    raised = False
+    try:
+        Obligation(file="subject.gd", sha256="0" * 64, line=4, expected_hit=True, evidence="bogus")
+    except ValueError:
+        raised = True
+    check("obligation_rejects_invalid_evidence", raised, "expected ValueError")
+
+
+def test_branch_obligation_requires_branch_type() -> None:
+    raised = False
+    try:
+        Obligation(file="subject.gd", sha256="0" * 64, line=4, expected_hit=True, evidence="branches")
+    except ValueError:
+        raised = True
+    check("branch_obligation_requires_branch_type", raised, "expected ValueError")
+
+
 def test_inconsistent_oracle_hash_rejected() -> None:
     """Two obligations for the same file declaring different sha256
     values is a broken oracle, not a comparable case -- must raise, not
@@ -274,6 +344,10 @@ def main() -> int:
     test_missing_file_detected()
     test_stale_report_detected()
     test_oracle_stale_source_detected()
+    test_branch_evidence_distinguished_from_hits()
+    test_branch_evidence_missing_branches_dict_reads_as_not_taken()
+    test_obligation_rejects_invalid_evidence()
+    test_branch_obligation_requires_branch_type()
     test_inconsistent_oracle_hash_rejected()
     test_malformed_shape_rejected()
     test_truncated_json_rejected()

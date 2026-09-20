@@ -32,17 +32,30 @@ Decision/branch lines (an `if`, `elif`, `for`/`while` header, or `match`
 arm) ARE first-class obligations, listed exactly like a statement line:
 {"file": ..., "line": <the decision's own line>, "kind": "branch",
 "branch_type": "if_true" | "if_false" | "elif_true" | "loop_header" |
-"match_case", "expected_hit": bool}. `kind` and `branch_type` are
-documentation for a human reader (and for a future
-branch-vs-statement-aware comparator); comparator.compare() does not
-currently distinguish them from a statement obligation -- both are
-just a (file, line, expected_hit) fact to it. This was a real gap
-identified on 2026-09-19 (F020's original oracle omitted lines 5 and 7,
-the decision lines themselves, treating them as "keyword lines, not
-body-line obligations" -- which meant F020's real gd-tools comparison
-needed hand-written prose instead of a mechanical compare() call).
-Omitting decision lines is no longer this project's convention;
-tier-1's control-flow cases (F022 onward) include them.
+"match_case", "expected_hit": bool}. This was a real gap identified on
+2026-09-19 (F020's original oracle omitted lines 5 and 7, the decision
+lines themselves, treating them as "keyword lines, not body-line
+obligations" -- which meant F020's real gd-tools comparison needed
+hand-written prose instead of a mechanical compare() call). Omitting
+decision lines is no longer this project's convention; tier-1's
+control-flow cases (F022 onward) include them.
+
+A "kind": "branch" obligation is loaded with evidence="branches"
+(comparator.Obligation), so it's checked against the actual report's
+separate "branches" dict, keyed by "<line>:<branch_type>" -- NOT
+against "hits" the way a statement obligation is. This is a second real
+gap, identified and fixed 2026-09-19: a decision line can be "reached"
+(hits -- the line executed at all) independently of whether a specific
+outcome was "taken" (branches) -- e.g. an elif whose condition
+evaluates to false was still reached, which is different from a later
+elif that's never evaluated at all because an earlier arm already
+matched; both are "outcome not taken" but only one is "reached". Give a
+decision line BOTH a plain statement obligation (kind: "statement",
+default evidence="hits", "was this line executed at all") AND a branch
+obligation (kind: "branch", evidence="branches", "was this specific
+outcome taken") when that distinction matters for the case -- this
+mirrors how LCOV itself keeps DA (line hits) and BRDA (branch hits) as
+separate record types for the same line, rather than one fact.
 
 File paths in "files[].path" and "obligations[].file" are always
 relative to pilot/fixtures/ (i.e. include the "cases/<case>/" prefix),
@@ -90,16 +103,20 @@ def obligations_for_input(oracle: dict, input_name: str) -> list[Obligation]:
                     f"oracle {oracle.get('id')} input {input_name!r} has no obligations "
                     "(this oracle tests process/artifact behavior, not line hits)"
                 )
-            return [
-                Obligation(
-                    file=o["file"],
-                    sha256=_sha_for_file(oracle, o["file"]),
-                    line=o["line"],
-                    expected_hit=bool(o["expected_hit"]),
-                )
-                for o in inp["obligations"]
-            ]
+            return [_obligation_from_raw(oracle, o) for o in inp["obligations"]]
     raise KeyError(f"no input named {input_name!r} in oracle {oracle.get('id')}")
+
+
+def _obligation_from_raw(oracle: dict, o: dict) -> Obligation:
+    branch_type = o.get("branch_type")
+    return Obligation(
+        file=o["file"],
+        sha256=_sha_for_file(oracle, o["file"]),
+        line=o["line"],
+        expected_hit=bool(o["expected_hit"]),
+        evidence="branches" if branch_type else "hits",
+        branch_type=branch_type,
+    )
 
 
 def union_obligations(oracle: dict) -> list[Obligation]:
@@ -108,16 +125,18 @@ def union_obligations(oracle: dict) -> list[Obligation]:
     cumulative report -- e.g. one GUT suite run covering several named
     inputs in a single invocation, the shape BP04's F020 runs actually
     produced.
+
+    Keyed by (file, line, evidence, branch_type), not just (file, line)
+    -- a statement obligation and a branch obligation can legitimately
+    share a line and must not be merged into one fact.
     """
-    merged: dict[tuple[str, int], Obligation] = {}
+    merged: dict[tuple, Obligation] = {}
     for inp in oracle["inputs"]:
         for o in inp.get("obligations", []):
-            key = (o["file"], o["line"])
-            sha = _sha_for_file(oracle, o["file"])
+            obl = _obligation_from_raw(oracle, o)
+            key = (obl.file, obl.line, obl.evidence, obl.branch_type)
             if key not in merged:
-                merged[key] = Obligation(
-                    file=o["file"], sha256=sha, line=o["line"], expected_hit=bool(o["expected_hit"])
-                )
-            elif o["expected_hit"]:
+                merged[key] = obl
+            elif obl.expected_hit:
                 merged[key].expected_hit = True
     return list(merged.values())

@@ -41,6 +41,18 @@ class Obligation:
     sha256: str
     line: int
     expected_hit: bool
+    evidence: str = "hits"       # "hits" (was this line executed at all) |
+                                 # "branches" (was this specific outcome taken)
+    branch_type: str | None = None  # required when evidence == "branches"
+
+    def __post_init__(self) -> None:
+        if self.evidence not in ("hits", "branches"):
+            raise ValueError(f"Obligation.evidence must be 'hits' or 'branches', got {self.evidence!r}")
+        if self.evidence == "branches" and not self.branch_type:
+            raise ValueError("Obligation.branch_type is required when evidence == 'branches'")
+
+    def branch_key(self) -> str:
+        return f"{self.line}:{self.branch_type}"
 
 
 @dataclass
@@ -66,7 +78,18 @@ class ComparisonResult:
 
 def compare(obligations: list[Obligation], actual: dict, source_root: Path) -> ComparisonResult:
     """Compare obligations against an actual report of the form
-    {"files": [{"path": str, "sha256": str, "hits": {"<line>": count}}]}.
+    {"files": [{"path": str, "sha256": str, "hits": {"<line>": count},
+    "branches"?: {"<line>:<branch_type>": count}}]}.
+
+    "hits" and "branches" are deliberately separate evidence sources,
+    matching how a real report like LCOV keeps DA (line hit) and BRDA
+    (branch hit) as distinct record types for the same line -- a line
+    can be "reached" (hits) while a specific decision outcome at that
+    same line was or wasn't "taken" (branches), and conflating the two
+    into one fact per line cannot express that. "branches" is optional
+    per file; its absence is treated as no branch evidence collected
+    (every branch obligation reads as not-taken), not as a malformed
+    report.
 
     Raises MalformedReportError if `actual` doesn't even have the
     minimum required shape -- this must never be interpreted as zero
@@ -118,9 +141,14 @@ def compare(obligations: list[Obligation], actual: dict, source_root: Path) -> C
             continue
 
         hits = entry["hits"]
+        branches = entry.get("branches", {})
         for o in obls:
-            line_key = str(o.line)
-            was_hit = line_key in hits and hits[line_key] > 0
+            if o.evidence == "branches":
+                key = o.branch_key()
+                was_hit = key in branches and branches[key] > 0
+            else:
+                line_key = str(o.line)
+                was_hit = line_key in hits and hits[line_key] > 0
             if o.expected_hit and was_hit:
                 result.matched.append((file_path, o.line))
             elif o.expected_hit and not was_hit:
