@@ -1,0 +1,32 @@
+{
+  "id": "F057",
+  "tier": 1,
+  "domain": "robustness",
+  "case": "Instrumentation shifts runtime error lines",
+  "requirement": "Diagnostics from a covered run report the same source location as an uninstrumented run",
+  "files": [
+    { "path": "../../adapter-run/f057_instrumentation_shifts_error_lines/subject/subject.gd", "sha256": "98dd68c5f92166da7ced30393871e03e0284bf66bf2c13dd91fac89bb2c5c9eb", "note": "Deliberate division-by-zero via a parameter (not a literal, which Godot catches at parse time instead), same technique as F015." },
+    { "path": "../../adapter-run/f057_instrumentation_shifts_error_lines/tests/test_subject.gd", "sha256": "134ff72235aeed0c1f51274b31562dcf7c7b621df6d2c334a87b1c9a5fb27cac", "note": "A single PASSING test (divisor=4), used only to produce a real plan.json via a real gd-tools test --coverage run. The division-by-zero is never triggered through this test -- it's triggered separately by probe.gd." },
+    { "path": "../../adapter-run/f057_instrumentation_shifts_error_lines/probe.gd", "sha256": "95ecc6ccd37205c971615132a4a46f482244d51e09e413a8eb76a2438c461a54", "note": "No GUT, no gd-tools CLI -- a standalone SceneTree script (F081's manual-driver technique) that calls subject.gd:run(0) directly and lets the engine's own SCRIPT ERROR diagnostic report the line. Run twice by check.py: once with GD_TOOLS_COVERAGE_PLAN unset (uninstrumented) and once with it set to the real plan.json from the gd-tools run (instrumented)." },
+    { "path": "../../adapter-run/f057_instrumentation_shifts_error_lines/check.py", "sha256": "742054e4ce1518b5fd6bc0fe0c968d04b5a4187d0f13317639e2f00990a29df9" }
+  ],
+  "inputs": [
+    { "name": "default", "call": "check.py -> real gd-tools test --coverage (to produce a real plan.json), then probe.gd:run(0) run twice, uninstrumented and instrumented, against the identical unmodified subject.gd (gd-tools-cli 0.4.0)" }
+  ],
+  "measured_with_gd_tools_0_4_0": {
+    "true_source_line": 4,
+    "uninstrumented_probe_reported_line": 4,
+    "instrumented_probe_reported_line": 5,
+    "shift": 1,
+    "plan_json_trackable_lines_for_subject": "[{line: 4, id: 0, type: statement}] -- exactly one tracker, inserted BEFORE line 4 per coverage.gd's _inject_trackers() default rule (non-branch statement lines get their tracker call inserted immediately before them)",
+    "requirement_met": false,
+    "finding": "The identical, unmodified subject.gd produces a division-by-zero SCRIPT ERROR at line 4 when run uninstrumented, and at line 5 -- one line further down -- when run with gd-tools' real, unmodified coverage instrumentation applied. gd-tools instruments by inserting tracker call lines directly into the script's in-memory source_code string (coverage.gd's _inject_trackers(), confirmed by direct source reading) before Script.reload(true); the engine has no way to know these inserted lines aren't part of the original source, so every line-numbered diagnostic it produces afterward (SCRIPT ERROR, an uncaught exception's stack trace, assert()'s failure message, print_stack()) is offset by however many tracker lines were inserted above the reported location. For a file with N trackable points spread throughout, the shift is not even a constant offset -- it grows line by line down the file, matching the exact pattern already noted qualitatively in this session's corpus-run write-up before this fixture made it a checked fact."
+  },
+  "notes": "This is the engine-only half of a larger 'diagnostic accuracy under instrumentation' question. It requires no debugger, no IDE, and no breakpoint machinery -- it is provable with the pinned engine alone, which is why it is built here as a tier-1 fixture rather than deferred to BP11's debugger work. It is explicitly NOT a substitute for tier-2 F082 ('Original-source breakpoint: breakpoint binds and stops at the intended user location'), which is a genuinely different, harder question (whether a debugger's own breakpoint-binding logic, likely keyed by its own source-position bookkeeping rather than blindly trusting the running script's live line numbers, is similarly confused by the shift, or already immune to it via some other mechanism). Building F057 does not close F082, and nobody should read it that way -- F082 remains BP11's to build, with its own debugger-attach infrastructure. This fixture only establishes the underlying mechanical fact BP11's eventual F082 fixture would need to account for: the shift is real, it is not constant, and any tool consuming engine diagnostics from a covered run (a debugger, a crash reporter, a log analyzer) needs its own translation layer back to original source lines, which gd-tools does not provide anywhere in its public API.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Only a single-tracker file (one trackable statement, shift of exactly 1) is tested. A file with many trackable points before the error line, or a branch-type tracker (inserted with different placement rules per coverage.gd's _inject_trackers -- match_case/if_false/elif_true insert AFTER their target line, not before), would need separate verification to confirm the shift's exact magnitude and direction still follow the same 'grows down the file, is never negative' pattern asserted qualitatively here.",
+    "Not tested: whether gd-tools' own JUnit XML / coverage.json output (as opposed to the raw engine SCRIPT ERROR diagnostic checked here) ever surfaces a line number at all for a runtime error, and if so, whether IT uses original or shifted line numbers."
+  ]
+}

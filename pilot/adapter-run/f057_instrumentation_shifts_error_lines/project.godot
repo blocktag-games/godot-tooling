@@ -1,0 +1,14 @@
+config_version=5
+
+[application]
+
+config/name="f057-instrumentation-shifts-error-lines"
+config/features=PackedStringArray("4.7")
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gut/plugin.gd")
+
+[autoload]
+
+_GDTCoverage="*res://addons/gd-tools-coverage/coverage.gd"
