@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="GutTests" failures="1" tests="2" >
+  <testsuite name="tests/test_subject.gd" tests="2" failures="1" skipped="0" time="0.000752" >
+      <testcase name="test_run_passes" assertions="1" status="pass" classname="tests/test_subject.gd" time="0.000313" >
+      </testcase>
+      <testcase name="test_run_fails_deliberately" assertions="1" status="fail" classname="tests/test_subject.gd" time="0.000439" >
+      <failure message="failed"><![CDATA[[1] expected to equal [999]:  
+            at line 9]]></failure></testcase>
+  </testsuite>
+</testsuites>

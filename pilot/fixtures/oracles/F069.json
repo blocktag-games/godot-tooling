@@ -1,0 +1,29 @@
+{
+  "id": "F069",
+  "tier": 1,
+  "domain": "failures",
+  "case": "Stale report from earlier run",
+  "requirement": "Wrong-run artifacts cannot satisfy a fresh attempt",
+  "files": [
+    { "path": "../../adapter-run/f069_stale_report/subject/subject.gd", "sha256": "2c5b73b27966732f2c3d63df08b10c2e9fcaea3b4075c5bb212e07d924a26fa9" },
+    { "path": "../../adapter-run/f069_stale_report/tests/test_subject.gd", "sha256": "95394eb36b096700f3a9df27c3f2415cd6e8b0ef5482ce845b6433a1a271c4f7" },
+    { "path": "../../adapter-run/f069_stale_report/check.py", "sha256": "8e43d3bad8d7f4b3885ea9b81000171f50a02413bbbb936a670f09a4c6c36f5c" }
+  ],
+  "inputs": [
+    { "name": "default", "call": "check.py -> real gd-tools test --coverage, then modify subject.gd WITHOUT re-running test/--import, then gd-tools coverage show / coverage report (gd-tools-cli 0.4.0 + GUT v9.7.1)" }
+  ],
+  "measured_with_gd_tools_0_4_0": {
+    "initial_run": "1/1 passed, plan.json records source_hash sha256:2c5b73b2... for subject.gd",
+    "source_modified_without_rerun": "subject.gd changed on disk (a function added), recorded hash no longer matches",
+    "coverage_show_after_source_change": "100.0% line coverage -- identical output to the fresh run, no warning, exit code 0",
+    "coverage_report_after_source_change": "Report written to .../index.html -- no warning, exit code 0",
+    "requirement_met": false,
+    "finding": "Neither 'gd-tools coverage show' nor 'gd-tools coverage report' checks plan.json's own recorded source_hash against the actual current file on disk before presenting or writing results. A stale coverage.json/plan.json pair from before a source change is read and reported exactly as if it were fresh -- there is no 'stale' or 'hash mismatch' diagnostic of any kind in either command's output. This is a genuine negative finding, not a null result: gd-tools DOES compute and store a source_hash per file in plan.json (confirmed present and correct), it simply never uses it as a staleness check on the read path, only (presumably) on the write path during an actual test run."
+  },
+  "notes": "This is the sharper, real-tool-confirmed counterpart to pilot/harness/comparator.py's own stale-report handling (compare()'s stale_files/oracle_stale_files distinction, tested synthetically in self_test.py's test_stale_report_detected and test_oracle_stale_source_detected) -- the harness itself would correctly flag this exact scenario as stale if fed through compare(), but gd-tools' own CLI has no equivalent self-check and will happily hand a caller (or a CI step, or a human running 'gd-tools coverage show' after editing a file and forgetting to re-run tests) a number for source that no longer exists in that form. Any adapter or harness wrapper built on top of gd-tools' CLI output cannot rely on gd-tools itself to catch this -- it must independently verify the plan's recorded source_hash against the current file before trusting a 'coverage show'/'coverage report' result, exactly the check pilot/harness/comparator.py already performs.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Not tested: whether 'gd-tools test --coverage' itself (a fresh full run, not just show/report against existing artifacts) would detect and report the source change, since that path re-instruments from the current source rather than reading a stored plan -- this fixture only exercises the read-only report commands against a stale artifact, which is the scenario that actually matches the catalog's 'stale report from earlier run' framing (no test was re-run)."
+  ]
+}

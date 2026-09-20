@@ -1,0 +1,28 @@
+{
+  "id": "F075",
+  "tier": 1,
+  "domain": "robustness",
+  "case": "Source restoration",
+  "requirement": "Successful and failed runs preserve original fixture sources",
+  "files": [
+    { "path": "../../adapter-run/f075_source_restoration/subject/subject.gd", "sha256": "2c5b73b27966732f2c3d63df08b10c2e9fcaea3b4075c5bb212e07d924a26fa9" },
+    { "path": "../../adapter-run/f075_source_restoration/tests/test_subject.gd", "sha256": "1530e1d760289f8d341e86869dc5768017cb9393d7e5d7715ed564405791b972" },
+    { "path": "../../adapter-run/f075_source_restoration/check.py", "sha256": "48df0e4600a6b6707efd4fcebafd95f474ce0d6978f42e7d172969a6eb455750" }
+  ],
+  "inputs": [
+    { "name": "default", "call": "check.py -> real gd-tools test --coverage with one passing and one deliberately failing test (gd-tools-cli 0.4.0 + GUT v9.7.1)" }
+  ],
+  "measured_with_gd_tools_0_4_0": {
+    "run_result": "1 passed, 1 failed",
+    "subject_gd_sha256_before": "2c5b73b27966732f2c3d63df08b10c2e9fcaea3b4075c5bb212e07d924a26fa9",
+    "subject_gd_sha256_after": "2c5b73b27966732f2c3d63df08b10c2e9fcaea3b4075c5bb212e07d924a26fa9",
+    "requirement_met": true,
+    "finding": "subject.gd is byte-for-byte identical on disk before and after the run, regardless of the mixed pass/fail outcome. This is a structural fact about gd-tools' instrumentation approach, not a runtime coincidence: gd-tools 0.4.0 instruments via GDScript's in-memory Script.reload(true) (confirmed by direct source reading during BP05/earlier BP06 work on the autoload fixtures), never by writing modified bytecode or source back to disk -- so there is no restoration step because there is no mutation to restore from."
+  },
+  "notes": "A clean pass, and a structurally strong one: this requirement is trivially satisfied for any tool using gd-tools' in-place-reload instrumentation strategy, since 'preserve sources' reduces to 'never touch the file', which is easy to verify and hard to violate by accident. This is a meaningfully different (and safer) approach than a hypothetical tool that instruments by rewriting source files on disk and restoring them afterward, where a crash mid-run could leave a fixture permanently mutated -- that failure mode (relevant to F066, forced termination or crash, currently unbuilt) does not apply to gd-tools' architecture at all.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Only subject.gd itself is checked. Whether gd-tools ever writes to any OTHER file under the project source tree (as opposed to its own .gd-tools/ output directory) during instrumentation is not independently verified here, only the one fixture file directly under test."
+  ]
+}

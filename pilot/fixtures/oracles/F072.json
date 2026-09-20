@@ -1,0 +1,27 @@
+{
+  "id": "F072",
+  "tier": 1,
+  "domain": "merge",
+  "case": "Duplicate input merge",
+  "requirement": "Duplicate handling follows explicit hit/count semantics",
+  "files": [
+    { "path": "cases/f072_duplicate_input_merge/run_a.json", "sha256": "ea4e6fcd0347553f791439b5defa0370f9415ea0002bd1bff7e68326d0dea626" },
+    { "path": "cases/f072_duplicate_input_merge/check.py", "sha256": "917314318a01a2fb84e727dcc043ecafde7643629b6ba7572b142f5159252f6c" }
+  ],
+  "inputs": [
+    { "name": "default", "call": "check.py -> real gd-tools coverage merge run_a.json run_a.json (the identical file passed twice) (gd-tools-cli 0.4.0)" }
+  ],
+  "measured_with_gd_tools_0_4_0": {
+    "input_hits": { "0": 3 },
+    "merge_exit_code": 0,
+    "merged_hits": { "0": 6 },
+    "requirement_met": false,
+    "finding": "Merging identical input twice silently doubles the hit count (3 -> 6), with no duplicate-input detection, warning, or deduplication at any level -- not by file content, not by any run-identity concept (gd-tools' coverage-data format has no run ID field to key off of in the first place). gd-tools' merge treats every input positionally as an independent run to sum, full stop. A caller that (accidentally or via a retry/re-submission bug) passes the same run's output twice gets silently inflated counts with no diagnostic of any kind."
+  },
+  "notes": "This is a genuine negative finding, not a null result: the catalog's requirement asks for an EXPLICIT duplicate-handling policy, and gd-tools 0.4.0 has none -- its actual policy is 'sum everything, unconditionally,' which happens to be internally consistent (same rule as F070/F071) but provides no protection against or even awareness of duplicate input. This compounds with F069's finding (stale reports satisfy fresh checks with no warning): a CI pipeline that re-runs a failed upload step and ends up merging the same coverage file twice would see inflated-but-plausible-looking numbers with no error anywhere in the chain.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Only byte-identical duplicate files are tested (the same file path passed twice). A 'duplicate run' in the more interesting sense -- two DIFFERENT coverage-data files that both happen to represent the same underlying test execution (e.g. re-exported twice) -- is not distinguishable from a genuinely independent second run using gd-tools' current coverage-data format at all, since it carries no run-identity field; this fixture cannot test a distinction the format itself doesn't support."
+  ]
+}

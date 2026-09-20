@@ -57,22 +57,22 @@ F054	2	concurrency	Contended counters	Concurrent updates do not silently lose pr
 F055	2	concurrency	Multiple processes and sessions	Isolation holds; merging requires explicit source/run identity	multiprocess_supported	Disjoint outputs and known input unions	planned
 F056	2	concurrency	Timing-sensitive gameplay	Timing perturbation is reported separately from deterministic semantic error	scene_supported	Predeclared invariant and real-time sensitivity scenario	planned
 F060	0	behavior	Deterministic state preservation across script reload	Covered and baseline output/state agree, including state on an instance created before instrumentation reloads its script	all_supported	Independent final state and event trace, with a pre-existing autoload instance carrying mutated state into the reload	fixture-built
-F061	1	failures	Baseline parse failure	Invalid fixture is not scored as a collector defect	all_supported	Engine diagnostic and failed baseline classification	planned
+F061	1	failures	Baseline parse failure	Invalid fixture is not scored as a collector defect	all_supported	Engine diagnostic and failed baseline classification	fixture-built
 F062	0	failures	Injected instrumentation failure	Collection failure cannot become a complete successful measurement	fault_injection_supported	Controlled rejected transformation and diagnostic provenance	fixture-built
-F063	1	failures	Application test failure	Application failure and coverage completeness remain independent	test_runner_supported	Deliberate failing assertion and known executed prefix	planned
+F063	1	failures	Application test failure	Application failure and coverage completeness remain independent	test_runner_supported	Deliberate failing assertion and known executed prefix	fixture-built
 F064	0	failures	Zero requested tests execute	Empty successful process cannot satisfy requested test execution	test_runner_supported	Requested selection and observed zero count	fixture-built
 F065	0	failures	Graceful interrupted run	Partial reports and source restoration follow termination contract	all_supported	Known interruption point and retained artifacts	fixture-built
 F066	1	failures	Forced termination or crash	Partial evidence and next-start recovery are explicit	all_supported	Owned process termination and recovery inspection	planned
 F067	1	failures	Timeout with child processes	Harness terminates/reaps owned work and retains failure outcome	child_process_supported	Synthetic child ownership and final process record	planned
-F068	1	failures	Truncated or malformed report	Parsing failure is not interpreted as zero or complete coverage	report_supported	Known malformed bytes and validator result	planned
-F069	1	failures	Stale report from earlier run	Wrong-run artifacts cannot satisfy a fresh attempt	report_supported	Old artifact plus new isolated run identity	planned
-F070	1	merge	Complementary run merge	Merged hit set equals defined union on identical source	merge_supported	Two known paths and exact source hashes	planned
+F068	1	failures	Truncated or malformed report	Parsing failure is not interpreted as zero or complete coverage	report_supported	Known malformed bytes and validator result	fixture-built
+F069	1	failures	Stale report from earlier run	Wrong-run artifacts cannot satisfy a fresh attempt	report_supported	Old artifact plus new isolated run identity	fixture-built
+F070	1	merge	Complementary run merge	Merged hit set equals defined union on identical source	merge_supported	Two known paths and exact source hashes	fixture-built
 F071	0	merge	Source revision mismatch	Incompatible source counters are rejected or separated explicitly, including when a provider keys merges by plan-order identity rather than source hash	merge_supported	Changed source hash and merge disposition; a second variant merges two plans with different file sets to check for identity-key mis-attribution	fixture-built
-F072	1	merge	Duplicate input merge	Duplicate handling follows explicit hit/count semantics	merge_supported	Same run ID twice and expected policy	planned
+F072	1	merge	Duplicate input merge	Duplicate handling follows explicit hit/count semantics	merge_supported	Same run ID twice and expected policy	fixture-built
 F073	2	merge	Different source filters	Merged denominator accounts for distinct selected populations	merge_supported	Two source manifests and defined merged scope	planned
 F074	2	merge	Relocated workspace merge	Logical source identity survives path relocation without collision	merge_supported	Same sources at two roots and verified path map	planned
-F075	1	robustness	Source restoration	Successful and failed runs preserve original fixture sources	all_supported	Before/after hashes and backup inventory	planned
-F076	1	robustness	User-data isolation	Run does not consume another profile or leak its outputs	all_supported	Unique sentinels in separate test profiles	planned
+F075	1	robustness	Source restoration	Successful and failed runs preserve original fixture sources	all_supported	Before/after hashes and backup inventory	fixture-built
+F076	1	robustness	User-data isolation	Run does not consume another profile or leak its outputs	all_supported	Unique sentinels in separate test profiles	fixture-built
 F077	2	robustness	Read-only or full output target	Write/flush failure produces explicit incomplete result	fault_injection_supported	Disposable constrained destination and recorded error	planned
 F078	2	robustness	Large stdout/stderr volume	No deadlock or unmarked evidence loss under backpressure	all_supported	Known emitted bytes and bounded capture	planned
 F079	2	robustness	Concurrent disk instrumentation	Independent workspaces stay separate; shared target conflict is explicit	disk_mode_supported	Distinct copies plus controlled shared-target conflict	planned

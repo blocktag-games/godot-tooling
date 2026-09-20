@@ -1,0 +1,29 @@
+{
+  "id": "F063",
+  "tier": 1,
+  "domain": "failures",
+  "case": "Application test failure",
+  "requirement": "Application failure and coverage completeness remain independent",
+  "files": [
+    { "path": "../../adapter-run/f063_application_test_failure/subject/subject.gd", "sha256": "af205c55d5068ccbc9baa0f476d9c6d9acf9c0eb865ef7463f05945de641e754", "note": "Deliberately buggy: returns 2, the test correctly expects 1." },
+    { "path": "../../adapter-run/f063_application_test_failure/tests/test_subject.gd", "sha256": "95394eb36b096700f3a9df27c3f2415cd6e8b0ef5482ce845b6433a1a271c4f7" },
+    { "path": "../../adapter-run/f063_application_test_failure/check.py", "sha256": "9f2e62db000838c20332f4c8f99931887c8c57120120aba8a569b091bd9c6f8c" }
+  ],
+  "inputs": [
+    { "name": "default", "call": "check.py -> real gd-tools test --coverage against a subject.gd with a genuine application bug, asserted correctly by the test (gd-tools-cli 0.4.0 + GUT v9.7.1)" }
+  ],
+  "measured_with_gd_tools_0_4_0": {
+    "exit_code": 1,
+    "gut_result": "0/1 passed -- '[2] expected to equal [1]' at test line 5, a clean assertion failure with no engine error",
+    "plan_files_tracked": 1,
+    "coverage_line_4_hit": true,
+    "requirement_met": true,
+    "finding": "The buggy return statement (line 4, which DID execute -- it just returned the wrong value) is reported as covered exactly as it would be for a passing test. gd-tools does not zero out, omit, or otherwise degrade coverage data because the test that exercised the code failed its assertion. Coverage completeness (did this code run) and test outcome (did the assertion hold) are correctly kept as independent facts."
+  },
+  "notes": "Confirms the requirement directly: a real, deliberate application bug (wrong return value) that fails a correct assertion still yields a fully accurate coverage report for the code that executed. A related, distinct observation (not this fixture's requirement, but relevant to future harness work): F061's parse-failure run and this fixture's assertion-failure run both exit with the SAME code (1) -- gd-tools' process-level exit code does not by itself distinguish 'the source didn't even parse' from 'the code ran fine but an assertion was wrong' from (untested here) 'coverage collection itself broke'. A harness or CI integration that needs to tell these apart cannot rely on exit code alone and must inspect the actual output/artifacts, the same lesson F064 already established for 'zero tests ran' vs. a passing run.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Not tested here: a case where coverage COLLECTION itself fails (distinct from the parse failure already covered by F061) while the test assertion would otherwise have passed -- e.g. an instrumentation-specific crash on an otherwise-valid, otherwise-correct file. Whether that scenario is distinguishable from an ordinary assertion failure by exit code or diagnostic text is unverified."
+  ]
+}

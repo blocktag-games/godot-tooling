@@ -1,0 +1,31 @@
+{
+  "id": "F076",
+  "tier": 1,
+  "domain": "robustness",
+  "case": "User-data isolation",
+  "requirement": "Run does not consume another profile or leak its outputs",
+  "files": [
+    { "path": "../../adapter-run/f076_user_data_isolation/project_a/subject/subject.gd", "sha256": "2c5b73b27966732f2c3d63df08b10c2e9fcaea3b4075c5bb212e07d924a26fa9" },
+    { "path": "../../adapter-run/f076_user_data_isolation/project_a/tests/test_subject.gd", "sha256": "381b530aac3dddd7e6c203a37cb17b557fb5a49a449f8d927c4542aa0759ce6b" },
+    { "path": "../../adapter-run/f076_user_data_isolation/project_b/subject/subject.gd", "sha256": "2c5b73b27966732f2c3d63df08b10c2e9fcaea3b4075c5bb212e07d924a26fa9" },
+    { "path": "../../adapter-run/f076_user_data_isolation/project_b/tests/test_subject.gd", "sha256": "67368116b105be432f83687561c571a3e2c2bd491479afeb402de6be372c995a" },
+    { "path": "../../adapter-run/f076_user_data_isolation/check.py", "sha256": "f2de28fdc1a3c2e606b29db76aab878268ada1f404145e0a68f9d0d09bfc1dfd" }
+  ],
+  "inputs": [
+    { "name": "default", "call": "check.py -> two real gd-tools test --coverage runs, project_a then project_b, each writing a unique sentinel to user:// (gd-tools-cli 0.4.0 + GUT v9.7.1)" }
+  ],
+  "measured_with_gd_tools_0_4_0": {
+    "project_a_userdata_dir": "~/.local/share/godot/app_userdata/f076-user-data-isolation-a/",
+    "project_b_userdata_dir": "~/.local/share/godot/app_userdata/f076-user-data-isolation-b/",
+    "sentinel_a_found_only_in_a": true,
+    "sentinel_b_found_only_in_b": true,
+    "requirement_met": true,
+    "finding": "Each project's test run reads and writes user:// data completely isolated from the other's, with no leakage in either direction. This follows directly from Godot's own default user:// resolution (keyed by config/name in project.godot, confirmed by the two distinct app_userdata directory names matching each project's config/name exactly) rather than anything gd-tools or GUT do specifically -- it is a real, verified fact about the pinned engine's behavior that any coverage workflow built on top of it inherits for free, not a gd-tools-specific guarantee."
+  },
+  "notes": "Confirms a structural fact rather than probing an edge case: as long as two fixture projects have distinct config/name values (true of every fixture project in this corpus, since each has its own project.godot with a unique name), Godot's default user:// resolution already provides this isolation. The interesting residual risk -- not tested here -- would be two projects that ACCIDENTALLY share the same config/name (a copy-paste error in project.godot), which would collide on the same app_userdata directory; that is a fixture-authoring hazard, not a gd-tools defect, and is why this corpus's own check.py-based fixtures each get a distinct, descriptive project name.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Does not test the accidental-name-collision scenario described in the notes, nor Godot's --user-data-dir CLI override (an explicit override could plausibly be misused to point two different projects at the same directory deliberately, which is a different, harness-level concern rather than a gd-tools/engine default-behavior question)."
+  ]
+}

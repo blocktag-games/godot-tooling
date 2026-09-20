@@ -185,6 +185,15 @@ pilot/adapter-run/*/addons/gdUnit4/
 pilot/adapter-run/*/addons/nano_coverage_godot/
 pilot/adapter-run/*/addons/coverage/
 pilot/adapter-run/*/.godot/
+# F076 (user-data isolation) needs two separate sub-projects, one
+# directory level deeper than every other adapter-run case, so the
+# patterns above (single-level `*/addons/...`) don't match its
+# project_a/project_b subdirectories -- named explicitly rather than
+# widening the glob above, for the same reason the single-level
+# patterns are named instead of blanket in the first place.
+pilot/adapter-run/f076_user_data_isolation/*/addons/gut/
+pilot/adapter-run/f076_user_data_isolation/*/addons/gd-tools-coverage/
+pilot/adapter-run/f076_user_data_isolation/*/.godot/
 
 # BP05 candidate source clones (Nano Coverage's full checkout with
 # godot-cpp/tree-sitter/gdUnit4 submodules is ~460MB, and it's a git

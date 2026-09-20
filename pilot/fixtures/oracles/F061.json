@@ -1,0 +1,30 @@
+{
+  "id": "F061",
+  "tier": 1,
+  "domain": "failures",
+  "case": "Baseline parse failure",
+  "requirement": "Invalid fixture is not scored as a collector defect",
+  "files": [
+    { "path": "../../adapter-run/f061_baseline_parse_failure/subject/subject.gd", "sha256": "2d968b73eecaf95fed7e952872acf8fedb01518e8e46b8abcd9f5fab57d3d57b", "note": "Deliberately invalid GDScript: an incomplete expression (`return 1 +` with nothing after the operator), a real engine-level syntax error." },
+    { "path": "../../adapter-run/f061_baseline_parse_failure/tests/test_subject.gd", "sha256": "95394eb36b096700f3a9df27c3f2415cd6e8b0ef5482ce845b6433a1a271c4f7" },
+    { "path": "../../adapter-run/f061_baseline_parse_failure/check.py", "sha256": "7344e8a2e98c331e21ac1365fe5dea108beb66114de2acef59fcbc67373c93f4" }
+  ],
+  "inputs": [
+    { "name": "default", "call": "check.py -> real gd-tools test --coverage against an unparseable subject.gd (gd-tools-cli 0.4.0 + GUT v9.7.1)" }
+  ],
+  "measured_with_gd_tools_0_4_0": {
+    "exit_code": 1,
+    "gd_tools_diagnostic": "Warning: Skipping '.../subject/subject.gd' — syntax error prevents coverage parsing.",
+    "engine_diagnostic": "SCRIPT ERROR: Parse Error: Expected expression after \"+\" operator. ... Failed to load script \"res://subject/subject.gd\" with error \"Parse error\".",
+    "gut_result": "0/1 passed, 1 error (the test itself fails because it can't call a function on a script that never loaded)",
+    "coverage_files_tracked": 0,
+    "requirement_met": true,
+    "finding": "gd-tools correctly and explicitly excludes the broken file from its coverage plan with a named reason ('syntax error prevents coverage parsing'), rather than crashing, hanging, or silently including it as zero-coverage. The underlying GDScript engine's own parse error is preserved verbatim in the output, so the failure is clearly attributable to the fixture's own invalid syntax, not to gd-tools' instrumentation. The overall process exits nonzero (1), correctly signaling failure at the process level too."
+  },
+  "notes": "A clean pass for gd-tools 0.4.0/GUT 9.7.1: this is exactly the failure mode the requirement asks to distinguish from a collector defect, and both the coverage-plan layer (explicit skip with reason) and the test-runner layer (real GDScript parse error surfaced, nonzero exit) handle it correctly and legibly. Contrast with F008 (a different real defect: gdtoolkit's OWN parser -- distinct from the game engine's parser -- rejects a legitimate, valid-to-Godot file and silently drops it with no diagnostic at all) -- F061's file is genuinely invalid to the ENGINE itself, and the response here is honest, unlike F008's silent drop of a file the engine itself considers valid.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Only one class of engine parse error (an incomplete binary expression) is exercised. Other parse-failure shapes (unterminated string, mismatched indentation, invalid annotation syntax) are assumed to be handled the same way (explicit skip, real engine diagnostic) but are not individually tested."
+  ]
+}

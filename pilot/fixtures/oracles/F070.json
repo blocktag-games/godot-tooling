@@ -1,0 +1,31 @@
+{
+  "id": "F070",
+  "tier": 1,
+  "domain": "merge",
+  "case": "Complementary run merge",
+  "requirement": "Merged hit set equals defined union on identical source",
+  "files": [
+    { "path": "cases/f070_complementary_run_merge/project/subject.gd", "sha256": "33fbd7963b21eafb0f39a478392b7c5468624900923df48169d77aef8bf10230" },
+    { "path": "cases/f070_complementary_run_merge/project/run_true.json", "sha256": "8203fac7a8f1a9a5efdbbf365d6b66165d5060dc6740e4838614bb1087b79739" },
+    { "path": "cases/f070_complementary_run_merge/project/run_false.json", "sha256": "69730a29807ee2745e30b628b0314989969bcfac19e80eb7a98829f79004d279" },
+    { "path": "cases/f070_complementary_run_merge/check.py", "sha256": "89c45ef5122a462fb8df8fc704e0634c60fd45791700386a2251cbdf3b0e3fc9" }
+  ],
+  "inputs": [
+    { "name": "default", "call": "check.py -> real gd-tools coverage merge on two hand-crafted, disjoint coverage-data files against the same plan (gd-tools-cli 0.4.0)" }
+  ],
+  "measured_with_gd_tools_0_4_0": {
+    "plan_lines": "line 4 (if-header, branch id 1), line 5 (true-branch body, id 0), line 6 (false-branch body, id 2)",
+    "run_true_hits": { "0": 1, "1": 1 },
+    "run_false_hits": { "2": 1 },
+    "merge_exit_code": 0,
+    "merged_hits": { "0": 1, "1": 1, "2": 1 },
+    "requirement_met": true,
+    "finding": "Merging two complementary runs (each touching a disjoint subset of the file's tracked lines/branches) produces exactly the union of what each run touched, with each line's own count preserved unchanged -- no line either run covered is lost, and no line neither run covered is invented."
+  },
+  "notes": "Uses hand-crafted coverage-data JSON (same technique as F071) rather than two real GUT test runs, so the input hit counts are exact and independently known, not derived from timing-sensitive real execution -- the real gd-tools plan_generator.generate_plan() is still used to obtain the actual line-id assignments for real subject.gd, so the fixture's ground truth is anchored to genuine tool behavior, not invented ids. Confirmed the real `gd-tools coverage merge` CLI (not a reimplementation) against real gd-tools-cli 0.4.0. Since gd-tools' merge policy is arithmetic summation per (file_id, line_id) (established in F071's finding: 5+7=12, 3+2=5), a complementary pair where each line is touched by only one run is the simplest case where summation and set-union coincide (each line's final count equals whichever single run touched it, since the other run contributes 0 by omission) -- this fixture confirms that coincidence holds, not that gd-tools performs a logical union distinct from summation.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Does not test a genuinely overlapping merge (both runs touching the SAME line) with different counts -- that is exactly F071's already-established finding (counts sum, e.g. 5+7=12), included here only by cross-reference, not re-verified in this fixture."
+  ]
+}

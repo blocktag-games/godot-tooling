@@ -201,6 +201,14 @@ is a real, verified **positive** result, not a defect:
 | F064 | Zero requested tests execute | `cases/f064_zero_requested_tests/` | Real GUT v9.7.1: correctly logs `[GUT ERROR]: Nothing was run.` and records `tests="0"` in JUnit XML output, but the **process exit code is still 0** — a CI pipeline gating on exit code alone would treat this as a passing build. |
 | F065 | Graceful interrupted run | `cases/f065_graceful_interruption/` | Synthetic, tool-independent: proves the harness's marker-triggered SIGTERM (`pilot/harness/runner.py`) correctly interrupts a write-temp-then-rename report writer with no finished-looking artifact leaking. Establishes the termination contract real adapters should be checked against later. |
 | F071 | Source revision mismatch | `cases/f071_merge_identity/` | Real gd-tools-cli 0.4.0: `coverage merge` sums hit counts purely by integer `file_id`. Its raw coverage-data JSON schema carries **no path or source hash at all** (confirmed from the tool's own docstring). Two sessions where file discovery order assigns the same `file_id` to two different files merge silently into one blended, meaningless count — exit code 0, no warning. |
+| F061 | Baseline parse failure (tier 1) | `pilot/adapter-run/f061_baseline_parse_failure/` | Real gd-tools-cli 0.4.0 + GUT v9.7.1: an unparseable fixture is skipped from the coverage plan with an explicit named reason, the real engine parse error is preserved verbatim, and the run exits nonzero. A clean pass, correctly distinguishing a fixture defect from a collector defect. |
+| F063 | Application test failure (tier 1) | `pilot/adapter-run/f063_application_test_failure/` | Real gd-tools-cli 0.4.0 + GUT v9.7.1: a genuine application bug that fails a correct assertion still yields fully accurate coverage for the code that executed — coverage completeness and test outcome are independent facts, confirmed directly. A related observation: F061's parse failure and this fixture's assertion failure share the SAME exit code (1), so exit code alone can't distinguish the two failure classes. |
+| F068 | Truncated or malformed report (tier 1) | `pilot/adapter-run/f068_truncated_malformed_report/` | Real gd-tools-cli 0.4.0: a real coverage.json truncated in half is rejected explicitly by both `coverage show` and `coverage report` (exit 2, a specific "Invalid JSON" diagnostic naming the exact parse failure) — never silently read as zero or complete coverage. A clean pass. |
+| F069 | Stale report from earlier run (tier 1) | `pilot/adapter-run/f069_stale_report/` | Real gd-tools-cli 0.4.0: **neither** `coverage show` nor `coverage report` checks the plan's own recorded `source_hash` against the current file on disk — a stale report from before a source change is presented as current with no warning at all, even though gd-tools computes and stores the hash. |
+| F070 | Complementary run merge (tier 1) | `cases/f070_complementary_run_merge/` | Real gd-tools-cli 0.4.0: merging two disjoint-coverage runs against the same plan produces exactly the union of what each run touched. Confirms F071's summation-based merge policy coincides with set union when the two runs don't overlap. |
+| F072 | Duplicate input merge (tier 1) | `cases/f072_duplicate_input_merge/` | Real gd-tools-cli 0.4.0: merging the identical coverage file with itself silently **doubles** the hit count, with no duplicate-input detection or warning of any kind — compounds with F069's finding for a CI retry/re-submission scenario. |
+| F075 | Source restoration (tier 1) | `pilot/adapter-run/f075_source_restoration/` | Real gd-tools-cli 0.4.0 + GUT v9.7.1: subject.gd is byte-for-byte unchanged on disk after a mixed pass/fail run — a structural consequence of gd-tools' in-memory `Script.reload(true)` instrumentation, which never writes to the source file at all. |
+| F076 | User-data isolation (tier 1) | `pilot/adapter-run/f076_user_data_isolation/` | Real gd-tools-cli 0.4.0 + GUT v9.7.1: two differently-named projects' test runs write to and read from completely separate `user://` profiles, with no leakage in either direction — inherited from Godot's own per-`config/name` user-data resolution. |
 
 Reproduce (each has its own driver/check script and, where noted, its own
 mini Godot project):
@@ -222,7 +230,31 @@ cd cases/f065_graceful_interruption && python3 check.py
 
 # F071: real gd-tools-cli 0.4.0 merge (pure Python; imports the gd-tools venv directly)
 cd cases/f071_merge_identity && python3 check.py
+
+# F061/F063/F068/F069/F075: real gd-tools-cli 0.4.0 + GUT v9.7.1 end-to-end runs
+cd ../../adapter-run/f061_baseline_parse_failure && python3 check.py
+cd ../f063_application_test_failure && python3 check.py
+cd ../f068_truncated_malformed_report && python3 check.py
+cd ../f069_stale_report && python3 check.py
+cd ../f075_source_restoration && python3 check.py
+cd ../f076_user_data_isolation && python3 check.py   # two sub-projects, own app_userdata each
+
+# F070/F072: real gd-tools-cli 0.4.0 merge, hand-crafted coverage-data inputs
+cd ../../fixtures/cases/f070_complementary_run_merge && python3 check.py
+cd ../f072_duplicate_input_merge && python3 check.py
 ```
+
+F061-F076's failures/merge/robustness fixtures follow the F005/F071
+pattern throughout: real end-to-end `gd-tools test --coverage` (or
+`coverage merge`) runs, never a reimplementation or a mock of the
+tool's behavior. Six of the eight (F063, F068, F069, F072, F075, F076)
+match their requirement or (F069, F072) surface a genuine negative
+finding; F061/F063/F068/F075/F076 are clean passes. F066 (forced
+termination/crash), F067 (timeout with child processes), F080 (GUT/
+GdUnit4 parity), and F081 (standalone/manual driver) remain `planned`
+-- each needs process-control or second-runner infrastructure this
+session deliberately did not build, rather than risk a half-finished
+result (see the BP06 row in implementation-plan.md).
 
 ## Status and open items
 

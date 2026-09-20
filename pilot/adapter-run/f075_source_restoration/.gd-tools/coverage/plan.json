@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "generated_by": "gd-tools",
+  "files": [
+    {
+      "file_id": 0,
+      "path": "res://subject/subject.gd",
+      "source_hash": "sha256:2c5b73b27966732f2c3d63df08b10c2e9fcaea3b4075c5bb212e07d924a26fa9",
+      "lines": [
+        {
+          "line": 4,
+          "id": 0,
+          "type": "statement",
+          "branch_type": null
+        }
+      ]
+    }
+  ]
+}
