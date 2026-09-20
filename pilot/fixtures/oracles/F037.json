@@ -30,7 +30,7 @@
   ],
   "notes": "Both call forms reach the same single function body line (there is no separate line for the default-value expression itself in GDScript's syntax -- it lives in the function signature on line 3, which is never a statement obligation, matching the established func-signature convention from F011/F012). The requirement this fixture actually verifies is behavioral, not structural: the two call forms must produce different results (12 vs. 40) proving the default is genuinely applied only when the argument is omitted, not silently overriding a supplied value or vice versa. Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed subject.gd; single body line 4, both call forms (12 and 40) confirmed; the default expression correctly has no obligation of its own. Driver passes. Nothing to correct.",
   "ambiguities": [
     "The default expression here is a constant literal (3). A default expression with side effects or a non-trivial computation (which some languages evaluate once at definition time vs. once per omitted call) is not tested -- GDScript evaluates default expressions per-call at the callee, but this fixture doesn't isolate a case where that distinction would be observable."
   ]

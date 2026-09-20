@@ -27,7 +27,7 @@
   ],
   "notes": "obj.value = input (line 12) and return obj.value (line 13) are both plain-looking attribute accesses with no call syntax at their use site, yet each implicitly invokes a getter/setter body elsewhere in the file (lines 6 and 8). A tool that only instruments explicit call expressions could miss these entirely. The setter doubles its input (5 -> _value=10) and the getter reads it back unchanged, so the 10 result also confirms both accessors actually ran, not just that the file parsed. Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed subject.gd; getter (line 6) and setter (line 8) bodies and lines 11-13 checked against source; run(5) = 10 confirmed by the doubling setter. The line-3 member-initializer obligation follows F041's convention for `var` initializers (not a signature/declaration line). Driver passes. Nothing to correct.",
   "ambiguities": [
     "The catalog's requirement also mentions 'recursion guards' (e.g. a setter that reads its own property, which GDScript guards against infinite recursion for). That case is not built here -- this fixture only covers the ordinary non-recursive accessor path."
   ]

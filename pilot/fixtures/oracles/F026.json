@@ -86,7 +86,7 @@
   ],
   "notes": "Four inputs isolate continue, break, neither, and the empty/zero-iteration case, so each mechanism's effect on line-level and branch-level obligations is unambiguous rather than mixed into one complex run. Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd. Line 5 (the for-loop header) is included as a statement obligation here, unlike F025's oracle which omitted it entirely -- F025 predates this convention and was not retrofitted, a minor known inconsistency worth fixing in a future pass rather than expanding this fixture's scope to cover it.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed subject.gd; hand-traced all four inputs per iteration against lines 4-11 (continue skips 8-10 for -1 only; break at 200 skips the append; empty leaves the header reached with loop_entered false). Driver passes. Nothing to correct.",
   "ambiguities": [
     "Line-level hit obligations here report 'reached at least once during the whole run', not per-iteration. A run with multiple iterations that mix continue/break/normal behavior across different items (not built here -- see continue_only/break_only's deliberately single-relevant-item design) would need per-iteration granularity this schema doesn't yet have to avoid conflating 'never happened' with 'happened on some but not all iterations'."
   ]

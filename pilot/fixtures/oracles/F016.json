@@ -22,7 +22,7 @@
   ],
   "notes": "Calling the same function three times with the same input returns the same result each time (deterministic, no hidden state), and the line's hit status stays true -- it does not toggle or reset between calls within one process. This oracle deliberately does NOT assert a specific hit *count* (e.g. exactly 3): the schema's obligations are reached/not-reached facts, not counters, and different tools may legitimately report count semantics differently (e.g. once per line vs. once per statement vs. per-invocation). The requirement this fixture documents is narrower and tool-agnostic: whatever counting convention a tool uses, it must be a defined, consistent contract -- not a value that drifts across repeated identical calls. Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed subject.gd; single obligation (line 4) and its honest no-count-contract limitation confirmed as stated. Driver passes. Nothing to correct.",
   "ambiguities": [
     "This fixture cannot, by itself, catch a tool that reports a wrong but internally-consistent count (e.g. always reporting count=1 regardless of actual invocations) -- doing so would require the oracle to commit to one specific counting convention, which the schema does not yet define. That is a real gap, noted here rather than papered over."
   ]

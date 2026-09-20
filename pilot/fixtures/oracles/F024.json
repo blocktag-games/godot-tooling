@@ -56,6 +56,6 @@
   ],
   "notes": "Direct while-loop counterpart to F025's for-loop case. run(1) deliberately returns 0 (not an 'interesting' nonzero value) since the loop sums 0..n-1 -- the point of this input is exercising exactly one iteration, not producing a distinctive result; 'many' (n=3, sum 0+1+2=3) is what actually demonstrates count multiplication. Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd. The line-6 condition is a statement obligation (reached: true for all three, since the condition is always evaluated at least once even for zero iterations) plus a branch obligation with branch_type 'loop_entered' (was the body entered at all) -- distinct from F022/F023's if_true/elif_true, since a loop condition's 'true' outcome can occur multiple times per call, which expected_count captures directly on the branch obligation itself rather than needing a separate representation.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed subject.gd; hand-traced run(0)/run(1)/run(3) (0, 0, 3) and the expected_count values (0/1/3) on lines 6-8; line-6 header reads reached in all three, consistent with the loop_entered branch flipping. Driver passes. Nothing to correct.",
   "ambiguities": []
 }

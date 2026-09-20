@@ -23,6 +23,6 @@
   ],
   "notes": "One static function calling another. Confirms both functions' hits attribute to their own original source lines rather than collapsing into a single call-site fact (e.g. only line 7 being marked hit because that's the only line the driver directly references). Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed subject.gd; lines 4 and 7 are the only executable lines and both are obligations; run(3) = 7 confirmed. Driver passes. Nothing to correct.",
   "ambiguities": []
 }

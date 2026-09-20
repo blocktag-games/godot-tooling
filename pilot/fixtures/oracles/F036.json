@@ -26,7 +26,7 @@
   ],
   "notes": "syntax_validated tier per the catalog: this fixture confirms the file parses, loads, and runs correctly under a real instrumentation pass with a typed Array[int] parameter and a Dictionary local/return, not detailed per-branch behavioral claims beyond straight-line execution (there's only one loop, always entered here). Godot 4.7.1 requires the caller to pass an actually-typed array (a bare [1, 2, 3] array literal is untyped and is rejected at the call site with a runtime type error) -- pilot/fixtures/driver.gd declares its input as `var f036_input: Array[int] = [1, 2, 3]` to satisfy this. Confirmed on the pinned Godot 4.7.1 engine.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed subject.gd; lines 4-7 and the loop_entered branch checked against source, result {1:1,2:4,3:9} confirmed. Note the baseline here is engine-only (driver.gd); no instrumentation pass has yet been run on this fixture, so the notes' 'under a real instrumentation pass' describes what the fixture is for, not a measurement already taken. Nothing to correct.",
   "ambiguities": [
     "Only Array[int] and an untyped Dictionary are exercised. Typed Dictionary syntax (Dictionary[K, V], a newer Godot feature) and typed signals/RPC signatures are not tested here."
   ]

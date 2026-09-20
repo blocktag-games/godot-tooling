@@ -124,9 +124,18 @@ same limitation already noted in F013's and F030's oracles.
 
 F046 is F045's direct negative twin (resume_now never emitted, the
 post-await continuation stays genuinely unreached); F048 uses the same
-fresh-process-per-input rule as F041/F044 to make "queued work pending
-at shutdown never ran" a real, checkable fact, not an intermediate
-snapshot of a process that would later drain it. F049 completes tier-1
+fresh-process-per-input rule as F041/F044. Its original oracle claimed
+the `no_drain` process leaves the queued work never-run; the 2026-09-19
+second-reviewer pass showed that is false on the pinned engine --
+`quit()` only requests exit, and Godot still runs one full main-loop
+iteration (deferred flush, delete-queue drain, `_process`) before
+honoring it, so the pending work IS included. The oracle now records
+that, and `driver.gd` prints the log from `_finalize()` so the fixture
+itself observes it. The same probe showed F044's negative fact holds
+for a different reason than its note claimed: the deferred signal goes
+undelivered because its RefCounted target is freed when `_initialize()`
+returns, not because no frame turns (see the corrections in
+`oracles/F044.json` and `oracles/F048.json`). F049 completes tier-1
 lifecycle (F040/F045/F091/F041-F044/F046/F048/F049); F047 is tier 2,
 correctly deferred.
 
@@ -291,6 +300,18 @@ fixture that found it.
   mechanism descriptions; F020 mischaracterized one comparison result). Each
   oracle's `reviewer` field now records specifically what was independently
   re-derived, per correctness-protocol.md's second-review requirement.
+- A second independent review pass on 2026-09-19 covered the 40 oracles
+  built after the first pass (every tier-1 oracle plus F045, whose
+  `reviewer` field the first pass had left null after fixing it), re-hashing
+  every bound file, checking every obligation's line against source, re-running
+  every driver and check.py, and probing the lifecycle negatives with
+  instrumented copies. 35 of 40 confirmed clean; 5 needed changes: F048's
+  `shutdown_before_drain` obligations were factually wrong (the queued work
+  runs after `quit()`; see above); F044's stated mechanism was wrong though
+  its obligations were right; F049 had a `const` declaration line as a
+  statement obligation (convention violation, zero discriminating power);
+  F067 bound `runner.py` via a path that resolved to nothing (hash was
+  already correct); F075's notes still called F066 unbuilt.
 - All 16 tier-0 oracles (15 cases + F091) are now built (groups 1, 2, and 3).
 - F008/F064/F071 constitute real, reproducible defect findings against the
   pinned tools, ahead of BP04's planned full adapter run — worth surfacing

@@ -44,7 +44,7 @@
   ],
   "notes": "Base and Derived are nested classes in the same file, each declaring a method with the same name (greet). derived_dispatch reaches Base's line 5 ONLY through Derived.greet()'s super.greet() call, never through a direct Base call -- this is the sharpest test that hits attribute to the correct class body's line, not to whichever class was instantiated at the top level. Function signature lines (4, 9, 12) are never statement obligations, matching the established convention (F011/F032/F037). Line 13 (`if use_derived:`) is hit=true in BOTH inputs since the if-header is always evaluated; only the branch obligation and the arms it guards differ between the two calls -- this was caught and corrected after an earlier draft of this oracle mistakenly attributed the if-statement's hit/branch facts to line 12 (the func signature above it) and marked line 13 unreached in base_dispatch, which was wrong on both counts. Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed subject.gd; hand-traced both dispatch inputs against lines 5/10/13-17, including the earlier-corrected line-12-vs-13 attribution (line 13 is the if header, reached in both inputs; no obligation on any signature line). Driver passes. Nothing to correct.",
   "ambiguities": [
     "Only nested nonclass_name inner classes are tested here, not top-level class_name-declared inheritance across separate files (that cross-file case is F038, tier 2, out of BP06 scope)."
   ]

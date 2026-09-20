@@ -24,7 +24,7 @@
   ],
   "notes": "Direct negative twin of F045 (await suspension and resumption): same shape, but the signal that would resume the coroutine is deliberately never emitted anywhere in this fixture. Calling subject.run() without awaiting its result from the driver lets the coroutine execute synchronously up to the suspension point and return control to the caller immediately -- confirmed empirically on the pinned Godot 4.7.1 engine that the process then quits cleanly with the coroutine still suspended, no hang and no error. This is the sharpest possible test of the requirement: it is not that the continuation is merely unlikely to run, it definitionally cannot, since nothing in the process ever emits resume_now.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed subject.gd; lines 9-11 checked; re-ran driver.gd and an instrumented copy with a print() on line 11 -- it never appears, so the post-await continuation is genuinely unreached, and the process exits cleanly. Nothing to correct.",
   "ambiguities": [
     "Godot's shutdown behavior for a RefCounted instance with a coroutine suspended on a signal it will never receive is not independently verified beyond 'the process exits cleanly without error' -- whether the coroutine's suspended call frame is cleanly freed or leaked is an engine-internal detail out of scope for a coverage-correctness fixture."
   ]

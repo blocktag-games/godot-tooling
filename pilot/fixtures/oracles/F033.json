@@ -44,7 +44,7 @@
   ],
   "notes": "The core fact this fixture isolates: creating a lambda literal (line 4) and invoking it (line 5, its body) are two distinct events, and a tool that conflates 'this closure was constructed' with 'this closure ran' would falsely mark line 5 hit in the made_but_not_invoked case. base=5 being correctly captured and used is confirmed by the invoked case's result (10 + 5 = 15), not by a separate obligation -- captured-value correctness is a return-value fact here, not a coverage fact. Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed subject.gd; hand-traced invoked (15) and made_but_not_invoked (-1): lambda creation on line 4 hit in both, lambda body (line 5) hit only when c.call() runs; line-10 header consistent in both. Driver passes. Nothing to correct.",
   "ambiguities": [
     "Only one Callable is created and either invoked once or not at all. Repeated invocation of the same Callable object, or invoking two different Callables built from the same lambda literal (to test whether hits are per-literal-site or per-closure-instance), is not exercised here."
   ]

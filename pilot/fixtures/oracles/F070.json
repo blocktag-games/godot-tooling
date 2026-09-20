@@ -24,7 +24,7 @@
   },
   "notes": "Uses hand-crafted coverage-data JSON (same technique as F071) rather than two real GUT test runs, so the input hit counts are exact and independently known, not derived from timing-sensitive real execution -- the real gd-tools plan_generator.generate_plan() is still used to obtain the actual line-id assignments for real subject.gd, so the fixture's ground truth is anchored to genuine tool behavior, not invented ids. Confirmed the real `gd-tools coverage merge` CLI (not a reimplementation) against real gd-tools-cli 0.4.0. Since gd-tools' merge policy is arithmetic summation per (file_id, line_id) (established in F071's finding: 5+7=12, 3+2=5), a complementary pair where each line is touched by only one run is the simplest case where summation and set-union coincide (each line's final count equals whichever single run touched it, since the other run contributes 0 by omission) -- this fixture confirms that coincidence holds, not that gd-tools performs a logical union distinct from summation.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed subject.gd, both hand-crafted run JSONs and check.py; confirmed the id mapping (line 4 header id 1, line 5 id 0, line 6 id 2) matches the run files' disjoint hit sets; re-ran check.py against the real merge CLI (3/3 pass, merged hits {0:1,1:1,2:1}). Nothing to correct.",
   "ambiguities": [
     "Does not test a genuinely overlapping merge (both runs touching the SAME line) with different counts -- that is exactly F071's already-established finding (counts sum, e.g. 5+7=12), included here only by cross-reference, not re-verified in this fixture."
   ]

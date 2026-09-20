@@ -24,7 +24,6 @@
         "after_subject_load_before_run": true
       },
       "obligations": [
-        { "file": "cases/f049_load_vs_preload/subject.gd", "line": 3, "kind": "statement", "expected_hit": true, "note": "preload() resolves eagerly, at the time subject.gd itself is loaded -- not deferred to when Preloaded is first used" },
         { "file": "cases/f049_load_vs_preload/subject.gd", "line": 6, "kind": "statement", "expected_hit": true },
         { "file": "cases/f049_load_vs_preload/subject.gd", "line": 6, "kind": "branch", "branch_type": "if_true", "expected_hit": false },
         { "file": "cases/f049_load_vs_preload/subject.gd", "line": 7, "kind": "statement", "expected_hit": false, "note": "never reached: the load()-using branch is not taken" },
@@ -38,7 +37,6 @@
       "call": "subject.gd:run(true)",
       "expected_result": 99,
       "obligations": [
-        { "file": "cases/f049_load_vs_preload/subject.gd", "line": 3, "kind": "statement", "expected_hit": true },
         { "file": "cases/f049_load_vs_preload/subject.gd", "line": 6, "kind": "statement", "expected_hit": true },
         { "file": "cases/f049_load_vs_preload/subject.gd", "line": 6, "kind": "branch", "branch_type": "if_true", "expected_hit": true },
         { "file": "cases/f049_load_vs_preload/subject.gd", "line": 7, "kind": "statement", "expected_hit": true },
@@ -48,9 +46,9 @@
       ]
     }
   ],
-  "notes": "The sharpest test of eager-vs-lazy is expected_resource_cache in uses_preloaded, checked by pilot/fixtures/driver.gd directly (not by comparator.py, same category as expected_log): ResourceLoader.has_cached() on dependency.gd's path is false before subject.gd is ever loaded, and already TRUE immediately after subject.gd loads -- before run() is ever called, and specifically for the input where the load()-using branch (line 7) is never taken. This proves preload() resolves at parse time of the FILE THAT CONTAINS IT, not at first use, and not dependent on which branches execute. load() by contrast is a plain statement (line 7) that only resolves when actually reached, matching the uses_loaded input where line 7 is hit and line 9 (the preloaded path) is not. Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd.",
+  "notes": "The sharpest test of eager-vs-lazy is expected_resource_cache in uses_preloaded, checked by pilot/fixtures/driver.gd directly (not by comparator.py, same category as expected_log): ResourceLoader.has_cached() on dependency.gd's path is false before subject.gd is ever loaded, and already TRUE immediately after subject.gd loads -- before run() is ever called, and specifically for the input where the load()-using branch (line 7) is never taken. This proves preload() resolves at parse time of the FILE THAT CONTAINS IT, not at first use, and not dependent on which branches execute. load() by contrast is a plain statement (line 7) that only resolves when actually reached, matching the uses_loaded input where line 7 is hit and line 9 (the preloaded path) is not. Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd. Removed 2026-09-19 (independent second-reviewer pass): a statement obligation on line 3 (`const Preloaded = preload(...)`) that was present in both inputs. A `const` declaration is resolved by the parser when the script is compiled, not executed as a statement at run time, so it is not a trackable statement obligation under the convention F030's correction established for signature/declaration lines (F034 also lists the func-signature form). It was expected_hit=true in both inputs, so it carried no discriminating power and could only ever score as a spurious missing_hits against a correct tool. The eager-resolution fact it tried to express is exactly what expected_resource_cache already carries, checked by the driver.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed both bound files, checked every obligation's line number against source, and re-ran pilot/fixtures/driver.gd (all four F049 checks pass, including the has_cached() before/after pair). Found and removed the line-3 const-declaration statement obligation described in the notes; the remaining obligations, both inputs' results, and the resource-cache facts are correct.",
   "ambiguities": [
     "Only a same-directory, always-valid dependency path is tested. Load/preload failure modes (missing file, cyclic preload) are not exercised here."
   ]

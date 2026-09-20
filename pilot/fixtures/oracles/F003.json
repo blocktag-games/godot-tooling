@@ -28,7 +28,7 @@
   },
   "notes": "A real, verified POSITIVE finding: unlike several of the negative findings this project has recorded against gd-tools, this requirement is met correctly. Worth recording explicitly rather than only cataloging defects -- correctness-protocol.md's own philosophy is that a passing case establishes agreement, not just that failing cases are interesting.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed check.py, re-ran it against the real gd-tools-cli 0.4.0 Python API (4/4 pass: empty plan, total_lines 0, line and branch rate 0.0 not 1.0). Finding reproduces exactly; nothing to correct.",
   "ambiguities": [
     "Only gd-tools was tested. GdUnit4-as-runner has no coverage concept of its own to test this against; Nano Coverage and godot-code-coverage's behavior on an empty population is untested."
   ]

@@ -23,7 +23,7 @@
   ],
   "notes": "Lines 1 (extends), 2/5 (blank), 3/4 (doc/regular comments), 6 (@warning_ignore annotation), 7 (func signature), and 8 (a comment-only line inside the body) deliberately have NO obligations at all -- their absence from the obligations list IS the answer, consistent with the schema's established convention (same as F012's continuation lines). Only lines 9 and 10, which contain real executable statements, are obligations. A trailing comment on line 9 does not change its executability. Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed subject.gd and checked lines 1-10 against the obligation set: only 9 and 10 are executable, every other line (extends, blanks, comments, @warning_ignore, func signature) is correctly absent. Driver passes. Nothing to correct.",
   "ambiguities": [
     "Only one annotation kind (@warning_ignore) and one doc-comment style (##) are exercised here. Other annotations (@export, @onready, @rpc, etc.) are assumed to behave the same way (nonexecuting) but are not individually tested."
   ]

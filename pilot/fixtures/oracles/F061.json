@@ -23,7 +23,7 @@
   },
   "notes": "A clean pass for gd-tools 0.4.0/GUT 9.7.1: this is exactly the failure mode the requirement asks to distinguish from a collector defect, and both the coverage-plan layer (explicit skip with reason) and the test-runner layer (real GDScript parse error surfaced, nonzero exit) handle it correctly and legibly. Contrast with F008 (a different real defect: gdtoolkit's OWN parser -- distinct from the game engine's parser -- rejects a legitimate, valid-to-Godot file and silently drops it with no diagnostic at all) -- F061's file is genuinely invalid to the ENGINE itself, and the response here is honest, unlike F008's silent drop of a file the engine itself considers valid.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed all three bound files, confirmed subject.gd's `return 1 +` is a real engine parse error, and re-ran the end-to-end check.py (4/4 pass: nonzero exit, verbatim engine diagnostic, explicit gd-tools skip, file not counted as covered). Reproduces exactly; nothing to correct.",
   "ambiguities": [
     "Only one class of engine parse error (an incomplete binary expression) is exercised. Other parse-failure shapes (unterminated string, mismatched indentation, invalid annotation syntax) are assumed to be handled the same way (explicit skip, real engine diagnostic) but are not individually tested."
   ]

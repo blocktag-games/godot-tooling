@@ -26,10 +26,15 @@ func _initialize() -> void:
 	print("deferred_log_before_frame=%s" % [deferred_subject.log])
 
 	if mode == "no_flush":
-		# Quit immediately -- the frame never turns, so the deferred
-		# callback never fires. Its own process, since a single
-		# cumulative report can't show "never fired" if a later frame
-		# in the SAME process would have flushed it.
+		# Quit immediately. NOTE (corrected 2026-09-19): quit() only
+		# requests exit -- Godot still runs one main-loop iteration
+		# (including a MessageQueue flush) before honoring it. The
+		# deferred callback never fires here because deferred_subject is
+		# a RefCounted local that is freed when _initialize() returns,
+		# before that flush, so the queued delivery has no live target
+		# (verified: holding it in a member variable makes it fire).
+		# Its own process, since a single cumulative report can't show
+		# "never fired" if anything later in the SAME process delivered it.
 		quit(0)
 		return
 

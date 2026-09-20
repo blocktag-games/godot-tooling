@@ -21,7 +21,7 @@
   },
   "notes": "A third real, verified positive finding (with F003 and F004): gd-tools' scope boundary holds even when excluded code is genuinely reachable and executed, not just present on disk unused. This is a stronger test than F004 alone, which only checked static file discovery -- F005 confirms the exclusion survives actual cross-boundary execution.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed app.gd/vendor.gd/check.py, confirmed run() == 10 + 1 by reading both sources, and re-ran the real end-to-end gd-tools test --coverage (4/4 pass: only app.gd in plan, its line 6 hit). Reproduces exactly; nothing to correct.",
   "ambiguities": [
     "Only tested one direction: selected code calling excluded code. The reverse (excluded code calling back into selected code, e.g. a vendor callback invoking an app-provided function) is untested and could plausibly behave differently."
   ]

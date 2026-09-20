@@ -23,7 +23,7 @@
   },
   "notes": "Real, verified positive finding: gd-tools 0.4.0 handles a truncated/malformed coverage.json robustly and explicitly on its own, for both places that read the file. This closes the loop between the harness's own synthetic guarantee (comparator.py refuses to interpret malformed report bytes as any coverage number, tested in self_test.py with a hand-built truncated string) and gd-tools' actual behavior against a REAL coverage.json produced by a REAL test run, truncated the same way a killed-mid-write process would leave it. The truncation point (half the file's bytes) was chosen to guarantee invalid JSON, confirmed via json.loads() raising JSONDecodeError before ever invoking gd-tools, so a pass here can't be explained by the truncation accidentally still being valid.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed the bound files and re-ran check.py end to end (7/7 pass: truncated coverage.json rejected by both coverage show and coverage report with exit 2 and the Invalid JSON diagnostic). Reproduces exactly; nothing to correct.",
   "ambiguities": [
     "Only mid-object truncation (cutting the file in half) is tested. Other malformed forms -- valid JSON with a wrong top-level shape, valid JSON with wrong types for expected fields, an empty file, or binary garbage -- are not tested here and could plausibly hit a different code path in gd-tools' loader."
   ]

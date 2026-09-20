@@ -24,7 +24,7 @@
   },
   "notes": "Confirms a structural fact rather than probing an edge case: as long as two fixture projects have distinct config/name values (true of every fixture project in this corpus, since each has its own project.godot with a unique name), Godot's default user:// resolution already provides this isolation. The interesting residual risk -- not tested here -- would be two projects that ACCIDENTALLY share the same config/name (a copy-paste error in project.godot), which would collide on the same app_userdata directory; that is a fixture-authoring hazard, not a gd-tools defect, and is why this corpus's own check.py-based fixtures each get a distinct, descriptive project name.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed all five bound files and re-ran check.py end to end (two real runs, sentinel_a only in project a's app_userdata and sentinel_b only in project b's). Reproduces exactly; nothing to correct.",
   "ambiguities": [
     "Does not test the accidental-name-collision scenario described in the notes, nor Godot's --user-data-dir CLI override (an explicit override could plausibly be misused to point two different projects at the same directory deliberately, which is a different, harness-level concern rather than a gd-tools/engine default-behavior question)."
   ]

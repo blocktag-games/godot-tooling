@@ -86,6 +86,6 @@
   ],
   "notes": "First tier-1 fixture, and the first built using the 2026-09-19 branch-obligation schema fix (see pilot/harness/oracle.py) from the start rather than retrofitted. Four inputs exercise each of the three arms plus the no-arm-matched fallthrough. All four confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd. Revised same day to add the reached/outcome distinction (a second schema fix, evidence='hits' vs evidence='branches'): each decision line (5, 7, 9) now carries BOTH a plain statement obligation (was this line reached at all) and a branch obligation (was this specific outcome taken), so 'never evaluated because an earlier arm matched' (line 7/9 for 'big') is now mechanically distinguishable from 'evaluated and false' (line 7 for 'zero'/'small', line 9 for 'none') -- the exact distinction the original version of this oracle could only note in prose.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed subject.gd and hand-traced all four inputs against lines 4-11: every reached/outcome pair for lines 5, 7, 9 (including 'big' leaving 7 and 9 unevaluated, and 'none' evaluating all three to false) matches the source. Header rule holds in every input. Driver passes. Nothing to correct.",
   "ambiguities": []
 }

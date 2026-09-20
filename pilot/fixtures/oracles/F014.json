@@ -38,6 +38,6 @@
   ],
   "notes": "Guards against a naive coverage tool that marks an entire function 'covered' once any line inside it is hit, rather than tracking which specific lines executed on a given call. Line 6 sits textually after the early return on line 5 and must read as unreached for the flag=true call despite line 5 (in the same function body) being hit. Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed subject.gd; hand-traced both inputs (line 5 return skips 6-7; falls_through reaches 6-7 and never 5); line-4 statement+if_true obligations consistent with the header rule. Driver passes. Nothing to correct.",
   "ambiguities": []
 }

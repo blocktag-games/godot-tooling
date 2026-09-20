@@ -20,7 +20,7 @@
   },
   "notes": "Another real, verified positive finding, like F003. Confirmed directly against the real gd-tools-cli 0.4.0 Python API: exactly one file (app.gd) selected from a three-file population.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed all four bound files and re-ran check.py against real gd-tools-cli 0.4.0: plan is exactly [res://app.gd], vendor.gd and tests/ excluded by defaults. Reproduces exactly; nothing to correct.",
   "ambiguities": [
     "Only default exclude/test_dir configuration was tested. gd-tools.toml supports custom exclude lists; a custom-configuration variant is unbuilt."
   ]

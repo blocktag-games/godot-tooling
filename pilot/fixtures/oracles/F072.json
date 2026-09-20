@@ -20,7 +20,7 @@
   },
   "notes": "This is a genuine negative finding, not a null result: the catalog's requirement asks for an EXPLICIT duplicate-handling policy, and gd-tools 0.4.0 has none -- its actual policy is 'sum everything, unconditionally,' which happens to be internally consistent (same rule as F070/F071) but provides no protection against or even awareness of duplicate input. This compounds with F069's finding (stale reports satisfy fresh checks with no warning): a CI pipeline that re-runs a failed upload step and ends up merging the same coverage file twice would see inflated-but-plausible-looking numbers with no error anywhere in the chain.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed run_a.json and check.py; re-ran check.py against the real merge CLI (3/3 pass: 3 -> 6, no warning). The negative finding reproduces exactly; nothing to correct.",
   "ambiguities": [
     "Only byte-identical duplicate files are tested (the same file path passed twice). A 'duplicate run' in the more interesting sense -- two DIFFERENT coverage-data files that both happen to represent the same underlying test execution (e.g. re-exported twice) -- is not distinguishable from a genuinely independent second run using gd-tools' current coverage-data format at all, since it carries no run-identity field; this fixture cannot test a distinction the format itself doesn't support."
   ]

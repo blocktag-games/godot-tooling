@@ -25,7 +25,7 @@
   ],
   "notes": "The coverage schema's hit obligations can only assert that each callback body ran at least once (line 6, 9, 12 all true) -- they cannot express the ORDER in which they ran, which is the actual requirement here ('lifecycle ordering'). A log side-channel (same technique as F013/F030) carries that ground truth instead: enter_tree fires when add_child() attaches the node to the live tree, ready fires once at the end of the frame in which the node entered the tree (confirmed empirically: NOT synchronously with add_child -- it requires awaiting a process_frame first), and exit_tree fires synchronously when remove_child() detaches the node. Confirmed on the pinned Godot 4.7.1 engine via this fixture's own driver.gd.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed subject.gd; lines 6/9/12 confirmed as the three callback bodies; re-ran driver.gd on the pinned engine, log order [enter_tree, ready, exit_tree] reproduces. Nothing to correct.",
   "ambiguities": [
     "Only the add/remove path is exercised, not queue_free()-driven removal (that overlaps with F048, deferred calls and queued deletion, which is a separate fixture). The schema still has no obligation kind for asserting call ORDER directly -- expected_log is fixture-specific, checked by the driver itself, not by pilot/harness/comparator.py, same gap already noted in F013's oracle."
   ]

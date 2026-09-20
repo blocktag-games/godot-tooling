@@ -36,6 +36,6 @@
   ],
   "notes": "Both ternary arms ('positive' and 'non_positive') are on the SAME physical line (4), so both inputs produce an identical whole-line statement hit -- a provider reporting only line-level coverage cannot distinguish these two inputs from each other on this line at all. The two branch obligations (ternary_true / ternary_false), both anchored to line 4 via evidence='branches' rather than 'hits' (per F022's schema fix), are what actually distinguish them. This is the sharpest demonstration yet of why 'reached' and 'outcome taken' need separate evidence: here there is only one 'reached' fact for both arms, entirely carried by the two independent branch facts. Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed subject.gd; both inputs' single line-4 statement plus the ternary_true/ternary_false branch pair checked against source. Driver passes. Nothing to correct.",
   "ambiguities": []
 }

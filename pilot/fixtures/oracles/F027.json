@@ -65,6 +65,6 @@
   ],
   "notes": "GDScript's match checks patterns in declaration order and stops at the first match, the same short-circuit structure as F022's elif chain -- confirmed here by the same reached/outcome pattern: 'one' never even checks the later two patterns (not reached), while 'other' reaches and evaluates both literal patterns (reached, not matched) before falling through to the catch-all. Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed subject.gd; hand-traced run(1)/run(2)/run(99) against lines 4-10, confirming the first-match short-circuit shape (later arms unreached after a match, all literal arms reached-but-unmatched before the catch-all). Driver passes. Nothing to correct.",
   "ambiguities": []
 }

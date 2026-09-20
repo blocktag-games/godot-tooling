@@ -56,6 +56,6 @@
   ],
   "notes": "Three inputs form the nested truth table (a=T/b=T, a=T/b=F, a=F -- b's value doesn't matter when a is false, deliberately set to true for 'neither' to prove the inner condition is never evaluated regardless of what it would have evaluated to, not coincidentally skipped because it would have been false anyway). Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd. Uses the reached/outcome (evidence='hits' vs 'branches') distinction from F022's schema fix: line 5's statement obligation is the direct test of this case's requirement -- reached=true for both/only_a (outer path included it), reached=false for neither (outer path excluded it entirely, structurally different from F022's elif short-circuit, which skips LATER alternatives after an earlier one matches, rather than skipping an inner block because an outer condition was false).",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed subject.gd and hand-traced both/only_a/neither against lines 4-8; the inner header (line 5) correctly reads reached-but-false for only_a and unreached for neither. Driver passes. Nothing to correct.",
   "ambiguities": []
 }

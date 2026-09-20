@@ -22,7 +22,7 @@
   },
   "notes": "Confirms the requirement directly: a real, deliberate application bug (wrong return value) that fails a correct assertion still yields a fully accurate coverage report for the code that executed. A related, distinct observation (not this fixture's requirement, but relevant to future harness work): F061's parse-failure run and this fixture's assertion-failure run both exit with the SAME code (1) -- gd-tools' process-level exit code does not by itself distinguish 'the source didn't even parse' from 'the code ran fine but an assertion was wrong' from (untested here) 'coverage collection itself broke'. A harness or CI integration that needs to tell these apart cannot rely on exit code alone and must inspect the actual output/artifacts, the same lesson F064 already established for 'zero tests ran' vs. a passing run.",
   "author": "godot-tooling-session-2026-09-19",
-  "reviewer": null,
+  "reviewer": "independent review agent (fable), 2026-09-19: re-hashed the bound files (subject returns 2, test expects 1) and re-ran the end-to-end check.py (5/5 pass: exit 1, real assertion failure, plan still tracks the file, line 4 still covered). Reproduces exactly; nothing to correct.",
   "ambiguities": [
     "Not tested here: a case where coverage COLLECTION itself fails (distinct from the parse failure already covered by F061) while the test assertion would otherwise have passed -- e.g. an instrumentation-specific crash on an otherwise-valid, otherwise-correct file. Whether that scenario is distinguishable from an ordinary assertion failure by exit code or diagnostic text is unverified."
   ]
