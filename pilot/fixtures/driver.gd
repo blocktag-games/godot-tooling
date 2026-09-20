@@ -66,6 +66,13 @@ func _initialize() -> void:
 	_check("F022", "run(0) third arm", f022.run(0), "zero")
 	_check("F022", "run(-5) no arm matched", f022.run(-5), "none")
 
+	# F023: nested decisions -- the inner if must not execute at all when
+	# the outer condition excludes it, not merely evaluate false.
+	var f023 = load("res://cases/f023_nested_decisions/subject.gd")
+	_check("F023", "run(true, true) both", f023.run(true, true), "both")
+	_check("F023", "run(true, false) only_a", f023.run(true, false), "only_a")
+	_check("F023", "run(false, true) neither, inner never reached", f023.run(false, true), "neither")
+
 	print("")
 	if failures.is_empty():
 		print("All tier-0 group 1 fixtures match their behavioral specification.")

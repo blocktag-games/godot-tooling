@@ -1,0 +1,61 @@
+{
+  "id": "F023",
+  "tier": 1,
+  "domain": "control_flow",
+  "case": "Nested decisions",
+  "requirement": "Inner decision does not execute when outer path excludes it",
+  "files": [
+    {
+      "path": "cases/f023_nested_decisions/subject.gd",
+      "sha256": "ac6bdf8ac7d6f9748f5788a842a789851d15209fd13d1f9364d9f93ee8f88fa6"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "both",
+      "call": "subject.gd:run(true, true)",
+      "expected_result": "both",
+      "obligations": [
+        { "file": "cases/f023_nested_decisions/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f023_nested_decisions/subject.gd", "line": 4, "kind": "branch", "branch_type": "if_true", "expected_hit": true },
+        { "file": "cases/f023_nested_decisions/subject.gd", "line": 5, "kind": "statement", "expected_hit": true, "note": "reached: outer condition was true, so the inner if IS entered" },
+        { "file": "cases/f023_nested_decisions/subject.gd", "line": 5, "kind": "branch", "branch_type": "if_true", "expected_hit": true },
+        { "file": "cases/f023_nested_decisions/subject.gd", "line": 6, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f023_nested_decisions/subject.gd", "line": 7, "kind": "statement", "expected_hit": false, "note": "never reached: function already returned at line 6" },
+        { "file": "cases/f023_nested_decisions/subject.gd", "line": 8, "kind": "statement", "expected_hit": false, "note": "never reached: function already returned inside the outer if block" }
+      ]
+    },
+    {
+      "name": "only_a",
+      "call": "subject.gd:run(true, false)",
+      "expected_result": "only_a",
+      "obligations": [
+        { "file": "cases/f023_nested_decisions/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f023_nested_decisions/subject.gd", "line": 4, "kind": "branch", "branch_type": "if_true", "expected_hit": true },
+        { "file": "cases/f023_nested_decisions/subject.gd", "line": 5, "kind": "statement", "expected_hit": true, "note": "reached: outer condition true, inner if IS entered/evaluated (just false)" },
+        { "file": "cases/f023_nested_decisions/subject.gd", "line": 5, "kind": "branch", "branch_type": "if_true", "expected_hit": false },
+        { "file": "cases/f023_nested_decisions/subject.gd", "line": 6, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f023_nested_decisions/subject.gd", "line": 7, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f023_nested_decisions/subject.gd", "line": 8, "kind": "statement", "expected_hit": false, "note": "never reached: returned at line 7, inside the outer if block" }
+      ]
+    },
+    {
+      "name": "neither",
+      "call": "subject.gd:run(false, true)",
+      "expected_result": "neither",
+      "obligations": [
+        { "file": "cases/f023_nested_decisions/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f023_nested_decisions/subject.gd", "line": 4, "kind": "branch", "branch_type": "if_true", "expected_hit": false },
+        { "file": "cases/f023_nested_decisions/subject.gd", "line": 5, "kind": "statement", "expected_hit": false, "note": "THE case this fixture exists for: outer condition is false, so the inner if is not entered AT ALL -- not 'entered and false', genuinely never reached. b=true here specifically to prove the inner condition's own truthiness is irrelevant; it's never even evaluated." },
+        { "file": "cases/f023_nested_decisions/subject.gd", "line": 5, "kind": "branch", "branch_type": "if_true", "expected_hit": false },
+        { "file": "cases/f023_nested_decisions/subject.gd", "line": 6, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f023_nested_decisions/subject.gd", "line": 7, "kind": "statement", "expected_hit": false },
+        { "file": "cases/f023_nested_decisions/subject.gd", "line": 8, "kind": "statement", "expected_hit": true }
+      ]
+    }
+  ],
+  "notes": "Three inputs form the nested truth table (a=T/b=T, a=T/b=F, a=F -- b's value doesn't matter when a is false, deliberately set to true for 'neither' to prove the inner condition is never evaluated regardless of what it would have evaluated to, not coincidentally skipped because it would have been false anyway). Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd. Uses the reached/outcome (evidence='hits' vs 'branches') distinction from F022's schema fix: line 5's statement obligation is the direct test of this case's requirement -- reached=true for both/only_a (outer path included it), reached=false for neither (outer path excluded it entirely, structurally different from F022's elif short-circuit, which skips LATER alternatives after an earlier one matches, rather than skipping an inner block because an outer condition was false).",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": []
+}
