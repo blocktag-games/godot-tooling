@@ -1,0 +1,61 @@
+{
+  "id": "F024",
+  "tier": 1,
+  "domain": "control_flow",
+  "case": "While loop zero/one/many iterations",
+  "requirement": "Loop entry/body/exit semantics and counts are explicit",
+  "files": [
+    {
+      "path": "cases/f024_while_loop_iteration/subject.gd",
+      "sha256": "e30a40383dd3dfa6d3220834ce4f995d1d2ec813af09223e0700c18240ddbb68"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "zero",
+      "call": "subject.gd:run(0)",
+      "expected_result": 0,
+      "obligations": [
+        { "file": "cases/f024_while_loop_iteration/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f024_while_loop_iteration/subject.gd", "line": 5, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f024_while_loop_iteration/subject.gd", "line": 6, "kind": "statement", "expected_hit": true, "note": "reached: the condition is evaluated once even for zero iterations" },
+        { "file": "cases/f024_while_loop_iteration/subject.gd", "line": 6, "kind": "branch", "branch_type": "loop_entered", "expected_hit": false, "expected_count": 0, "note": "the loop body was never entered" },
+        { "file": "cases/f024_while_loop_iteration/subject.gd", "line": 7, "kind": "statement", "expected_hit": false, "expected_count": 0 },
+        { "file": "cases/f024_while_loop_iteration/subject.gd", "line": 8, "kind": "statement", "expected_hit": false, "expected_count": 0 },
+        { "file": "cases/f024_while_loop_iteration/subject.gd", "line": 9, "kind": "statement", "expected_hit": true }
+      ]
+    },
+    {
+      "name": "one",
+      "call": "subject.gd:run(1)",
+      "expected_result": 0,
+      "obligations": [
+        { "file": "cases/f024_while_loop_iteration/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f024_while_loop_iteration/subject.gd", "line": 5, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f024_while_loop_iteration/subject.gd", "line": 6, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f024_while_loop_iteration/subject.gd", "line": 6, "kind": "branch", "branch_type": "loop_entered", "expected_hit": true, "expected_count": 1 },
+        { "file": "cases/f024_while_loop_iteration/subject.gd", "line": 7, "kind": "statement", "expected_hit": true, "expected_count": 1 },
+        { "file": "cases/f024_while_loop_iteration/subject.gd", "line": 8, "kind": "statement", "expected_hit": true, "expected_count": 1 },
+        { "file": "cases/f024_while_loop_iteration/subject.gd", "line": 9, "kind": "statement", "expected_hit": true }
+      ]
+    },
+    {
+      "name": "many",
+      "call": "subject.gd:run(3)",
+      "expected_result": 3,
+      "obligations": [
+        { "file": "cases/f024_while_loop_iteration/subject.gd", "line": 4, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f024_while_loop_iteration/subject.gd", "line": 5, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f024_while_loop_iteration/subject.gd", "line": 6, "kind": "statement", "expected_hit": true },
+        { "file": "cases/f024_while_loop_iteration/subject.gd", "line": 6, "kind": "branch", "branch_type": "loop_entered", "expected_hit": true, "expected_count": 3 },
+        { "file": "cases/f024_while_loop_iteration/subject.gd", "line": 7, "kind": "statement", "expected_hit": true, "expected_count": 3 },
+        { "file": "cases/f024_while_loop_iteration/subject.gd", "line": 8, "kind": "statement", "expected_hit": true, "expected_count": 3 },
+        { "file": "cases/f024_while_loop_iteration/subject.gd", "line": 9, "kind": "statement", "expected_hit": true }
+      ]
+    }
+  ],
+  "notes": "Direct while-loop counterpart to F025's for-loop case. run(1) deliberately returns 0 (not an 'interesting' nonzero value) since the loop sums 0..n-1 -- the point of this input is exercising exactly one iteration, not producing a distinctive result; 'many' (n=3, sum 0+1+2=3) is what actually demonstrates count multiplication. Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd. The line-6 condition is a statement obligation (reached: true for all three, since the condition is always evaluated at least once even for zero iterations) plus a branch obligation with branch_type 'loop_entered' (was the body entered at all) -- distinct from F022/F023's if_true/elif_true, since a loop condition's 'true' outcome can occur multiple times per call, which expected_count captures directly on the branch obligation itself rather than needing a separate representation.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": []
+}

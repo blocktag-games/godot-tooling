@@ -23,6 +23,7 @@ which named inputs, bound to the fixture file's exact SHA-256 hash.
 | F025 | For loop zero/one/many elements | `cases/f025_for_loop_iteration/subject.gd` |
 | F022 | Elif chain (tier 1) | `cases/f022_elif_chain/subject.gd` |
 | F023 | Nested decisions (tier 1) | `cases/f023_nested_decisions/subject.gd` |
+| F024 | While loop zero/one/many iterations (tier 1) | `cases/f024_while_loop_iteration/subject.gd` |
 
 F022 is tier 1, not tier 0, but lives here since it's pure GDScript with no
 live-process/harness needs, matching this group. It's the first fixture

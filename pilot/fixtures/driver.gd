@@ -73,6 +73,12 @@ func _initialize() -> void:
 	_check("F023", "run(true, false) only_a", f023.run(true, false), "only_a")
 	_check("F023", "run(false, true) neither, inner never reached", f023.run(false, true), "neither")
 
+	# F024: while loop with zero, one, and many iterations.
+	var f024 = load("res://cases/f024_while_loop_iteration/subject.gd")
+	_check("F024", "run(0) zero iterations", f024.run(0), 0)
+	_check("F024", "run(1) one iteration", f024.run(1), 0)
+	_check("F024", "run(3) many iterations", f024.run(3), 3)
+
 	print("")
 	if failures.is_empty():
 		print("All tier-0 group 1 fixtures match their behavioral specification.")
