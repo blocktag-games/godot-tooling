@@ -94,6 +94,12 @@ func _initialize() -> void:
 	_check("F027", "run(2) second arm", f027.run(2), "two")
 	_check("F027", "run(99) fallback", f027.run(99), "other")
 
+	# F029: conditional expression (ternary) -- both arms live on one
+	# physical line, so a whole-line hit alone can't distinguish them.
+	var f029 = load("res://cases/f029_conditional_expression/subject.gd")
+	_check("F029", "run(5) true arm", f029.run(5), "positive")
+	_check("F029", "run(-5) false arm", f029.run(-5), "non_positive")
+
 	print("")
 	if failures.is_empty():
 		print("All tier-0 group 1 fixtures match their behavioral specification.")

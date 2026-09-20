@@ -27,7 +27,7 @@ F025	0	control_flow	For loop zero/one/many elements	Iteration and exhaustion obl
 F026	1	control_flow	Break and continue	Skipped statements and exit paths have correct hit states	branch_optional	Per-iteration trace	fixture-built
 F027	1	control_flow	Match and fallback	Reached arms and default behavior are distinguished	branch_optional	Inputs for each arm and fallback	fixture-built
 F028	2	control_flow	Match guards and patterns	Guard evaluation and selected arm follow pinned engine syntax	syntax_validated	Hand-traced guard inputs	planned
-F029	1	control_flow	Conditional expression	Selected expression arm is distinct from whole-line hit	branch_optional	Both values and expression obligations	planned
+F029	1	control_flow	Conditional expression	Selected expression arm is distinct from whole-line hit	branch_optional	Both values and expression obligations	fixture-built
 F030	1	control_flow	Short-circuit and/or	Unevaluated operand remains distinguishable from false operand	condition_optional	Operand side effects and truth table	planned
 F031	2	control_flow	Compound condition independence	Condition and MC/DC requirements are separate from decision coverage	condition_optional	Explicit independence pairs; no inferred support	planned
 F032	1	language	Static functions	Static entry/calls map to original source	all_supported	Known calls and return values	planned

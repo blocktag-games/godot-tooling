@@ -1,0 +1,41 @@
+{
+  "id": "F029",
+  "tier": 1,
+  "domain": "control_flow",
+  "case": "Conditional expression",
+  "requirement": "Selected expression arm is distinct from whole-line hit",
+  "files": [
+    {
+      "path": "cases/f029_conditional_expression/subject.gd",
+      "sha256": "11edfb3da93f95aa17acee26891a5acfb3a8c6f1afbb8c50b3c5ccd37e256c5b"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "positive",
+      "call": "subject.gd:run(5)",
+      "expected_result": "positive",
+      "obligations": [
+        { "file": "cases/f029_conditional_expression/subject.gd", "line": 4, "kind": "statement", "expected_hit": true, "note": "whole-line hit: true regardless of which arm ran -- this alone cannot tell you which string was selected" },
+        { "file": "cases/f029_conditional_expression/subject.gd", "line": 4, "kind": "branch", "branch_type": "ternary_true", "expected_hit": true },
+        { "file": "cases/f029_conditional_expression/subject.gd", "line": 4, "kind": "branch", "branch_type": "ternary_false", "expected_hit": false },
+        { "file": "cases/f029_conditional_expression/subject.gd", "line": 5, "kind": "statement", "expected_hit": true }
+      ]
+    },
+    {
+      "name": "non_positive",
+      "call": "subject.gd:run(-5)",
+      "expected_result": "non_positive",
+      "obligations": [
+        { "file": "cases/f029_conditional_expression/subject.gd", "line": 4, "kind": "statement", "expected_hit": true, "note": "same whole-line hit as the 'positive' input -- both arms live on this one physical line, which is exactly the gap this case tests" },
+        { "file": "cases/f029_conditional_expression/subject.gd", "line": 4, "kind": "branch", "branch_type": "ternary_true", "expected_hit": false },
+        { "file": "cases/f029_conditional_expression/subject.gd", "line": 4, "kind": "branch", "branch_type": "ternary_false", "expected_hit": true },
+        { "file": "cases/f029_conditional_expression/subject.gd", "line": 5, "kind": "statement", "expected_hit": true }
+      ]
+    }
+  ],
+  "notes": "Both ternary arms ('positive' and 'non_positive') are on the SAME physical line (4), so both inputs produce an identical whole-line statement hit -- a provider reporting only line-level coverage cannot distinguish these two inputs from each other on this line at all. The two branch obligations (ternary_true / ternary_false), both anchored to line 4 via evidence='branches' rather than 'hits' (per F022's schema fix), are what actually distinguish them. This is the sharpest demonstration yet of why 'reached' and 'outcome taken' need separate evidence: here there is only one 'reached' fact for both arms, entirely carried by the two independent branch facts. Confirmed on the pinned Godot 4.7.1 engine via pilot/fixtures/driver.gd.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": []
+}
