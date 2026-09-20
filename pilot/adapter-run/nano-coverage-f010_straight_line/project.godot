@@ -1,0 +1,6 @@
+config_version=5
+
+[application]
+
+config/name="bp05-nano-coverage-f010"
+config/features=PackedStringArray("4.7")

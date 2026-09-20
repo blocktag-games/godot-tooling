@@ -176,6 +176,16 @@ pilot/godot/*
 pilot/adapter-run/*/addons/
 pilot/adapter-run/*/.godot/
 
+# BP05 candidate source clones (Nano Coverage's full checkout with
+# godot-cpp/tree-sitter/gdUnit4 submodules is ~460MB, and it's a git
+# clone with its own .git/, so it can't be partially un-ignored).
+# Findings, exact commit hashes, and build commands are recorded in
+# nano-coverage-godot-PIN.md (a sibling file, not inside the ignored
+# clone) instead of vendoring the source tree or compiled binaries.
+pilot/candidates/nano-coverage-godot/
+pilot/adapter-run/nano-coverage-*/addons/
+pilot/adapter-run/nano-coverage-*/.godot/
+
 # Rope project settings
 .ropeproject
 
