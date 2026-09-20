@@ -13,7 +13,7 @@ Frozen 2026-09-19. This is the completion evidence for [BP01](implementation-pla
 | RAM | 62 GiB |
 | Pinned date | 2026-09-19 |
 
-This machine is a development workstation, not an isolated benchmark host. Background load, thermal throttling, and shared-resource contention are not controlled. Treat any timing collected here as pilot/smoke evidence only, per the study plan's caution against confusing a development session with a controlled performance run. Dedicated hardware and additional OS coverage (Windows/macOS) remain unconfirmed — tracked as unavailable modes below and left to BP12.
+This machine is a development workstation, not an isolated benchmark host. Background load, thermal throttling, and shared-resource contention are not controlled. Treat any timing collected here as pilot/smoke evidence only, per the study plan's caution against confusing a development session with a controlled performance run. This is the only machine this study uses; dedicated hardware and additional OS coverage (Windows/macOS) are explicitly descoped (2026-09-20, see implementation-plan.md's BP12 row) rather than pending -- tracked as a permanent unavailable mode below, not a gap awaiting resolution.
 
 ## Engine
 
@@ -78,13 +78,13 @@ BP05 (remaining candidates: Nano Coverage, godot-code-coverage, GdUnit4 Coverage
 
 Recorded now so later results aren't mistaken for broader coverage than they are:
 
-- **Operating systems:** Linux only. Windows and macOS are unconfirmed and deferred to BP12; nothing here should be read as cross-platform evidence.
+- **Operating systems:** Linux only, permanently -- an explicit scope decision (2026-09-20), not a deferral. Windows and macOS are out of scope for this study; nothing here should be read as cross-platform evidence, and none is planned.
 - **Engine variant:** standard GDScript build only. The mono (C#) build is not pinned; C# tooling (Coverlet, GdUnit4Net, GoDotTest) stays an adjacent/later study per the study plan's scope section.
 - **Hardware:** shared development workstation, not a dedicated/controlled benchmark machine. No thermal, background-load, or scheduling isolation. Any timing from this machine is pilot/smoke evidence, not a performance-study result.
 - **GdUnit4 Coverage:** deferred entirely. Its measurement engine is closed source and requires a patched Godot build outside this pin; it remains a BP05 feature comparator, not part of the correctness pilot.
 - **Nano Coverage disk-instrumentation mode:** not pinned yet. Disk-mode-specific fixtures (F075, F079) require their own environment note when Nano is evaluated in BP05.
 - **godot-code-coverage:** not pinned yet; scheduled for BP05.
-- **PyCharm/debugger integration:** out of scope until BP11. No IDE build or plugin version is pinned here.
+- **Debugger integration (Godot Editor primary; VS Code `godot-tools` optional secondary; JetBrains/PyCharm dropped from scope 2026-09-20):** out of scope until BP11. No editor/IDE build or plugin version is pinned here.
 
 ## Reproduction
 

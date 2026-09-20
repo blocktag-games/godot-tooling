@@ -87,7 +87,7 @@ Use a short initial capture to identify a candidate bottleneck, then rerun that 
 
 For manual external launch, Godot provides `--remote-debug` and `--profiling`. A receiving debugger must be configured appropriately and the capture must be inspected. The debugger connection is distinct from the IDE's DAP endpoint. The flag is not a promise of a standalone machine-readable script-profile file. Use the editor workflow first; building an automated script-profile exporter would require an additional verified capture/integration path. [Command-line reference](https://docs.godotengine.org/en/4.7/tutorials/editor/command_line_tutorial.html)
 
-PyCharm can remain the editing environment while Godot or an external profiler performs capture. PyCharm's Python profiler does not automatically profile GDScript. DAP debugging and coverage navigation remain separate integration capabilities to verify.
+The editing environment (the Godot Editor, primarily; an external editor such as VS Code if pursued as a secondary target) is separate from whatever performs profiling capture -- an editor's own general-purpose profiler, if it has one, does not automatically profile GDScript running inside Godot. DAP debugging and coverage navigation remain separate integration capabilities to verify, primarily against the Godot Editor's own built-in debugger (see BP11).
 
 ## 3. Separate script/physics work from rendering
 

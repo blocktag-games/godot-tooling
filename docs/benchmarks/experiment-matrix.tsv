@@ -20,10 +20,10 @@ E18	harness_profile	RQ4;RQ5	BP08	W00;W01;W13;W17	python_profile_available	cProfi
 E19	observer_pilot	RQ5	BP08	W01;W03;W11	selected_factorial_available	Eight H/C/P conditions; two sessions five blocks proposed	Equivalent child command; all condition outcomes retained	planned
 E20	observer_main	RQ5	BP09	W01;W03;W11	selected_factorial_eligible	Selected combinations only; ten sessions six blocks proposed	Frozen contrasts and session-level uncertainty	planned
 E21	profiler_sensitivity	RQ5	BP08;BP09	W03;W11	sampling_available	Separate sampling-rate/marker-density sweep	Requested/achieved settings and loss known	planned
-E22	developer_integration	RQ6	BP11	W11	ide_debugger_available	Godot/PyCharm launch attach steps failed test and gutters	Exact IDE/plugin build and original-source transcript	planned
+E22	developer_integration	RQ6	BP11	W11	ide_debugger_available	Godot Editor (built-in debugger, primary) launch attach steps failed test and gutters; VS Code godot-tools optional secondary	Exact editor/plugin build and original-source transcript	planned
 E23	rendered_export	RQ3;RQ6	BP06;BP07	W15;W16	render_export_available	Rendered/debug-export/release-export as separate strata	Template renderer display settings and behavior verified	planned
 E24	feature_comparator	RQ1;RQ2;RQ6	BP05;BP06	W11	gdunit4_coverage_available	Within-limit feature checks plus explicit limit boundary	Matched permitted binaries; no unrestricted scaling claim	planned
-E25	portability	RQ1;RQ2;RQ6	BP12	W01;W11	platform_available	Clean additional OS correctness; optional controlled performance	Named environment; no pooling unlike machines	planned
-E26	real_project	RQ3;RQ6	BP07;BP12	W12	case_study_available	Public reproducible case after core corpus	Pinned assets/license and scenario; limited generalization	planned
+E25	portability	RQ1;RQ2;RQ6	BP12	W01;W11	platform_available	Clean additional OS correctness; optional controlled performance	Named environment; no pooling unlike machines	descoped
+E26	real_project	RQ3;RQ6	BP07	W12	case_study_available	Public reproducible case after core corpus	Pinned assets/license and scenario; limited generalization	planned
 E27	publication_rebuild	RQ6;RQ7	BP13	none	all_artifacts	Fresh environment regenerates tables and figures from archived data	Hashes scheduled-cell accounting and identical derived values	planned
 E28	future_synthesis	RQ5;RQ7	BP13	none	independent_studies_available	Structured evidence table then optional compatible-study synthesis	Study-level independence and estimand compatibility reviewed	planned

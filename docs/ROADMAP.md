@@ -1,12 +1,12 @@
 # Godot Tooling roadmap
 
-Trustworthy GDScript coverage is the first priority. Live debugging, PyCharm integration, and profiling are requested feature areas. The benchmark should also investigate its own measurement overhead and produce evidence suitable for public release.
+Trustworthy GDScript coverage is the first priority. Live debugging (primarily via the Godot Editor's own built-in debugger, the dominant real-world GDScript workflow) and profiling are requested feature areas. The benchmark should also investigate its own measurement overhead and produce evidence suitable for public release.
 
 | Milestone | Status | Deliverable |
 | --- | --- | --- |
 | 1. Survey the ecosystem | Complete: documentary research and selected source inspection | [Survey](research/2026-09-06-godot-tooling-survey.md) and [inventory](research/2026-09-06-godot-tooling-inventory.tsv). |
 | 2. Evaluate coverage and measurement quality | BP01-BP05 all closed. godot-code-coverage confirmed incompatible with Godot 4.7.1; Nano Coverage builds and loads but its headless API crashes; GdUnit4 confirmed working. BP06 (full tier-1 corpus) scope set from these results, not pre-committed -- see implementation-plan.md. | Shared correctness corpus, controlled performance study, profiling/observer experiments, and reproducible public report. |
-| 3. Verify PyCharm integration | Planned within benchmark integration lane; unverified | Reproducible launch/attach, selected-test debugging, and original-source navigation. |
+| 3. Verify debugger integration | Planned within benchmark integration lane; unverified. Revised 2026-09-20: retargeted from PyCharm/JetBrains tooling to the Godot Editor's own built-in debugger (primary), with VS Code's `godot-tools` extension as an optional secondary target -- see implementation-plan.md's BP11 row for why. | Reproducible launch/attach, selected-test debugging, and original-source navigation. |
 | 4. Choose the contribution and architecture | Open, dependent on evidence | Decision to extend, integrate, or implement, with demonstrated requirements. |
 | 5. Prepare a first tooling release | Unscoped | Compatibility policy, installation, examples, and release checks for a demonstrated need. |
 
@@ -30,7 +30,7 @@ Milestone 2 progresses through these evidence gates:
 
 Profiling covers the application, native engine/extensions, collector, harness, and report processing. The [observer experiment](benchmarks/profiling-protocol.md) varies harness, coverage, and profiler settings to investigate measurement interactions. A later meta-analysis depends on independent compatible studies; it is not a prerequisite for publishing the first measurement-validity study.
 
-For PyCharm, investigate existing JetBrains Godot components and LSP4IJ with Godot's DAP service. Record the exact IDE edition/build and plugin versions. Demonstrate launch or attach, a verified breakpoint, stepping, variables, stack frames, and debugging a selected failing test. Evaluate coverage gutters and source mapping separately. A protocol or integration working in Rider does not establish PyCharm compatibility.
+JetBrains/PyCharm tooling is dropped from scope as of 2026-09-20: it was never the dominant real-world GDScript development environment, and the Godot Editor's own integrated debugger is. For the Godot Editor, record its exact build. Demonstrate launch or attach, a verified breakpoint against original source, stepping, variables, stack frames, and debugging a selected failing test. Evaluate coverage gutters and source mapping separately. If an external editor is pursued as a secondary target, VS Code's `godot-tools` extension is the candidate: it is an official godotengine-org project with a real Debug Adapter Protocol integration against Godot's own built-in debug server (confirmed 2026-09-20), not a third-party bridge requiring separate compatibility validation the way a JetBrains IDE would have.
 
 The architecture decision should compare upstream improvements, reusable adapters/packaging, and a new collector against accuracy, scope, installation, maintenance, performance, complete implementation openness, and IDE needs. Publishing the benchmark corpus is itself a useful open-source deliverable and may precede any new tooling implementation.
 

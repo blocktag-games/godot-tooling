@@ -15,7 +15,7 @@ The first public deliverable should be a reusable benchmark suite and an evidenc
 | RQ3 | What does coverage cost in realistic development workflows? | Paired timings, resource measurements, scaling curves, and uncertainty for specific tool/engine/runner combinations. |
 | RQ4 | Where does that cost arise? | Separate profiles of engine, scripts, collector, orchestration, and reporting, with phase and process attribution. |
 | RQ5 | How much do the harness and profiler perturb the benchmark? | Controlled experiments with harness, coverage, and profiler settings; independent timing checks and observer interaction estimates. |
-| RQ6 | Can developers reproduce the workflow across runners, IDEs, and machines? | Installation records, GUT/GdUnit4/manual execution, exact PyCharm builds, and independent reruns. |
+| RQ6 | Can developers reproduce the workflow across runners, editors, and machines? | Installation records, GUT/GdUnit4/manual execution, the Godot Editor's exact build (and, if pursued, an external editor's build/plugin versions), and independent reruns. |
 | RQ7 | What should this project build or contribute? | Decision record linking demonstrated gaps to upstream fixes, reusable adapters, or a new collector. |
 
 The public package comprises a versioned protocol, small readable correctness fixtures, deterministic performance workloads, tool adapters, raw observations, analysis code, and a report generated from those observations. This draft specifies those artifacts; it does not provide their executable implementation.
@@ -53,10 +53,10 @@ Use five study lanes:
 1. **Semantic correctness:** small programs with explicitly reviewed execution obligations. All collectors receive the same application sources and inputs where their contracts permit.
 2. **Workflow performance:** headless test suites, standalone scenes, fresh project import, repeated launches, and report generation. Performance eligibility is decided per workload after behavior and measurement checks.
 3. **Profiling and measurement validity:** diagnostic captures, harness calibration, and controlled overhead experiments on a smaller representative subset.
-4. **Developer integration:** Godot editor, live debugger, PyCharm, report navigation, and source mapping. Interactive timing is separate from automated throughput.
+4. **Developer integration:** the Godot Editor's built-in debugger (primary), report navigation, and source mapping; an external editor such as VS Code is an optional secondary target, not JetBrains tooling. Interactive timing is separate from automated throughput.
 5. **Portability and replication:** clean installations and correctness on additional operating systems, followed by performance replication on named hardware.
 
-Linux is the initial planning assumption because the current working environment is Linux. Available benchmark hardware, controlled machine time, and Windows/macOS access remain unconfirmed. Do not treat this development session or shared CI as a controlled performance run.
+Linux, on this one development workstation, is the study's scope for its full duration -- a deliberate decision (2026-09-20), not a placeholder awaiting Windows/macOS or additional-machine access (see implementation-plan.md's BP12 row, descoped). Do not treat this development session or shared CI as a controlled performance run.
 
 C#, native C++ coverage, mutation testing, static analyzer accuracy, GPU profiling, mobile/web targets, and a new IDE plugin remain adjacent or later studies. Preserve extension points and relevant evidence, but they are not prerequisites for the first GDScript coverage report. Exported-game support is an explicit capability question; unsupported collectors remain visible.
 

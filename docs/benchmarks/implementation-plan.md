@@ -16,9 +16,9 @@ Status on 19 September 2026: protocol and catalogs drafted; BP01 through BP06 ar
 | BP08 | Validate profiling and measure the harness. | BP03, BP07 | Null/CPU/wait/log/memory controls, independent timing cross-check, one useful script/native/harness capture where available, pilot observer matrix. | 3–6 days |
 | BP09 | Freeze main study and analysis. | BP06–BP08 | Tagged protocol and oracles, eligible cells, exact repetition/analysis rules, validated analysis on synthetic known data. | 1–3 days |
 | BP10 | Run controlled Linux study. | BP09 | Complete schedule/attempt accounting, raw artifacts, environment checks, independent sessions, generated result tables. | 3–5 calendar days plus machine time |
-| BP11 | Verify debugger and PyCharm workflow. | BP05, BP06 | Exact IDE build/plugins, launch/attach, verified original-source breakpoints, stepping/state, failed-test path, coverage navigation. | 2–5 days |
-| BP12 | Add OS and machine replication. | BP06, BP09; hardware access | Clean Windows/macOS correctness as available; separately labeled performance replication and deviations. | 2–5 days per environment |
-| BP13 | Write, review, and publish the study. | BP10, BP11; available BP12 evidence | Rebuildable report, complete artifacts, limitations, maintainer review material, independent reproduction record, architecture decision. | 3–6 days plus optional review window |
+| BP11 | Verify debugger workflow. | BP05, BP06 | Godot Editor's built-in debugger (primary, dominant real-world workflow): launch/attach, verified original-source breakpoints, stepping/state, failed-test path, coverage navigation. VS Code's `godot-tools` extension (secondary, optional): same checks via its DAP-based debugger, if pursued. Revised 2026-09-20 -- earlier drafts targeted PyCharm/JetBrains tooling, dropped entirely: the Godot Editor's own integrated debugger is what the large majority of GDScript developers actually use, and F057 (instrumentation shifts reported error lines) is directly testable against it without any external-IDE bridge layer in between. | 2–5 days |
+| BP12 | Add OS and machine replication. | BP06, BP09; hardware access | **Descoped 2026-09-20 -- explicit scope decision, not a pending gap.** This study targets one Linux workstation by design; the goal is an objective evaluation of the coverage tooling, not a cross-platform release engineering effort, and no second machine or OS is available or planned. BP13's published limitations section states this plainly (Linux-only, single machine) rather than treating it as unfinished work. If OS/machine access is ever obtained, this row can be reopened; nothing here should be read as inconclusive pending future replication. | Descoped |
+| BP13 | Write, review, and publish the study. | BP10, BP11 | Rebuildable report, complete artifacts, a limitations section stating Linux/single-machine scope plainly (BP12 descoped by decision, not incomplete), maintainer review material, independent reproduction record, architecture decision. | 3–6 days plus optional review window |
 
 These ranges are not a promised delivery date and do not include unlimited upstream debugging, new engine builds, or waiting for hardware/reviewers. Some work can overlap operationally, but no multi-person staffing is assumed. The first usable contribution is BP04, not completion of every catalog case.
 
@@ -58,7 +58,7 @@ Use routine CI for schema/link integrity, harness failure controls, a small base
 
 | Item | Current planning position | Resolve by |
 | --- | --- | --- |
-| Hardware and OS access | Linux first; controlled machine availability and Windows/macOS access unconfirmed. | BP01 and BP12 |
+| Hardware and OS access | Decided 2026-09-20, not merely unconfirmed: Linux only, this one development workstation only, for the study's full duration -- a deliberate scope choice (an objective tooling evaluation, not a cross-platform release effort), not a resourcing gap awaiting resolution. See BP12. | BP01; closed by BP12's descope |
 | Engine target | Godot 4.7.1 reference; exact binary/build still to pin. | BP01 |
 | Candidate installation budget | Initially one working day per configuration before recording unresolved setup and moving on; publish actual effort and follow-ups. | BP01 |
 | Oracle ambiguity | Record alternative contracts and defer universal claims; never derive truth from a favored collector. | BP02/BP06 |
@@ -67,7 +67,7 @@ Use routine CI for schema/link integrity, harness failure controls, a small base
 | Profiler access/build effort | Linux perf first if available; Godot/script and Python captures where feasible; Tracy is a separate build experiment. | BP08 |
 | Workload sizes and sample counts | Proposed defaults only; choose using pilot variance and cost, then freeze. | BP09 |
 | Public dataset hosting | GitHub release assets or a versioned archive, with hashes; provider undecided. | BP09/BP13 |
-| PyCharm support | Exact edition/build/plugins must be demonstrated; no assumption based on Rider. | BP11 |
+| Debugger under instrumentation | Godot Editor's built-in debugger is primary and required; F057 already shows instrumentation shifts reported error lines, so whether breakpoint binding is similarly affected is a real open question, not assumed either way. JetBrains/PyCharm dropped from scope 2026-09-20 -- not the dominant real-world GDScript workflow. VS Code's `godot-tools` extension (confirmed 2026-09-20: an official godotengine-org project, real DAP-based launch/attach/breakpoints/stepping/variables) may be added as an optional secondary target. | BP11 |
 | Independent review | Oracle review and reproduction participation to recruit when artifacts exist. | BP06/BP13 |
 | New tool architecture | Remains open pending evidence; upstream contribution is a valid outcome. | BP13 |
 
