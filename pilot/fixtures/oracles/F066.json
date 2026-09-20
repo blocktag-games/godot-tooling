@@ -1,0 +1,35 @@
+{
+  "id": "F066",
+  "tier": 1,
+  "domain": "failures",
+  "case": "Forced termination or crash",
+  "requirement": "Partial evidence and next-start recovery are explicit",
+  "files": [
+    { "path": "../../adapter-run/f066_forced_termination_crash/subject/subject.gd", "sha256": "2c5b73b27966732f2c3d63df08b10c2e9fcaea3b4075c5bb212e07d924a26fa9" },
+    { "path": "../../adapter-run/f066_forced_termination_crash/tests/test_subject.gd", "sha256": "bee4924d23be6d98375ec4dc5b940b98f9d959e8a2457b26bd04a906b604181d", "note": "Deliberately slow (OS.delay_msec(15000)) so check.py has a real window to find and SIGKILL the Godot process externally, mid-run -- simulating an OOM-kill or operator kill, not a graceful interruption gd-tools itself could catch." },
+    { "path": "../../adapter-run/f066_forced_termination_crash/check.py", "sha256": "c3ab21d9a2f174a82b82ba7dac0b383818be796838a72f98b5692390e04acf3b" }
+  ],
+  "inputs": [
+    { "name": "default", "call": "check.py -> real gd-tools test --coverage, SIGKILL sent directly to the Godot process (found via `ps`, by command line) once it's confirmed running, then a fresh recovery run with no manual cleanup (gd-tools-cli 0.4.0 + GUT v9.7.1)" }
+  ],
+  "measured_with_gd_tools_0_4_0": {
+    "crash_mechanism": "os.kill(godot_pid, 9) sent externally to the Godot process while it is inside OS.delay_msec(15000), from outside gd-tools' own process tree -- not something gd-tools could intercept or handle gracefully",
+    "artifacts_after_crash": {
+      "plan.json": "present (written before the test run starts)",
+      "coverage.json": "absent (only written by post_run_hook.gd on normal completion)",
+      "results.xml": "absent (JUnit output, also only written on normal completion)"
+    },
+    "gd_tools_stderr": "Error: JUnit XML file not found: .../.gd-tools/results.xml\nGodot exit code: -9",
+    "gd_tools_stdout_has_no_fabricated_pass_summary": true,
+    "recovery_run_after_no_cleanup": "1/1 passed, coverage.json regenerated correctly",
+    "requirement_met": true,
+    "finding": "After a forced SIGKILL of the Godot process, the only artifact present is the one written BEFORE the run started (plan.json) -- coverage.json and results.xml are simply absent, not corrupted or fabricated. gd-tools' own wrapper detects the missing JUnit report and reports the real crash exit code (-9) to stderr rather than printing any pass/fail summary that could be mistaken for a completed run. A completely fresh run afterward, with the crashed run's stale plan.json left in place (no manual cleanup performed), succeeds normally and regenerates coverage.json correctly -- recovery requires no special handling."
+  },
+  "notes": "Distinct from F065 (graceful interrupted run, a SIGTERM sent to a Python subprocess simulation that gets a chance to write a partial artifact) -- F066 uses SIGKILL against the REAL Godot process, which cannot catch or react to the signal at all, and is checked against the real, pinned gd-tools-cli 0.4.0 + GUT v9.7.1, not a synthetic stand-in. The absence of coverage.json/results.xml after the crash is the correct behavior per the project's established 'unknown differs from measured zero' convention (F001, F003, F008): a caller inspecting .gd-tools/ after this crash sees a real plan.json (so the intended scope is known) but no coverage data at all (so nothing can be mistaken for 0% or 100% coverage) -- the absence itself is the honest signal, not a defect to fix. The `ps`-based process discovery matches by both this fixture's own path AND `gut_cmdln.gd` specifically, to avoid ever accidentally killing the earlier `--import` step's Godot process instead of the actual test-run process.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "Only a SIGKILL sent directly to the Godot process is tested. A crash of the gd-tools Python wrapper process itself (its parent), or an OS-level crash affecting both processes simultaneously (e.g. the machine losing power), would leave different partial state (e.g. plan.json's write could itself be interrupted mid-write, unlike here where it always completes before the slow test even starts) -- not tested.",
+    "The `ps`-based Godot-process discovery has a small window (up to 25s, polled every 0.2s) where a heavily loaded machine could delay the test process's appearance past the polling deadline, causing a false 'process never appeared' failure rather than a true negative finding -- observed to complete reliably in about 5-10s on this machine across two consecutive runs, but not stress-tested under load."
+  ]
+}

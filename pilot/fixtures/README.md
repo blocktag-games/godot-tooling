@@ -250,19 +250,30 @@ cd ../../adapter-run/f080_gut_gdunit4_parity && python3 check.py
 
 # F081: real gd-tools-cli 0.4.0, GUT reference + a from-scratch manual driver
 cd ../f081_standalone_manual_driver && python3 check.py
+
+# F066/F067: real gd-tools-cli 0.4.0 + GUT v9.7.1, real process signaling
+# (each takes ~15-40s: a deliberately slow test gives a real window to
+# find and kill the Godot process externally)
+cd ../f066_forced_termination_crash && python3 check.py
+cd ../f067_timeout_with_child_processes && python3 check.py
 ```
 
-F061-F076's failures/merge/robustness fixtures follow the F005/F071
-pattern throughout: real end-to-end `gd-tools test --coverage` (or
-`coverage merge`) runs, never a reimplementation or a mock of the
-tool's behavior. Six of the eight (F063, F068, F069, F072, F075, F076)
-match their requirement or (F069, F072) surface a genuine negative
-finding; F061/F063/F068/F075/F076 are clean passes. F066 (forced
-termination/crash), F067 (timeout with child processes), F080 (GUT/
-GdUnit4 parity), and F081 (standalone/manual driver) remain `planned`
--- each needs process-control or second-runner infrastructure this
-session deliberately did not build, rather than risk a half-finished
-result (see the BP06 row in implementation-plan.md).
+F061-F081's failures/merge/robustness/integration fixtures follow the
+F005/F071 pattern throughout: real end-to-end `gd-tools test --coverage`
+(or `coverage merge`) runs, never a reimplementation or a mock of the
+tool's behavior.
+
+| ID | Case | Directory | Real finding |
+| --- | --- | --- | --- |
+| F066 | Forced termination or crash (tier 1) | `pilot/adapter-run/f066_forced_termination_crash/` | Real gd-tools-cli 0.4.0 + GUT v9.7.1: a SIGKILL sent directly to the Godot process (simulating an OOM-kill, not a graceful interruption) leaves only the evidence written before the crash (`plan.json`) — `coverage.json`/`results.xml` are simply absent, never fabricated. gd-tools reports the real crash exit code (`-9`) to stderr. A fresh run afterward, with no manual cleanup, recovers and succeeds normally. |
+| F067 | Timeout with child processes (tier 1) | `pilot/adapter-run/f067_timeout_with_child_processes/` | Found and fixed a real defect in **this project's own harness**: `pilot/harness/runner.run()`'s timeout used plain `subprocess.run(..., timeout=...)`, which only kills the direct child — the Godot process gd-tools spawns as its own child was left orphaned and running after the harness's timeout fired. Fixed via `start_new_session=True` + `os.killpg()` on timeout; verified with both a real gd-tools/Godot run and a new harness self-test (`pilot/harness/self_test.py`). |
+
+Six of the eight failures/merge/robustness fixtures (F063, F068, F069,
+F072, F075, F076) match their requirement or (F069, F072) surface a
+genuine negative finding in gd-tools itself; F061/F063/F066/F068/F075/
+F076 are clean passes. F067's finding is in this project's own harness
+code, not a third-party tool -- fixed in the same commit as the
+fixture that found it.
 
 ## Status and open items
 

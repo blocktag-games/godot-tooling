@@ -1,0 +1,31 @@
+{
+  "id": "F067",
+  "tier": 1,
+  "domain": "failures",
+  "case": "Timeout with child processes",
+  "requirement": "Harness terminates/reaps owned work and retains failure outcome",
+  "files": [
+    { "path": "../../adapter-run/f067_timeout_with_child_processes/subject/subject.gd", "sha256": "2c5b73b27966732f2c3d63df08b10c2e9fcaea3b4075c5bb212e07d924a26fa9" },
+    { "path": "../../adapter-run/f067_timeout_with_child_processes/tests/test_subject.gd", "sha256": "7600864c7174810d7df5f166da42c979f85a8423d3c90a31558697da2fb5641b", "note": "Deliberately slow (OS.delay_msec(15000)) so a short harness timeout has a real window to fire while the Godot child process is still running." },
+    { "path": "../../adapter-run/f067_timeout_with_child_processes/check.py", "sha256": "b683d5b7e224ae36e01f361c64225bcb122c877b57034aff727d4fb10ac18893" },
+    { "path": "../../../harness/runner.py", "sha256": "9c13c351f9b5e21d1417304323f1f5fec3ed8dfe6f791f1751d2945862460d9a", "note": "The fixed version. run() now launches its target in a new process session (start_new_session=True) and, on timeout, kills the whole process GROUP via os.killpg(), not just the direct child." }
+  ],
+  "inputs": [
+    { "name": "default", "call": "check.py -> pilot/harness/runner.run([gd-tools, test, --coverage], timeout_s=3.0) against a test that takes >=15s, checked for orphaned Godot processes afterward (gd-tools-cli 0.4.0 + GUT v9.7.1)" }
+  ],
+  "measured_with_gd_tools_0_4_0": {
+    "harness_timeout_s": 3.0,
+    "actual_test_duration_s": ">=15 (OS.delay_msec)",
+    "run_result_timed_out": true,
+    "godot_process_orphaned_before_fix": true,
+    "godot_process_orphaned_after_fix": false,
+    "requirement_met": true,
+    "finding": "BEFORE the fix (a version of run() using plain subprocess.run(cmd, timeout=timeout_s)): when the harness-level timeout fired and killed the gd-tools process, the Godot process gd-tools had spawned as ITS OWN child (to actually run GUT) was left running, orphaned -- confirmed directly via `ps aux` showing the Godot process still alive well after run() returned with timed_out=True. This is a real, general Python subprocess.run() pitfall: TimeoutExpired's kill() only ever signals the direct child process object, never any descendants that child spawned. AFTER the fix (run() launches with start_new_session=True and kills the whole process group via os.killpg() on timeout): no orphan, confirmed by direct process inspection immediately after the timeout fires."
+  },
+  "notes": "This is the one fixture in the corpus whose 'real tool' isn't gd-tools or GUT -- it's this project's OWN harness code (pilot/harness/runner.py), and the defect found and fixed here is in code this project owns and controls, not a third-party finding to merely document. Fixed in the same commit as this fixture: run() now uses subprocess.Popen(..., start_new_session=True) instead of subprocess.run(..., timeout=...), and on subprocess.TimeoutExpired calls os.killpg(os.getpgid(proc.pid), signal.SIGKILL) to reach the entire process tree, not just the direct child. A new harness self-test (pilot/harness/self_test.py's test_run_kills_entire_process_tree_on_timeout) reproduces the same shape with two tiny synthetic Python scripts (no Godot dependency, so it stays fast) as a fast regression guard independent of this real-tool fixture. Verified no existing runner.run() caller (F065's check.py uses the separate run_and_terminate_on_marker function, unaffected; the self-test's own baseline/covered comparisons in test_null_adapter_shows_no_behavioral_difference use run() for single-process Python scripts with no children, unaffected by the process-group change) regressed after the fix.",
+  "author": "godot-tooling-session-2026-09-19",
+  "reviewer": null,
+  "ambiguities": [
+    "The synthetic self-test's original PID-liveness check (a single os.kill(pid, 0) immediately after the timeout) was genuinely flaky under system load -- SIGKILL delivery to a process group is not synchronous with os.killpg() returning, and a just-killed process can briefly remain visible as a zombie until reparented to init and reaped. Fixed by polling for up to 2s instead of checking once, confirmed stable across 5 consecutive runs afterward. The REAL-tool fixture (this file) does not share this risk in the same form, but does its own short polling loop for the same underlying reason (process death is never instantaneous from an external observer's perspective)."
+  ]
+}

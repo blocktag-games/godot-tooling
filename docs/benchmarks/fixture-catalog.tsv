@@ -62,8 +62,8 @@ F062	0	failures	Injected instrumentation failure	Collection failure cannot becom
 F063	1	failures	Application test failure	Application failure and coverage completeness remain independent	test_runner_supported	Deliberate failing assertion and known executed prefix	fixture-built
 F064	0	failures	Zero requested tests execute	Empty successful process cannot satisfy requested test execution	test_runner_supported	Requested selection and observed zero count	fixture-built
 F065	0	failures	Graceful interrupted run	Partial reports and source restoration follow termination contract	all_supported	Known interruption point and retained artifacts	fixture-built
-F066	1	failures	Forced termination or crash	Partial evidence and next-start recovery are explicit	all_supported	Owned process termination and recovery inspection	planned
-F067	1	failures	Timeout with child processes	Harness terminates/reaps owned work and retains failure outcome	child_process_supported	Synthetic child ownership and final process record	planned
+F066	1	failures	Forced termination or crash	Partial evidence and next-start recovery are explicit	all_supported	Owned process termination and recovery inspection	fixture-built
+F067	1	failures	Timeout with child processes	Harness terminates/reaps owned work and retains failure outcome	child_process_supported	Synthetic child ownership and final process record	fixture-built
 F068	1	failures	Truncated or malformed report	Parsing failure is not interpreted as zero or complete coverage	report_supported	Known malformed bytes and validator result	fixture-built
 F069	1	failures	Stale report from earlier run	Wrong-run artifacts cannot satisfy a fresh attempt	report_supported	Old artifact plus new isolated run identity	fixture-built
 F070	1	merge	Complementary run merge	Merged hit set equals defined union on identical source	merge_supported	Two known paths and exact source hashes	fixture-built

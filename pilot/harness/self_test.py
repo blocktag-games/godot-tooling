@@ -337,6 +337,74 @@ def test_null_adapter_shows_no_behavioral_difference() -> None:
             workspace.cleanup(ws_covered)
 
 
+def test_run_kills_entire_process_tree_on_timeout() -> None:
+    """F067's ground truth: run()'s timeout must reach a child process
+    spawned BY the command it launches (e.g. gd-tools test spawning a
+    Godot subprocess), not just the direct child. A plain
+    subprocess.run(..., timeout=...) only ever signals the direct child;
+    the grandchild is left orphaned and running. Uses two tiny synthetic
+    Python scripts (no Godot dependency) so this stays fast and
+    deterministic: a parent that spawns a child and then sleeps past the
+    timeout, and a child that just sleeps and can be checked for
+    liveness afterward via its own recorded PID.
+    """
+    import os
+    import time
+
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        child_pid_file = tmp / "child.pid"
+        child_script = tmp / "child.py"
+        child_script.write_text(
+            "import os, time, sys\n"
+            f"open({str(child_pid_file)!r}, 'w').write(str(os.getpid()))\n"
+            "time.sleep(30)\n"
+        )
+        parent_script = tmp / "parent.py"
+        parent_script.write_text(
+            "import subprocess, sys, time\n"
+            f"subprocess.Popen([sys.executable, {str(child_script)!r}])\n"
+            "time.sleep(30)\n"
+        )
+
+        result = run([sys.executable, str(parent_script)], cwd=str(tmp), timeout_s=1.5)
+        check("run_reports_timeout", result.timed_out, str(result))
+
+        # Give the killed child's PID file a moment to appear if the
+        # child were somehow still alive and only just now writing it
+        # (it shouldn't be -- this just avoids a race against a false
+        # pass on a slow CI machine).
+        deadline = time.monotonic() + 2.0
+        while not child_pid_file.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+        check("child_process_pid_was_recorded", child_pid_file.exists(), "child never started")
+
+        if child_pid_file.exists():
+            child_pid = int(child_pid_file.read_text())
+            # SIGKILL delivery to the process group is not synchronous
+            # with os.killpg() returning, and a just-killed process can
+            # briefly remain visible to os.kill(pid, 0) as a zombie
+            # until its new parent (init, after reparenting) reaps it.
+            # Poll briefly rather than checking exactly once -- checking
+            # once produced a real, observed flaky failure under system
+            # load (the process was reaped a few milliseconds later).
+            child_still_alive = True
+            liveness_deadline = time.monotonic() + 2.0
+            while time.monotonic() < liveness_deadline:
+                try:
+                    os.kill(child_pid, 0)
+                except ProcessLookupError:
+                    child_still_alive = False
+                    break
+                time.sleep(0.05)
+            check(
+                "child_process_reaped_not_orphaned",
+                not child_still_alive,
+                f"child pid {child_pid} is still running after run()'s timeout -- "
+                "orphaned, exactly the F067 defect this test guards against",
+            )
+
+
 def main() -> int:
     test_clean_report_matches()
     test_false_hit_detected()
@@ -353,6 +421,7 @@ def main() -> int:
     test_truncated_json_rejected()
     test_workspace_isolation_and_restoration_check()
     test_null_adapter_shows_no_behavioral_difference()
+    test_run_kills_entire_process_tree_on_timeout()
     print()
     if FAILURES:
         print(f"{len(FAILURES)} failure(s):")
