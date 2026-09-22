@@ -1,5 +1,7 @@
 # GDScript coverage tooling: an evidence-based evaluation
 
+*A shorter, plain-language version of this report, written for Godot developers rather than for tracing claims to data, is at [final-report-summary.md](final-report-summary.md).*
+
 **Status: study release, single machine.** Everything below is a demonstrated result, an inference, or a proposed decision, labeled as such per this document's own outline. Report generated 2026-09-21 against artifacts committed the same date; every quoted number is rebuildable from the source cited beside it.
 
 ## 1. Questions, configurations, and headline results
