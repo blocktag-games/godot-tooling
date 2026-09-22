@@ -1,0 +1,31 @@
+{
+  "id": "F082",
+  "tier": 2,
+  "domain": "robustness",
+  "case": "Debugger-protocol error-line accuracy under instrumentation",
+  "requirement": "A debugger observing a covered run reports the same source location as an uninstrumented run",
+  "files": [
+    { "path": "../../adapter-run/f082_debugger_error_line_accuracy/godot_debug_protocol.py", "note": "Minimal decoder for Godot's remote debug wire protocol, reverse-engineered against the pinned 4.7.1 binary (same protocol the Godot Editor's Debugger panel and VS Code's godot-tools extension speak)." },
+    { "path": "../../adapter-run/f082_debugger_error_line_accuracy/check.py", "note": "Builds its own scratch subject.gd (same deliberate division-by-zero as F057, TRUE_ERROR_LINE=4) for a raw-engine baseline, a real gd-tools/GUT scratch, and a real Nano Coverage/GdUnit4 scratch; runs each with --remote-debug attached to a real listener and decodes the resulting 'error' protocol message's source_line field." }
+  ],
+  "inputs": [
+    { "name": "default", "call": "check.py -> raw engine baseline, real gd-tools test --coverage (producing a real plan.json), real GdUnitCmdTool.gd run with Nano Coverage's session hook active -- three separate runs of the identical unmodified subject.gd" }
+  ],
+  "measured_with_gd_tools_0_4_0_and_nano_coverage": {
+    "true_source_line": 4,
+    "uninstrumented_debugger_protocol_reported_line": 4,
+    "gd_tools_debugger_protocol_reported_line": 5,
+    "nano_coverage_debugger_protocol_reported_line": 5,
+    "requirement_met": false,
+    "finding": "Godot's own remote debug protocol -- the exact structured 'error' message the Godot Editor's Debugger panel and VS Code's godot-tools extension both render, sent automatically the instant a debugger attaches, with no debugger-side configuration required -- reports a SHIFTED line (5, not the true 4) for the identical unmodified subject.gd's division-by-zero under EITHER candidate's coverage instrumentation. F057 had already shown this for gd-tools' raw stderr text; this fixture shows the SAME symptom (a) is visible at the debugger-protocol level, not just in stderr text, and (b) affects Nano Coverage too, which had never been checked. Nano Coverage's own reload-time parser warnings show the same two-pass pattern F057 documented for gd-tools (one INTEGER_DIVISION warning at line 4, a second at line 5), consistent with in-memory script re-instrumentation shifting line numbers by the same mechanism shape, though Nano Coverage's own native (GDExtension) instrumentation code was not directly inspected -- only its observed symptom.",
+    "scope_not_covered": "Explicit breakpoint BINDING (a developer's own -b flag or an Editor gutter click, and whether execution actually pauses at the intended original-source statement) was NOT tested: a real -b breakpoint did not activate against a minimal receive-only debug-protocol client built for this fixture (several variants tried: res:// path, absolute path, longer wait; none produced a debug_enter). Godot's real debugger clients (the Editor, godot-tools) evidently perform additional protocol-level configuration this project did not reverse-engineer. A real Godot Editor GUI session was not available either: no xdotool/scrot/import installed in this environment (would need sudo, not cached this session), and the only available X display is the user's own live interactive desktop -- not appropriate to launch automated GUI tests against without disrupting it."
+  },
+  "notes": "This is the debugger-protocol half of F057's own two-part framing (see F057.json's notes, which explicitly reserved this exact question -- 'whether a debugger's own breakpoint-binding logic... is similarly confused by the shift' -- for BP11). It answers a narrower, adjacent question (automatic error-break line accuracy, not explicit breakpoint binding) honestly rather than claiming the harder question closed. The automatic 'pause on unhandled error' debugger behavior requires no debugger-side setup and is exactly what a developer watching the Debugger panel during a covered test run would see fire -- so this finding is directly developer-relevant even though it stops short of full breakpoint-binding verification.",
+  "author": "godot-tooling-session-2026-09-21",
+  "reviewer": null,
+  "ambiguities": [
+    "Only a single-tracker file (one trackable statement, shift of exactly 1) is tested, same limitation F057 already noted for its own gd-tools-only version of this check.",
+    "Nano Coverage's own instrumentation mechanism was not directly inspected (native GDExtension, not GDScript) -- only its observed symptom, which matches gd-tools' shape. Whether the underlying mechanism is genuinely the same (in-memory source-text injection) or a different mechanism that happens to produce the same symptom was not determined.",
+    "Explicit breakpoint binding (this fixture's scope_not_covered) is a real, unresolved open question, not merely deferred paperwork -- BP13's limitations section should state it plainly."
+  ]
+}

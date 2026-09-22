@@ -88,3 +88,4 @@ F087	2	portability	Path spaces unicode and separators	Launch report paths and ma
 F088	2	portability	Debug and release export	Export capability and measurement semantics are established separately	export_supported	Pinned templates and standalone exported behavior	planned
 F089	2	portability	Fresh machine installation	Documented pinned setup yields the same small correctness case	platform_available	Installation log and reproduced case artifacts	planned
 F090	2	robustness	Test-order and seed reproducibility	Independent case union survives reversed order and repeated seed	test_runner_supported	Forward/reverse schedules and expected union	planned
+F082	2	robustness	Debugger-protocol error-line accuracy under instrumentation	A debugger observing a covered run reports the same source location as an uninstrumented run	all_supported	Debug-protocol capture against real gd-tools and real Nano Coverage; breakpoint binding not covered	fixture-built
