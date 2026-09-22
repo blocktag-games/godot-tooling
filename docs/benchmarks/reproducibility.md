@@ -1,6 +1,12 @@
 # Reproducibility and artifact contract
 
-This document specifies the proposed harness and data model. Directories, interfaces, schemas, and commands described as future work do not exist yet. The [implementation plan](implementation-plan.md) schedules them.
+This document specifies the proposed harness and data model. It predates BP01-BP13's actual implementation, whose real layout differs from the aspirational one below in the specific ways the status note lists. Not everything described here was built as specified; the [implementation plan](implementation-plan.md) is the authoritative record of what was actually done.
+
+## Status as of BP13 (2026-09-21)
+
+The isolation/lifecycle principles below (unique run identity, disposable workspaces, per-condition cache isolation, process-group-owned timeouts) ARE implemented, verified directly, and used throughout — see `pilot/harness/`, `pilot/performance/candidates.py`'s `isolate_user_dir_for_workload`, and `pilot/performance/quiescence.py`. The specific proposed bundle layout in "Proposed release layout" below was NOT built as specified; the real layout is flatter and TSV/JSON-based rather than the `runs/<run-id>/` tree shown there. See `docs/benchmarks/artifacts-manifest.md` for what actually exists and how to rebuild it, and `final-report.md` for the study this data supports.
+
+**Reproduction actually performed** (not merely instructed): as part of preparing `final-report.md`, `pilot/performance/pilot_report.py` and `pilot/performance/main_study_report.py` were both re-run against the already-committed raw TSVs in the same session that wrote this document, and their fresh output was diffed against the previously-committed report text with no discrepancy. `pilot/adapter-run/f057_instrumentation_shifts_error_lines/check.py` and the new `pilot/adapter-run/f082_debugger_error_line_accuracy/check.py` were both run from a clean scratch state (prior `.gd-tools`/`.godot` state removed first) and reproduced their documented results. This satisfies "at least one separately recorded clean-environment reproduction" for these specific artifacts; it is not an INDEPENDENT (different person/machine) reproduction, which remains open.
 
 ## Architecture and adapter boundary
 

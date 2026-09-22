@@ -20,6 +20,8 @@ The first public deliverable should be a reusable benchmark suite and an evidenc
 
 The public package comprises a versioned protocol, small readable correctness fixtures, deterministic performance workloads, tool adapters, raw observations, analysis code, and a report generated from those observations. This draft specifies those artifacts; it does not provide their executable implementation.
 
+**Study released 2026-09-21: [final-report.md](final-report.md) is the published study** (BP13) synthesizing everything below into the nine-section outline `publication-plan.md` specifies, with [maintainer-review-package.md](maintainer-review-package.md) (factual findings for tool maintainers, not yet sent), [architecture-decision.md](architecture-decision.md) (the resulting decision record), and [artifacts-manifest.md](artifacts-manifest.md) (hashes and provenance) alongside it.
+
 | Read next | Purpose |
 | --- | --- |
 | [Correctness protocol](correctness-protocol.md) | Independent truth, coverage semantics, behavior, failures, and scoring. |
